@@ -10,6 +10,10 @@ namespace HVAC_Checker
     {
         static void Main(string[] args)
         {
+
+
+            Math.Abs(3.14);
+
         }
     }
 }
