@@ -19,7 +19,7 @@ namespace HVAC_Checker
     
 
             //找到与风口相连的风机对象
-            static Fan GetFanFromAirterminal(AirTerminal airterminal)
+            static Fan GetFanConnectingAirterminal(AirTerminal airterminal)
             {
                 List<Fan> Fans = new List<Fan>();
                 return Fans;
