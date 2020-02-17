@@ -9,7 +9,7 @@ namespace HVAC_Checker
     class HVACFunction
     {
         //获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
-        static List<Room> GetRooms(string type, string name, double area, bool isUp)
+        static List<Room> GetRooms(string type, string name, double area, RoomPosition roomPosition)
         {
             List<Room> rooms = new List<Room>();
             return rooms;
@@ -19,44 +19,49 @@ namespace HVAC_Checker
     
 
             //找到与风口相连的风机对象
-            static List<Fan> GetFanIDFromAirterminal(string airterminalID)
+            static List<Fan> GetFanConnectingAirterminal(AirTerminal airterminal)
             {
                 List<Fan> Fans = new List<Fan>();
                 return Fans;
             }
 
             //找到风机的取风口或排风口对象
-            static List<AirTerminal> GetAirTerminalFromFan(string fanID)
+            static List<AirTerminal> GetExhaustAirTerminalsOfFan(Fan fan)
             {
                 List<AirTerminal> airTerminals = new List<AirTerminal>();
                 return airTerminals; 
             }
 
-            //找到大于一定长度的走道对象
+        //找到大于一定长度的走道对象
+        //找到一个风机的全部风口对象集合
+        static List<AirTerminal> GetAirTerminalsOfFan(Fan fan)
+        {
+            List<AirTerminal> airTerminals = new List<AirTerminal>();
 
-            //找到一个风系统的全部风口对象集合
-            static List<AirTerminal> GetOutletIDsFromDuctSysterm(string ductSystermID)
-            {
-                List<AirTerminal> airTerminals = new List<AirTerminal>();
-                return airTerminals;
-             }
+            return airTerminals;
+        }
 
-            //找到穿越某些房间的风管对象集合
-            static List<Duct> GetDuctIDsFromSpace(string spaceID)
-            {
-                List<Duct> ducts = new List<Duct>();
-                return ducts;
-            }
-            //找到穿越防火分区的风管对象集合
-            static List<Duct> GetDuctIDsFromFireDistrict(string spaceID)
-            {
-                List<Duct> ducts = new List<Duct>();
-                return ducts;
-            }
-        //找到穿越防火分隔处的变形缝两侧的风管集合
-        static List<Duct> GetDuctIDsFromFireSide(string spaceID)
+
+
+        //找到穿越某些房间的风管对象集合
+        static List<Duct> GetDuctsCrossSpace(Room room)
         {
             List<Duct> ducts = new List<Duct>();
+
+            return ducts;
+        }
+        //找到穿越防火分区的风管对象集合
+        static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
+        {
+            List<Duct> ducts = new List<Duct>();
+            return ducts;
+        }
+        //找到穿越防火分隔处的变形缝两侧的风管集合
+
+        static List<Duct> GetDuctsCrossFireSide()
+        {
+            List<Duct> ducts = new List<Duct>();
+
             return ducts;
         }
 
@@ -77,17 +82,25 @@ namespace HVAC_Checker
             return rooms;
         }
         //找到名称包含某一字段的房间对象集合
-        static List<Room> GetRoomsFromPartName(string roomName)
+        //找到名称包含某一字段的房间对象集合
+
+        static List<Room> GetRoomsContainingString(string containedString)
         {
+
             List<Room> rooms = new List<Room>();
+
             return rooms;
+
         }
 
-       // 判断房间属于地上房间或地下房间
-       static bool isUpRoom(Room room)
+        // 判断房间属于地上房间或地下房间
+        static bool isOvergroundRoom(Room room)
         {
+
             bool isUp = true;
+
             return isUp;
+
         }
         //获取所有楼层对象集合
         static List<Floor> GetFloors()
@@ -96,16 +109,19 @@ namespace HVAC_Checker
             return floors;
         }
         //获得风机所连接的所有风管集合
-        static List<Duct> GetDuctsFromFan(Fan fan)
+        static List<Duct> GetDuctsOfFan(Fan fan)
         {
             List<Duct> ducts = new List<Duct>();
             return ducts;
         }
         //判断是否风机所连风系统所有支路都连接了风口
-        static bool isLinkAirTerminal(Fan fan)
+        static bool isAllBranchLinkingAirTerminal(Fan fan)
         {
+
             bool isLink = true;
+
             return isLink;
+
         }
         //获得防烟分区长边长度
 
@@ -121,3 +137,4 @@ namespace HVAC_Checker
         }
     
 }
+enum RoomPosition { overground, underground, semi_underground }
