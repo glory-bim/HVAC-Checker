@@ -15,7 +15,7 @@ namespace HVAC_Checker
         {
             string type = "房间";
             string name = "CH/PH Stock 1";
-            double area = 0.0;
+            double area = 10.0;
             RoomPosition roomPosition = RoomPosition.overground;
             HVACFunction.GetRooms(type, name, area, roomPosition);
             Console.ReadLine();
