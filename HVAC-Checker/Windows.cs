@@ -8,5 +8,8 @@ namespace HVAC_Checker
 {
     class Windows
     {
+        long id;
+        double dArea;   
+
     }
 }
