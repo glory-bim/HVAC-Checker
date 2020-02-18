@@ -8,7 +8,11 @@ namespace HVAC_Checker
 {
     class Room
     {
-        List<string> ElementID;
-    
+        public
+        string type;
+        string name;
+        double area;
+        RoomPosition roomPosition;
+
     }
 }

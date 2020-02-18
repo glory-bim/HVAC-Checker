@@ -3,15 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SQLite;
+using System.IO;
 
 namespace HVAC_Checker
 {
     class HVACFunction
     {
+         public
         //获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
         static List<Room> GetRooms(string type, string name, double area, RoomPosition roomPosition)
         {
             List<Room> rooms = new List<Room>();
+            dynamic ProgramType = (new Program()).GetType();
+
+            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
+            int iSub = currentDirectory.IndexOf("\\bin");
+            currentDirectory = currentDirectory.Substring(0, iSub);
+            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
+
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+               return rooms;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);            
+            m_dbConnection.Open();          
+            string sql = "select * from Spaces Where userLabel = ";
+            sql = sql + "'"+type+"'";
+            sql = sql + "and name = " ;
+            sql = sql + "'" + name + "'";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+                Console.WriteLine("书名: " + reader["userLabel"]);
+                Room room = new Room();
+            
+
+            //关闭连接
+            m_dbConnection.Close();
+      
+
+
+
+
+
             return rooms;
         }
 
@@ -78,7 +115,33 @@ namespace HVAC_Checker
         //找到属于某种类型的房间对象集合
         static List<Room> GetRooms(string roomType)
         {
+        
+
             List<Room> rooms = new List<Room>();
+            dynamic ProgramType = (new Program()).GetType();
+
+            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
+            int iSub = currentDirectory.IndexOf("\\bin");
+            currentDirectory = currentDirectory.Substring(0, iSub);
+            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
+
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return rooms;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Spaces Where userLabel = ";
+            sql = sql + "'" + roomType + "'";
+           
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+                Console.WriteLine("书名: " + reader["userLabel"]);
+                Room room = new Room();
+                rooms.Add(room);
             return rooms;
         }
         //找到名称包含某一字段的房间对象集合
