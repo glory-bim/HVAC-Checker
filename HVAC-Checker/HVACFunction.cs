@@ -1,12 +1,13 @@
-﻿using System;
+﻿//#define RELEASE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.IO;
-
-namespace HVAC_Checker
+#if RELEASE
+namespace HVAC_CheckEngine
 {
     class HVACFunction
     {
@@ -198,6 +199,7 @@ namespace HVAC_Checker
             //生成审查结果
             //各条文审查子函数
         }
-    
+    enum RoomPosition { overground, underground, semi_underground }
 }
-enum RoomPosition { overground, underground, semi_underground }
+
+#endif

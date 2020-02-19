@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
-    class Class1
+    class HVACChecker
     {
+        public string runHVACCheck(string[] xdbPaths)
+        {
+            HVACFunction.HVACXdbPath = xdbPaths[0];
+            HVACFunction.ArchXdbPath = xdbPaths[1];
+        }
     }
 }
