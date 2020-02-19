@@ -17,7 +17,14 @@ namespace HVAC_Checker
             string name = "CH/PH Stock 1";
             double area = 10.0;
             RoomPosition roomPosition = RoomPosition.overground;
-            HVACFunction.GetRooms(type, name, area, roomPosition);
+            // HVACFunction.GetRooms(type, name, area, roomPosition);
+            Windows window = new Windows();
+            window.SetID(322);
+            // HVACFunction.GetArea(window);
+            List<Floor> floors = HVACFunction.GetFloors();
+            string containedString = "Lea";
+            
+           List<Room> rooms = HVACFunction.GetRoomsContainingString(containedString);
             Console.ReadLine();
         }
     }

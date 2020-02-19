@@ -8,8 +8,17 @@ namespace HVAC_Checker
 {
     class Windows
     {
-        long id;
-        double dArea;   
+        long m_id;
+        double m_dArea;
+        public long GetID()
+        {
+            return m_id;
+        }
+        public void SetID(long id)
+        {
+            m_id = id;
+        }
+
 
     }
 }

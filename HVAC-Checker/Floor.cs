@@ -8,5 +8,15 @@ namespace HVAC_Checker
 {
     class Floor
     {
+
+        private string m_storeyName;
+        public string GetStoreyName()
+        {
+            return m_storeyName;
+        }
+        public void SetStoreyName(string storeyName)
+        {
+            m_storeyName = storeyName;
+        }
     }
 }

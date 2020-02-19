@@ -10,9 +10,18 @@ namespace HVAC_Checker
     {
         public
         string type;
-        string name;
+        string m_name;
         double area;
         RoomPosition roomPosition;
+
+        public string GetName()
+        {
+            return m_name;
+        }
+        public void SetName(string Name)
+        {
+            m_name = Name;
+        }
 
     }
 }
