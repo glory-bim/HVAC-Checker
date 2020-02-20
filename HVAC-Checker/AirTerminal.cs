@@ -8,5 +8,6 @@ namespace HVAC_Checker
 {
     class AirTerminal
     {
+        public long Id;
     }
 }
