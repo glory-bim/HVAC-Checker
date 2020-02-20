@@ -315,149 +315,7 @@ namespace HVAC_Checker
             return xdbCurveLoops;
         }
 
-        /// <summary>
-        /// XDB二维点
-        /// </summary>
-        public class XDBUV
-        {
-            private static XDBUV m_zero = new XDBUV(0, 0);
-            /// <summary>
-            /// u
-            /// </summary>
-            public double u { get; set; }
-            /// <summary>
-            /// v
-            /// </summary>
-            public double v { get; set; }
-
-            /// <summary>
-            /// 创建一个默认的XDBUV使用值0，0
-            /// </summary>
-            public XDBUV() { u = 0; v = 0; }
-
-            /// <summary>
-            /// 创建一个带有指定值du，dv的XDBUV
-            /// </summary>
-            /// <param name="du">The first coordinate</param>
-            /// <param name="dv">The second coordinate</param>
-            public XDBUV(double du, double dv) { u = du; v = dv; }
-
-            /// <summary>
-            /// The coordinate origin or zero 2-D vector
-            /// </summary>
-            public static XDBUV Zero { get { return m_zero; } }
-        }
-        /// <summary>
-        /// 二维多段线
-        /// </summary>
-        public class XDB2DPolyLine : XDBCurve
-        {
-            /// <summary>
-            /// XDB多段线数据结构点，XDB2DPolyLine内部使用
-            /// </summary>
-            public class XDBPolyLinePoint2D
-            {
-                /// <summary>
-                /// 点
-                /// </summary>
-                public XDBUV pt { get; set; }
-                /// <summary>
-                /// 凸度
-                /// </summary>
-                public double bulge { get; set; }
-            }
-
-            private List<XDBPolyLinePoint2D> m_points = new List<XDBPolyLinePoint2D>();
-            private bool m_bIsClosed = false;
-            /// <summary>
-            /// 多段线点和凸度集合
-            /// </summary>
-            public List<XDBPolyLinePoint2D> points { get { return m_points; } set { m_points = value; } }
-
-            /// <summary>
-            /// 是否闭合
-            /// </summary>
-            public bool IsClosed { get { return m_bIsClosed; } set { m_bIsClosed = value; } }
-
-            /// <summary>
-            /// 添加多段线集合
-            /// </summary>
-            /// <param name="pt">要添加的多段线的点</param>
-            /// <param name="bulge">要添加的多段线的点的凸度，
-            /// 凸度是用于指定当前顶点的平滑性，其被定义为：选取顶点与下一个顶点形成的弧之间角度的四分之一的正切值。
-            /// 凸度可以用来设置多段线某一段的凸出参数，0表示直线，1表示半圆，介于0～1之间为劣弧，大于1为优弧</param>
-            public void addVertex(XDBUV pt, double bulge = 0)
-            {
-                XDBPolyLinePoint2D point = new XDBPolyLinePoint2D();
-                point.pt = new XDBUV(pt.u, pt.v);
-                point.bulge = bulge;
-
-                m_points.Add(point);
-            }
-
-            /// <summary>
-            /// 设置当前多段线是否闭合
-            /// </summary>
-            /// <param name="bClosed"></param>
-            public void SetClosed(bool bClosed)
-            {
-                m_bIsClosed = bClosed;
-            }
-        }
-
-        /// <summary>
-        /// 三维多段线
-        /// </summary>
-        public class XDB3DPolyLine : XDBCurve
-        {
-            /// <summary>
-            /// XDB多段线数据结构点，XDB3DPolyLine内部使用
-            /// </summary>
-            public class XDBPolyLinePoint3D
-            {
-                /// <summary>
-                /// 当前弧形所在多段线的索引值，从0开始
-                /// </summary>
-                public int hasArcIndex { get; set; }
-
-                /// <summary>
-                /// 圆弧上一点
-                /// </summary>
-                public XDBXYZ ptOnArc { get; set; }
-            }
-
-            private List<XDBXYZ> m_points = new List<XDBXYZ>();
-            private List<XDBPolyLinePoint3D> m_Index2Arc = new List<XDBPolyLinePoint3D>();
-
-            /// <summary>
-            /// 多段线点集合，只包含直线、弧线的起终点
-            /// </summary>
-            public List<XDBXYZ> points { get { return m_points; } set { m_points = value; } }
-
-            /// <summary>
-            /// 对于弧线，该属性记录了该弧线所在多段线的段标识等信息，具体请查看XDBPolyLinePoint3D
-            /// </summary>
-            public List<XDBPolyLinePoint3D> Index2Arc { get { return m_Index2Arc; } set { m_Index2Arc = value; } }
-
-            /// <summary>
-            /// 添加一个点到当前多段线上
-            /// </summary>
-            /// <param name="nIndex">当前要添加点所在多段线的索引，从0开始</param>
-            /// <param name="pt">要添加的坐标值</param>
-            /// <param name="ptOnArc">如果当前添加的是弧形段，则该项有值，添加的为弧形上一点的坐标</param>
-            public void appendVertex(int nIndex, XDBXYZ pt, XDBXYZ ptOnArc = null)
-            {
-                m_points.Add(pt);
-                if (null != ptOnArc)
-                {
-                    XDBPolyLinePoint3D point = new XDBPolyLinePoint3D();
-                    point.hasArcIndex = nIndex;
-                    point.ptOnArc = new XDBXYZ(ptOnArc.x, ptOnArc.y, ptOnArc.z);
-
-                    m_Index2Arc.Add(point);
-                }
-            }
-        }
+     
 
         /// <summary>
         /// 根据房间边界曲线，获得房间的包围盒（默认AABB）
@@ -552,6 +410,11 @@ namespace HVAC_Checker
     //6找到一个风机的全部末端风口对象集合
     public static List<AirTerminal> GetAirTerminalsOfFan(Fan fan)
     {
+
+
+
+
+
         List<AirTerminal> airTerminals = new List<AirTerminal>();
 
         return airTerminals;
@@ -733,8 +596,8 @@ namespace HVAC_Checker
 
         return floors;
     }
-    //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
-    static List<Duct> GetDuctsOfFan(Fan fan)
+        //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
+    public static List<Duct> GetDuctsOfFan(Fan fan)
     {
         List<Duct> ducts = new List<Duct>();
         return ducts;
