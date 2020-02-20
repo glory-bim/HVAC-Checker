@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
     class FireDistrict
     {
+        FireDistrict(long id)
+        {
+            Id = id;
+        }
+        public long Id { get; } = -1;
     }
 }
