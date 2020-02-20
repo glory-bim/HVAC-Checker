@@ -9,18 +9,28 @@ namespace HVAC_Checker
     class Room
     {
         public
-        string type;
-        string m_name;
-        double area;
-        RoomPosition roomPosition;
-
+            long m_longId;
+            string m_strType;
+            string m_strName;
+            double m_dArea;
+            RoomPosition m_eRoomPosition;
+        public string boundaryLoops { get; set; }
         public string GetName()
         {
-            return m_name;
+            return m_strName;
         }
-        public void SetName(string Name)
+        public void SetName(string name)
         {
-            m_name = Name;
+            m_strName = name;
+        }
+
+        public long GetId()
+        {
+            return m_longId;
+        }
+        public void SetId(long id)
+        {
+            m_longId = id;
         }
 
     }

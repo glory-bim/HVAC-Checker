@@ -23,8 +23,11 @@ namespace HVAC_Checker
             // HVACFunction.GetArea(window);
             List<Floor> floors = HVACFunction.GetFloors();
             string containedString = "Lea";
-            
-           List<Room> rooms = HVACFunction.GetRoomsContainingString(containedString);
+
+            // List<Room> rooms = HVACFunction.GetRoomsContainingString(containedString);
+            Room room = new Room();
+            room.SetId(573789);
+            List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
             Console.ReadLine();
         }
     }
