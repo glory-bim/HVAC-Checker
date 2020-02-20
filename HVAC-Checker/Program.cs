@@ -28,6 +28,11 @@ namespace HVAC_Checker
             Room room = new Room();
             room.SetId(573789);
             List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
+            airTerminals.Clear();
+
+            Fan fan = new Fan();
+            room.SetId(573789);
+            airTerminals = HVACFunction.GetAirTerminalsOfFan(fan);
             Console.ReadLine();
         }
     }

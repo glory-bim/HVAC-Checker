@@ -550,7 +550,7 @@ namespace HVAC_Checker
 
 
     //6找到一个风机的全部末端风口对象集合
-    static List<AirTerminal> GetAirTerminalsOfFan(Fan fan)
+    public static List<AirTerminal> GetAirTerminalsOfFan(Fan fan)
     {
         List<AirTerminal> airTerminals = new List<AirTerminal>();
 
@@ -559,22 +559,22 @@ namespace HVAC_Checker
 
 
 
-    //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
-    static List<Duct> GetDuctsCrossSpace(Room room)
+        //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
+    public static List<Duct> GetDuctsCrossSpace(Room room)
     {
         List<Duct> ducts = new List<Duct>();
 
         return ducts;
     }
-    //8找到穿越防火分区的风管对象集合  userlable
-    static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
+        //8找到穿越防火分区的风管对象集合  userlable
+    public static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
     {
         List<Duct> ducts = new List<Duct>();
         return ducts;
     }
-    //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
+        //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
 
-    static List<Duct> GetDuctsCrossFireSide()
+    public static List<Duct> GetDuctsCrossFireSide()
     {
         List<Duct> ducts = new List<Duct>();
 
