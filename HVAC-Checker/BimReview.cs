@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
 	struct ComponentAnnotation
 	{
@@ -20,7 +20,8 @@ namespace HVAC_Checker
 		public int compulsory;        //规范编号 
 		public string comment;       //审查意见  【xxx条通过】
 		public string standardCode; //规范编号  【3-2-1】
-		List<ComponentAnnotation> componentAnnotations;  // 构件批注【无】	
+		public bool isPassCheck;    //是否通过审查
+		List<ComponentAnnotation> violationComponent;  // 违规构建【无】	
 	};
 	class CheckResult
 	{
@@ -35,7 +36,8 @@ namespace HVAC_Checker
 			data.Add(bimReview);
 		}
 		public int state { get; set;}
-		public string message { get; set; }
 		List<BimReview> data;
+		public string message { get; set; }
+		
     }
 }
