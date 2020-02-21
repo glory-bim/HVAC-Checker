@@ -31,6 +31,7 @@ namespace HVAC_Checker
             airTerminals.Clear();
 
             Fan fan = new Fan();
+            fan.SetId(1230487612968402944);
             List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);
             Console.ReadLine();
         }

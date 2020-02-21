@@ -596,10 +596,52 @@ namespace HVAC_Checker
 
         return floors;
     }
+
+        private static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {
+           
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+
+                sql = "select * from Ducts Where Id = ";
+                sql += reader["linkElementId"].ToString();
+
+                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                while (readerDucts.Read())
+                {                  
+                    readerDucts["Id"].ToString();
+                    Duct duct = new Duct();
+                    
+                    ducts.Add(duct);
+                    FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+
+                }
+
+            }
+        }
+
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
     public static List<Duct> GetDuctsOfFan(Fan fan)
     {
-        List<Duct> ducts = new List<Duct>();
+            List<Duct> ducts = new List<Duct>();
+            string strDbName = "/测试.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return ducts;
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            //创建一个连接
+            FindDucts(dbConnection,fan.GetId().ToString(),ducts);
+
+            //关闭连接
+            dbConnection.Close();          
         return ducts;
     }
     //17判断是否风机所连风系统所有支路都连接了风口  //管堵
