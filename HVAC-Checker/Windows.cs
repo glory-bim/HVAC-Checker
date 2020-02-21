@@ -8,17 +8,27 @@ namespace HVAC_CheckEngine
 {
     class Windows
     {
-        long m_id;
-        double m_dArea;
-        public long GetID()
+        public Windows(long id)
         {
-            return m_id;
+            Id = id;
         }
-        public void SetID(long id)
-        {
-            m_id = id;
+        public bool? isExternalWindow { get; set; } = null;//是否为外窗
+        public double? area { get; set; } = null;
+
+        public double? effectiveArea //有效面积在这里计算
+        { 
+            get 
+            {
+                return 0; 
+            } 
         }
 
+        WindowOpenMode? openMode { get; set; } = null;
 
+        double? openingAngle { get; set; } = null;//开启角度
+
+        public long? Id { get; } = null;
+
+        public enum WindowOpenMode{HangWindow,SashWindow,BlindWindow,CasementWindow,PushWindow }//悬窗，推拉窗，百叶窗，平开窗，平推窗
     }
 }

@@ -8,30 +8,14 @@ namespace HVAC_CheckEngine
 {
     class Room
     {
-        public
-            long m_longId;
-            string m_strType;
-            string m_strName;
-            double m_dArea;
-            RoomPosition m_eRoomPosition;
-        public string boundaryLoops { get; set; }
-        public string GetName()
+        public Room(long id)
         {
-            return m_strName;
+            Id = id;
         }
-        public void SetName(string name)
-        {
-            m_strName = name;
-        }
-
-        public long GetId()
-        {
-            return m_longId;
-        }
-        public void SetId(long id)
-        {
-            m_longId = id;
-        }
-
+        public string type { get; set; } = null;
+        public string name { get; set; } = null;
+        public double? area { get; set; } = null;
+        public RoomPosition? roomPosition { get; set; } = null;
+        public long? Id { get; } = null;
     }
 }

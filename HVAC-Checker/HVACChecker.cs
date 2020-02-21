@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    class AirTerminal
+    class HVACChecker
     {
-        public AirTerminal(long id)
+        public string runHVACCheck(string[] xdbPaths)
         {
-            Id = id;
+            HVACFunction.HVACXdbPath = xdbPaths[0];
+            HVACFunction.ArchXdbPath = xdbPaths[1];
         }
-        public long? Id { get; } = null;
     }
 }

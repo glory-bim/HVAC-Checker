@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define RELEASE
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -696,15 +697,19 @@ namespace HVAC_CheckEngine
 
         return isLink;
 
-    }
-    //18获得防烟分区长边长度  清华引擎  矩形替代弧形 
-    static double GetFireDistrictLength(FireDistrict fan)
-    {
-        double dLength = 0.0;
-        return dLength;
-    }            
-       
-    }
+        }
+        //获得防烟分区长边长度
+
+        static double GetFireDistrictLength(FireDistrict fan)
+        {
+            double dLength = 0.0;
+            return dLength;
+        }
+
+    
+            //生成审查结果
+            //各条文审查子函数
+        }
     
 }
 enum RoomPosition { overground, underground, semi_underground }

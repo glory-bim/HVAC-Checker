@@ -8,15 +8,14 @@ namespace HVAC_CheckEngine
 {
     class Floor
     {
+        public Floor(long id)
+        {
+            Id = id;
+        }
+        public double? elevation { get; set; } = null;
+        public double? height { get; set; } = null;
 
-        private string m_storeyName;
-        public string GetStoreyName()
-        {
-            return m_storeyName;
-        }
-        public void SetStoreyName(string storeyName)
-        {
-            m_storeyName = storeyName;
-        }
+        public int? FloorNumber { get; set; } = null;
+        public long? Id { get; set; } = null;
     }
 }
