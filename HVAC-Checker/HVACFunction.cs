@@ -405,6 +405,7 @@ namespace HVAC_CheckEngine
 
         //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
 
+
         public static List<Room> GetRoomsMoreThan(double dLength)
         {
             List<Room> rooms = new List<Room>();
@@ -413,7 +414,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        //6找到一个风机的全部末端风口对象集合
+        //6找到一个风机的进风口对象集合
         public static List<AirTerminal> GetInletOfFan(Fan fan)
     {
         List<AirTerminal> airTerminals = new List<AirTerminal>();
