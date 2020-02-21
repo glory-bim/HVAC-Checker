@@ -7,7 +7,7 @@ using BCGL.Sharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
     /// <summary>
     /// XDB二维点

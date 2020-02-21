@@ -7,7 +7,7 @@ using System.Data.SQLite;
 using System.IO;
 
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
     class Program
     {

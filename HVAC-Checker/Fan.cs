@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
     class Fan
     {

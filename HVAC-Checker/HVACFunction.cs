@@ -9,7 +9,7 @@ using BCGL.Sharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
     /// <summary>
     /// 曲线，XDB描述曲线的类
@@ -612,21 +612,65 @@ namespace HVAC_Checker
 
                 SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
-                while (readerDucts.Read())
+                if (readerDucts.Read())
                 {                  
                     readerDucts["Id"].ToString();
                     Duct duct = new Duct();
                     
                     ducts.Add(duct);
                     FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
-
+                }
+                else
+                {
+                    FindDuctsByDuct3t(dbConnection, reader["linkElementId"].ToString(), ducts);
+                    FindDuctsByDuct4t(dbConnection, reader["linkElementId"].ToString(), ducts);
+                    FindDuctsByDuctDuctDampers(dbConnection, reader["linkElementId"].ToString(), ducts);                    
                 }
 
             }
         }
 
+        private static void FindDuctsByDuct3t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {                  
+                string  sql = "select * from Duct3Ts Where Id = ";
+                sql += strId;
+
+                SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
+                if (readerDuct3T.Read())
+                {
+                    FindDucts(dbConnection, readerDuct3T["Id"].ToString(), ducts);
+                }          
+        }
+
+        private static void FindDuctsByDuct4t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {
+            string sql = "select * from Duct4Ts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
+            if (readerDuct4T.Read())
+            {
+                FindDucts(dbConnection, readerDuct4T["Id"].ToString(), ducts);
+            }
+        }
+
+        private static void FindDuctsByDuctDuctDampers(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {
+            string sql = "select * from DuctDampers Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
+            if (readerDampers.Read())
+            {
+                FindDucts(dbConnection, readerDampers["Id"].ToString(), ducts);
+            }
+        }
+
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
-    public static List<Duct> GetDuctsOfFan(Fan fan)
+        public static List<Duct> GetDuctsOfFan(Fan fan)
     {
             List<Duct> ducts = new List<Duct>();
             string strDbName = "/测试.GDB";
