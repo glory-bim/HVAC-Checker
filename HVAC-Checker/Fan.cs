@@ -8,5 +8,6 @@ namespace HVAC_CheckEngine
 {
     class Fan
     {
+        public long? Id { get; set; } = null;
     }
 }

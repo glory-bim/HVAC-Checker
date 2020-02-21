@@ -18,20 +18,19 @@ namespace HVAC_CheckEngine
             double area = 10.0;
             RoomPosition roomPosition = RoomPosition.overground;
             // HVACFunction.GetRooms(type, name, area, roomPosition);
-            Windows window = new Windows();
-            window.SetID(322);
+            Windows window = new Windows(322);
+         
             // HVACFunction.GetArea(window);
             List<Floor> floors = HVACFunction.GetFloors();
             string containedString = "Lea";
 
             // List<Room> rooms = HVACFunction.GetRoomsContainingString(containedString);
-            Room room = new Room();
-            room.SetId(573789);
+            Room room = new Room(573789);      
             List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
             airTerminals.Clear();
 
             Fan fan = new Fan();
-            fan.SetId(1230487612968402944);
+            fan.Id =1230487612968402944;
             List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);
             Console.ReadLine();
         }

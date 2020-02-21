@@ -161,8 +161,8 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                Room room = new Room();
-                room.SetName(reader["name"].ToString());
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
                 rooms.Add(room);
             }             
             //关闭连接
@@ -186,15 +186,15 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces Where Id = ";
-            sql = sql + room.GetId();          
+            sql = sql + room.Id;          
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
    
             if(reader.Read())
             {                
-                room.SetName(reader["name"].ToString());
+                room.name = reader["name"].ToString();
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.GetId().ToString());
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
 
                 strDbName = "/机电.GDB";
@@ -248,8 +248,8 @@ namespace HVAC_CheckEngine
                                 || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
                             {
 
-                                AirTerminal airTerminal = new AirTerminal();
-                                airTerminal.Id = Convert.ToInt64(readerAirTerminals["Id"].ToString());
+                                AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                            
                                 airterminals.Add(airTerminal);
                             }
                         }
@@ -396,26 +396,26 @@ namespace HVAC_CheckEngine
             return Fans;
         }
 
-        //4找到风机的取风口或排风口对象//怎么判断风口前端后端
-        static List<AirTerminal> GetExhaustAirTerminalsOfFan(Fan fan)
+        //4找到风机的排风口对象//怎么判断风口前端后端
+        static List<AirTerminal> GetOutLetsOfFan(Fan fan)
         {
             List<AirTerminal> airTerminals = new List<AirTerminal>();
             return airTerminals; 
         }
 
-    //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
+        //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
+
+        public static List<Room> GetRoomsMoreThan(double dLength)
+        {
+            List<Room> rooms = new List<Room>();
+
+            return rooms;
+        }
 
 
-
-
-    //6找到一个风机的全部末端风口对象集合
-    public static List<AirTerminal> GetAirTerminalsOfFan(Fan fan)
+        //6找到一个风机的全部末端风口对象集合
+        public static List<AirTerminal> GetInletOfFan(Fan fan)
     {
-
-
-
-
-
         List<AirTerminal> airTerminals = new List<AirTerminal>();
 
         return airTerminals;
@@ -446,10 +446,16 @@ namespace HVAC_CheckEngine
     }
 
 
-    //10获得构建所在房间的对象  几何 包含 遍历表都查
-         
-    //11获得一个窗户对象的有效面积  差公式 xdb差参数  开启角度  开启方式
-    public static double GetArea(Windows window)  
+        //10获得构建所在房间的对象  几何 包含 遍历表都查
+
+        public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
+        {
+            Room room = new Room(2345);
+                return room;
+        }
+
+        //11获得一个窗户对象的有效面积  差公式 xdb差参数  开启角度  开启方式
+        public static double GetArea(Windows window)  
     {
         double dArea = 0.0;
         dynamic ProgramType = (new Program()).GetType();
@@ -467,7 +473,7 @@ namespace HVAC_CheckEngine
         SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
         m_dbConnection.Open();
         string sql = "select Area from Windows Where Id = ";
-        sql = sql + window.GetID() ;
+        sql = sql + window.Id ;
         //sql = sql + "'" + window.GetID() + "'";
 
         SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
@@ -484,36 +490,38 @@ namespace HVAC_CheckEngine
         return dArea;
     }
 
-    //12找到属于某种类型的房间对象集合
-    static List<Room> GetRooms(string roomType)
-    {
-        
+        //12找到属于某种类型的房间对象集合
+        static List<Room> GetRooms(string roomType)
+        {
 
-        List<Room> rooms = new List<Room>();
-        dynamic ProgramType = (new Program()).GetType();
 
-        string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-        int iSub = currentDirectory.IndexOf("\\bin");
-        currentDirectory = currentDirectory.Substring(0, iSub);
-        string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
+            List<Room> rooms = new List<Room>();
+            dynamic ProgramType = (new Program()).GetType();
 
-        //如果不存在，则创建一个空的数据库,
-        if (!System.IO.File.Exists(path))
-            return rooms;
+            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
+            int iSub = currentDirectory.IndexOf("\\bin");
+            currentDirectory = currentDirectory.Substring(0, iSub);
+            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
 
-        //创建一个连接
-        string connectionstr = @"data source =" + path;
-        SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
-        m_dbConnection.Open();
-        string sql = "select * from Spaces Where userLabel = ";
-        sql = sql + "'" + roomType + "'";
-           
-        SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-        SQLiteDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-            Console.WriteLine("书名: " + reader["userLabel"]);
-            Room room = new Room();
-            rooms.Add(room);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return rooms;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Spaces Where userLabel = ";
+            sql = sql + "'" + roomType + "'";
+
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                rooms.Add(room);
+            }
+               
         return rooms;
     }
     //13找到名称包含某一字段的房间对象集合    
@@ -542,8 +550,8 @@ namespace HVAC_CheckEngine
         SQLiteDataReader reader = command.ExecuteReader();
         while (reader.Read())
         {
-            Room room = new Room();      
-            room.SetName(reader["name"].ToString());
+            Room room =  new Room(Convert.ToInt64(reader["Id"].ToString()));                         
+            room.name = reader["name"].ToString();
             rooms.Add(room);
         }
             
@@ -586,8 +594,8 @@ namespace HVAC_CheckEngine
           
         while (reader.Read())
         {
-            Floor floor = new Floor();
-            floor.SetStoreyName(reader["storeyName"].ToString());
+            Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));       
+            floor.storeyName = (reader["storeyName"].ToString());
             floors.Add(floor);
 
         }
@@ -614,9 +622,8 @@ namespace HVAC_CheckEngine
                 SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
                 if (readerDucts.Read())
-                {                  
-                    readerDucts["Id"].ToString();
-                    Duct duct = new Duct();
+                {                                  
+                    Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                     
                     ducts.Add(duct);
                     FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -683,7 +690,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             //创建一个连接
-            FindDucts(dbConnection,fan.GetId().ToString(),ducts);
+            FindDucts(dbConnection,fan.Id.ToString(),ducts);
 
             //关闭连接
             dbConnection.Close();          
