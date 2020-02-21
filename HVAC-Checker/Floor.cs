@@ -12,6 +12,7 @@ namespace HVAC_CheckEngine
         {
             Id = id;
         }
+        public string storeyName { get; set; } = null;
         public double? elevation { get; set; } = null;
         public double? height { get; set; } = null;
 

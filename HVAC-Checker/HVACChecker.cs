@@ -8,11 +8,7 @@ namespace HVAC_CheckEngine
 {
     class HVACChecker
     {
-        public string runHVACCheck(string[] xdbPaths)
-        {
-            HVACFunction.HVACXdbPath = xdbPaths[0];
-            HVACFunction.ArchXdbPath = xdbPaths[1];
-        }
+       
     }
     /**
     建筑设计防火规范 GB50016-2014：8.5.1条文：
