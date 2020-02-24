@@ -262,7 +262,86 @@ namespace HVAC_CheckEngine
             return airterminals;
         }
 
+        public static List<Windows> GetWindowsInRoom(Room room)
+        {
+            List<Windows> windows = new List<Windows>();
+            string strDbName = "/建筑.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return windows;
 
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + room.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                room.name = reader["name"].ToString();
+                room.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+            
+                sql = "select * from Windows";
+                SQLiteCommand commandWindows = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerWindows = commandWindows.ExecuteReader();
+                while (readerWindows.Read())
+                {
+
+                    string sTransformer = readerWindows["transformer"].ToString();
+
+                    sql = "select * from LODRelations where graphicElementId = ";
+                    sql = sql + readerWindows["Id"].ToString();
+
+                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                    while (readerHVAC1.Read())
+                    {
+                        sql = "select * from Geometrys where Id = ";
+                        sql = sql + readerHVAC1["geometryId"].ToString();
+                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                        while (readerHVACGeo.Read())
+                        {
+                            readerHVACGeo["Id"].ToString();
+
+                            Geometry geo = new Geometry();
+                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                            geo.vertices = readerHVACGeo["vertices"].ToString();
+                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                            geo.normals = readerHVACGeo["normals"].ToString();
+                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                Windows window = new Windows(Convert.ToInt64(readerWindows["Id"].ToString()));
+
+                                windows.Add(window);
+                            }
+                        }
+                    }
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return windows;
+        }
 
 
 
