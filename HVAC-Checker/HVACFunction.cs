@@ -535,13 +535,88 @@ namespace HVAC_CheckEngine
 
         public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
         {
-            Room room = new Room(2345);
+            long lid = 0;//id為空的對象
+            Room room = new Room(lid);
+            string strDbName = "机电.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return room;
 
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from AirTerminals Where Id = ";
+            sql = sql + airTerminal.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                string sTransformer = reader["transformer"].ToString();
+                sql = "select * from LODRelations where graphicElementId = ";
+                sql = sql + reader["Id"].ToString();
 
+                SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                if (readerHVAC1.Read())
+                {
+                    sql = "select * from Geometrys where Id = ";
+                    sql = sql + readerHVAC1["geometryId"].ToString();
+                    SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                    if(readerHVACGeo.Read())
+                    {
+                        readerHVACGeo["Id"].ToString();
 
+                        Geometry geo = new Geometry();
+                        geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                        geo.vertices = readerHVACGeo["vertices"].ToString();
+                        geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                        geo.normals = readerHVACGeo["normals"].ToString();
+                        geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                        geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                        geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                        geo.materialIds = readerHVACGeo["materialIds"].ToString();
 
+                        AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
 
+                        strDbName = "建筑.GDB";
+                        path = GetCurrentPath(strDbName);
+                        //如果不存在，则创建一个空的数据库,
+                        if (!System.IO.File.Exists(path))
+                            return room;
 
+                        //创建一个连接
+                        string connectionArchstr = @"data source =" + path;
+                        SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
+                        dbConnectionArch.Open();
+                        sql = "select * from Spaces";
+                        SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
+                        SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
+
+                        while (readerRoom.Read())
+                        {
+                            room.name = readerRoom["name"].ToString();
+                            room.boundaryLoops = readerRoom["boundaryLoops"].ToString();
+                            Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                               
+                            }
+                        }
+                    }
+                }
+            }                                
+        //关闭连接               
                 return room;
         }
 
