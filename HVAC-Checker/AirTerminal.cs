@@ -8,6 +8,7 @@ namespace HVAC_CheckEngine
 {
     class AirTerminal
     {
+        public string systemType { get; set; }= null;
         public AirTerminal(long id)
         {
             Id = id;
