@@ -31,7 +31,7 @@ namespace HVAC_CheckEngine
 
         private BimReview GB50016_2014_8_5_1()
         {
-            BimReview result;
+            BimReview result=new BimReview();
             result.isPassCheck = true;
             //获得建筑中所有防烟楼梯间、前室及避难间的集合
             List<Room> rooms = new List<Room>();
@@ -52,6 +52,7 @@ namespace HVAC_CheckEngine
             //经过以上操作后，如果审查通过，则在审查结果中注明审查通过
             //                如果审查不通过，则在审查结果中注明审查未通过，并写明原因
             //返回审查结果
+            return result;
         }
     }
     

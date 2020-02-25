@@ -79,7 +79,7 @@ namespace HVAC_CheckEngine
             List<AirTerminal> inlets = new List<AirTerminal>();
            
             //关闭连接
-            dbConnection.Close();
+           
 
 
 
@@ -114,7 +114,7 @@ namespace HVAC_CheckEngine
 
         public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
         {
-            Room room = new Room(lid);
+            Room room = new Room(1);
             //关闭连接               
             return room;
         }

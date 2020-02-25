@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    class Floor
+    public class Floor
     {
         public Floor(long id)
         {
