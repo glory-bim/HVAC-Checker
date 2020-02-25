@@ -1,4 +1,4 @@
-﻿
+﻿#define DEBUG
 using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -11,6 +11,7 @@ using BCGL.Sharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+#if !DEBUG
 namespace HVAC_CheckEngine
 {
    
@@ -887,3 +888,4 @@ namespace HVAC_CheckEngine
     
 }
 enum RoomPosition { overground, underground, semi_underground }
+#endif

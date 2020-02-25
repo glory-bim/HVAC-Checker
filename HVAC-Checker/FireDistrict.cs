@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    class FireDistrict
+    public class FireDistrict
     {
         FireDistrict(long id)
         {

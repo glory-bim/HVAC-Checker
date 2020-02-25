@@ -23,7 +23,7 @@ namespace HVAC_CheckEngine
             } 
         }
 
-        WindowOpenMode? openMode { get; set; } = null;
+        public WindowOpenMode? openMode { get; set; } = null;
 
         double? openingAngle { get; set; } = null;//开启角度
 
