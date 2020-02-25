@@ -13,107 +13,7 @@ using Newtonsoft.Json.Linq;
 
 namespace HVAC_CheckEngine
 {
-    /// <summary>
-    /// 曲线，XDB描述曲线的类
-    /// </summary>
-    public class XDBCurve
-    {
-        /// <summary>
-        /// 曲线类型名称,如直线XDBBoundLine,曲线XDBEllipse等
-        /// </summary>
-        public string curveType { get; set; }
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        public XDBCurve()
-        {
-            curveType = GetType().Name;
-        }
-    };
-    /// <summary>
-    /// XDB三维点
-    /// </summary>
-    public class XDBXYZ
-    {
-        private static XDBXYZ m_zero = new XDBXYZ(0, 0, 0);
-        /// <summary>
-        /// Gets the first coordinate
-        /// </summary>
-        public double x { get; set; }
-        /// <summary>
-        /// Gets the second coordinate
-        /// </summary>
-        public double y { get; set; }
-        /// <summary>
-        /// Gets the third coordinate
-        /// </summary>
-        public double z { get; set; }
-
-        /// <summary>
-        /// 创建一个默认的XDBXYZ使用值0，0，0
-        /// </summary>
-        public XDBXYZ() { x = 0; y = 0; z = 0; }
-
-        /// <summary>
-        /// 创建一个带指定值的XDBXYZ
-        /// </summary>
-        /// <param name="dx">The first coordinate</param>
-        /// <param name="dy">The second coordinate</param>
-        /// <param name="dz">The third coordinate</param>
-        public XDBXYZ(double dx, double dy, double dz) { x = dx; y = dy; z = dz; }
-
-        /// <summary>
-        /// The coordinate origin or zero vector
-        /// </summary>
-        public static XDBXYZ Zero { get { return m_zero; } }
-    };
-    /// <summary>
-    /// 椭圆
-    /// </summary>
-    public class XDBEllipse : XDBCurve
-    {
-        /// <summary>
-        /// 中心点
-        /// </summary>
-        public XDBXYZ center { get; set; }
-
-        /// <summary>
-        /// x轴正方向，该值可以是个长度
-        /// </summary>
-        public XDBXYZ vector0 { get; set; }
-
-        /// <summary>
-        /// y轴正方向，该值可以是个长度
-        /// </summary>
-        public XDBXYZ vector90 { get; set; }
-
-        /// <summary>
-        /// 起始角度,X轴正方向按逆时针旋转一定角度作为起点角度
-        /// </summary>
-        public double startAngle { get; set; }
-
-        /// <summary>
-        /// 扫掠角度，与起始角度按逆时针方向旋转了一定角度，扫掠的角度就是该扫掠角度
-        /// </summary>
-        public double sweepAngle { get; set; }
-    };
-
-
-    /// <summary>
-    /// 有界直线，包含起终点
-    /// </summary>
-    public class XDBBoundLine : XDBCurve
-    {
-        /// <summary>
-        /// 直线起点
-        /// </summary>
-        public XDBXYZ startPoint { get; set; }
-
-        /// <summary>
-        /// 直线终点
-        /// </summary>
-        public XDBXYZ endPoint { get; set; }
-    };
+   
     class HVACFunction
     {
         private
@@ -263,7 +163,86 @@ namespace HVAC_CheckEngine
             return airterminals;
         }
 
+        public static List<Windows> GetWindowsInRoom(Room room)
+        {
+            List<Windows> windows = new List<Windows>();
+            string strDbName = "/建筑.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return windows;
 
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + room.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                room.name = reader["name"].ToString();
+                room.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+            
+                sql = "select * from Windows";
+                SQLiteCommand commandWindows = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerWindows = commandWindows.ExecuteReader();
+                while (readerWindows.Read())
+                {
+
+                    string sTransformer = readerWindows["transformer"].ToString();
+
+                    sql = "select * from LODRelations where graphicElementId = ";
+                    sql = sql + readerWindows["Id"].ToString();
+
+                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                    while (readerHVAC1.Read())
+                    {
+                        sql = "select * from Geometrys where Id = ";
+                        sql = sql + readerHVAC1["geometryId"].ToString();
+                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                        while (readerHVACGeo.Read())
+                        {
+                            readerHVACGeo["Id"].ToString();
+
+                            Geometry geo = new Geometry();
+                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                            geo.vertices = readerHVACGeo["vertices"].ToString();
+                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                            geo.normals = readerHVACGeo["normals"].ToString();
+                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                Windows window = new Windows(Convert.ToInt64(readerWindows["Id"].ToString()));
+
+                                windows.Add(window);
+                            }
+                        }
+                    }
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return windows;
+        }
 
 
 
@@ -400,6 +379,14 @@ namespace HVAC_CheckEngine
         //4找到风机的排风口对象//怎么判断风口前端后端
         static List<AirTerminal> GetOutLetsOfFan(Fan fan)
         {
+
+
+
+
+
+
+
+
             List<AirTerminal> airTerminals = new List<AirTerminal>();
             return airTerminals; 
         }
@@ -416,17 +403,114 @@ namespace HVAC_CheckEngine
 
 
         //6找到一个风机的进风口对象集合
-        public static List<AirTerminal> GetInletOfFan(Fan fan)
+    public static List<AirTerminal> GetInletOfFan(Fan fan)
     {
-        List<AirTerminal> airTerminals = new List<AirTerminal>();
+        List<AirTerminal> inlets = new List<AirTerminal>();        
+        string strDbName = "/rme_basic_sample_project.GDB";
+        string path = GetCurrentPath(strDbName);
+        //如果不存在，则创建一个空的数据库,
+        if (!System.IO.File.Exists(path))
+            return inlets;
+        string connectionstr = @"data source =" + path;
+        SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+        dbConnection.Open();
 
-        return airTerminals;
+
+
+            FindInlets(dbConnection, fan.Id.ToString(), inlets);
+
+            //关闭连接
+            dbConnection.Close();
+
+
+
+            return inlets;
     }
+        private static void FindInlets(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
+        {
 
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+
+                sql = "select * from AirTerminals Where Id = ";
+                sql += reader["linkElementId"].ToString();
+
+                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                if (readerDucts.Read())
+                {
+                    AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerDucts["Id"].ToString()));
+                    inlets.Add(inlet);                
+                }
+                else
+                {
+                    FindInletsByDuct(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindInletsByDuct3t(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindInletsByDuct4t(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindInletsByDuctDampers(dbConnection, reader["linkElementId"].ToString(), inlets);
+                }
+
+            }
+        }
+
+        private static void FindInletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        {
+            string sql = "select * from Ducts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
+            if (readerDuct3T.Read())
+            {
+                FindInlets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
+            }
+        }
+        private static void FindInletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        {
+            string sql = "select * from Duct3Ts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
+            if (readerDuct3T.Read())
+            {
+                FindInlets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
+            }
+        }
+
+        private static void FindInletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        {
+            string sql = "select * from Duct4Ts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
+            if (readerDuct4T.Read())
+            {
+                FindInlets(dbConnection, readerDuct4T["Id"].ToString(), ducts);
+            }
+        }
+
+        private static void FindInletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        {
+            string sql = "select * from DuctDampers Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
+            if (readerDampers.Read())
+            {
+                FindInlets(dbConnection, readerDampers["Id"].ToString(), ducts);
+            }
+        }
 
 
         //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
-    public static List<Duct> GetDuctsCrossSpace(Room room)
+        public static List<Duct> GetDuctsCrossSpace(Room room)
     {
         List<Duct> ducts = new List<Duct>();
 
@@ -452,7 +536,88 @@ namespace HVAC_CheckEngine
 
         public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
         {
-            Room room = new Room(2345);
+            long lid = 0;//id為空的對象
+            Room room = new Room(lid);
+            string strDbName = "机电.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return room;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from AirTerminals Where Id = ";
+            sql = sql + airTerminal.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                string sTransformer = reader["transformer"].ToString();
+                sql = "select * from LODRelations where graphicElementId = ";
+                sql = sql + reader["Id"].ToString();
+
+                SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                if (readerHVAC1.Read())
+                {
+                    sql = "select * from Geometrys where Id = ";
+                    sql = sql + readerHVAC1["geometryId"].ToString();
+                    SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                    if(readerHVACGeo.Read())
+                    {
+                        readerHVACGeo["Id"].ToString();
+
+                        Geometry geo = new Geometry();
+                        geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                        geo.vertices = readerHVACGeo["vertices"].ToString();
+                        geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                        geo.normals = readerHVACGeo["normals"].ToString();
+                        geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                        geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                        geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                        geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                        AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                        strDbName = "建筑.GDB";
+                        path = GetCurrentPath(strDbName);
+                        //如果不存在，则创建一个空的数据库,
+                        if (!System.IO.File.Exists(path))
+                            return room;
+
+                        //创建一个连接
+                        string connectionArchstr = @"data source =" + path;
+                        SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
+                        dbConnectionArch.Open();
+                        sql = "select * from Spaces";
+                        SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
+                        SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
+
+                        while (readerRoom.Read())
+                        {
+                            room.name = readerRoom["name"].ToString();
+                            room.boundaryLoops = readerRoom["boundaryLoops"].ToString();
+                            Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                               
+                            }
+                        }
+                    }
+                }
+            }                                
+        //关闭连接               
                 return room;
         }
 
