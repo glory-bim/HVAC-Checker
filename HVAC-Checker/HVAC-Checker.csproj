@@ -94,6 +94,7 @@
     <Compile Include="AirTerminal.cs" />
     <Compile Include="assistantFunctions.cs" />
     <Compile Include="BimReview.cs" />
+    <Compile Include="globalData.cs" />
     <Compile Include="HVACChecker.cs" />
     <Compile Include="Duct.cs" />
     <Compile Include="Fan.cs" />

@@ -10,18 +10,25 @@ namespace HVAC_CheckEngine
 	{
 		public long Id;       //构件id
 		public string type;   //构件类型
-		public long storeyID; //构件楼层
 	};
 
 
 	//批注管理的结构体，最后转换为json返回
 	struct BimReview
 	{
-		public int compulsory;        //规范编号 
+		public string compulsory;        //规范编号 
 		public string comment;       //审查意见  【xxx条通过】
 		public string standardCode; //规范编号  【3-2-1】
 		public bool isPassCheck;    //是否通过审查
-		List<ComponentAnnotation> violationComponent;  // 违规构建【无】	
+		public void AddViolationComponent(long Id,string componentType)
+		{
+			ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+			componentAnnotation.Id = Id;
+			componentAnnotation.type = componentType;
+			violationComponents.Add(componentAnnotation);
+		}
+		public List<ComponentAnnotation> ViolationComponents { get { return violationComponents; } }
+		List<ComponentAnnotation> violationComponents;  // 违规构建【无】	
 	};
 	class CheckResult
 	{

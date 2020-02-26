@@ -8,21 +8,33 @@ namespace HVAC_CheckEngine
 {
     public class assistantFunctions
     {
-        public static AirTerminal getAirTerminalOfCertainSystem(List<AirTerminal> airTerminals,string systemType)
+        public static AirTerminal GetAirTerminalOfCertainSystem(List<AirTerminal> airTerminals,string systemType)
         {
-            if(airTerminals==null)
-            {
-                throw new ArgumentException("airTerminals为null");
-            }
             if(systemType==null)
             {
                 throw new ArgumentException("systemType为null");
             }
+            if (airTerminals == null)
+                return null;
+
             foreach(AirTerminal airTerminal in airTerminals)
             {
                 if (airTerminal.systemType == systemType)
                     return airTerminal;
             }
+            return null;
+        }
+
+        public static Windows GetOpenableOuterWindow(List<Windows> windows)
+        {
+            if (windows == null)
+                return null;
+            foreach(Windows window in windows)
+            {
+                if (window.isExternalWindow.Value&& window.openMode != Windows.WindowOpenMode.FixWindow)
+                    return window;
+            }
+
             return null;
         }
     }

@@ -3,9 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using HVAC_CheckEngine;
 using System.Collections.Generic;
 
-namespace UnitTestHVACChecker
+
+namespace UnitTestAssitantFunction
 {
-   
     [TestClass]
     public class getAirTerminalOfCertainSystem_Test
     {
@@ -32,7 +32,7 @@ namespace UnitTestHVACChecker
            int indexOfAimAirTerminals = Int32.Parse(context.DataRow["目标风口编号"].ToString());
 
            //act
-           AirTerminal aimAirTerminal= assistantFunctions.getAirTerminalOfCertainSystem(airTerminals, aimSystemType);
+           AirTerminal aimAirTerminal= assistantFunctions.GetAirTerminalOfCertainSystem(airTerminals, aimSystemType);
 
            //assert
            Assert.IsNotNull(aimAirTerminal);
@@ -60,7 +60,7 @@ namespace UnitTestHVACChecker
 
 
             //act
-            AirTerminal aimAirTerminal = assistantFunctions.getAirTerminalOfCertainSystem(airTerminals, aimSystemType);
+            AirTerminal aimAirTerminal = assistantFunctions.GetAirTerminalOfCertainSystem(airTerminals, aimSystemType);
 
             //assert
             Assert.IsNull(aimAirTerminal);
@@ -73,17 +73,18 @@ namespace UnitTestHVACChecker
             //arrange
             List<AirTerminal> airTerminals =new List<AirTerminal>();
             //act
-            assistantFunctions.getAirTerminalOfCertainSystem(airTerminals, null);
+            assistantFunctions.GetAirTerminalOfCertainSystem(airTerminals, null);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void test_getAirTerminalOfCertainSystem_AirTerminalsIsNull()
+        public void test_AirTerminalsIsNull()
         {
             //arrange
-            List<AirTerminal> airTerminals = new List<AirTerminal>();
+          
             //act
-            assistantFunctions.getAirTerminalOfCertainSystem(null, string.Empty);
+            AirTerminal aimAirTerminal= assistantFunctions.GetAirTerminalOfCertainSystem(null, string.Empty);
+            //assert
+            Assert.IsNull(aimAirTerminal);
         }
 
         private TestContext context;
@@ -94,4 +95,95 @@ namespace UnitTestHVACChecker
             set { context = value; }
         }
     }
+
+    [TestClass]
+    public class getOpenableOuterWindow_Test
+    {
+        [TestMethod]
+        [DeploymentItem(@"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据.xlsx")]
+        [DataSource("MyExcelDataSource2")]
+        public void test_differentOrder()
+        {
+            //arrange
+            Windows window_1 = new Windows(1);
+            window_1.openMode =(Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第一个外窗类型"].ToString());
+            window_1.isExternalWindow = Convert.ToBoolean(context.DataRow["第一个外窗是否为可开启"].ToString());
+            Windows window_2 = new Windows(2);
+            window_2.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第二个外窗类型"].ToString());
+            window_2.isExternalWindow = Convert.ToBoolean(context.DataRow["第二个外窗是否为可开启"].ToString());
+            Windows window_3 = new Windows(3);
+            window_3.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第三个外窗类型"].ToString());
+            window_3.isExternalWindow = Convert.ToBoolean(context.DataRow["第三个外窗是否为可开启"].ToString());
+
+            List<Windows> windows = new List<Windows>();
+            windows.Add(window_1);
+            windows.Add(window_2);
+            windows.Add(window_3);
+
+          
+            int indexOfAimWindow = Int32.Parse(context.DataRow["目标外窗编号"].ToString());
+
+            //act
+            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+
+            //assert
+            Assert.IsNotNull(aimWindow);
+            Assert.AreEqual(indexOfAimWindow, aimWindow.Id);
+        }
+        [TestMethod]
+   
+        public void test_doNotHaveAimWindow()
+        {
+            Windows window_1 = new Windows(1);
+            window_1.openMode = Windows.WindowOpenMode.FixWindow;
+            window_1.isExternalWindow =true;
+            Windows window_2 = new Windows(2);
+            window_2.openMode = Windows.WindowOpenMode.PushWindow;
+            window_2.isExternalWindow = false;
+            Windows window_3 = new Windows(3);
+            window_3.openMode = Windows.WindowOpenMode.FixWindow;;
+            window_3.isExternalWindow = false;
+
+            List<Windows> windows = new List<Windows>();
+            windows.Add(window_1);
+            windows.Add(window_2);
+            windows.Add(window_3);
+
+
+            //act
+            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+
+            //assert
+            Assert.IsNull(aimWindow);
+
+        }
+
+        [TestMethod]
+        public void test_WindowsIsNull()
+        {
+           
+            //act
+            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(null);
+
+            //assert
+            Assert.IsNull(aimWindow);
+
+        }
+        private TestContext context;
+
+        public TestContext TestContext
+        {
+            get { return context; }
+            set { context = value; }
+        }
+    }
+
+    [TestClass]
+    public class GB50016_2014_8_5_1_Test
+    {
+
+    }
+
+
 }
+

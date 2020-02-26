@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC-Checker", "HVAC-Checker\HVAC-Checker.csproj", "{326A5BD0-1AC4-44C4-B01F-25A99751F82B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestHVACChecker", "UnitTestHVACChecker\UnitTestHVACChecker.csproj", "{30F94794-55D7-4741-8762-1E966EC7F93C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestHVAC_CheckEngin", "UnitTestHVACChecker\UnitTestHVAC_CheckEngin.csproj", "{30F94794-55D7-4741-8762-1E966EC7F93C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
