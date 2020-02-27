@@ -8,6 +8,10 @@ namespace HVAC_CheckEngine
 {
     public class Fan
     {
+        public Fan(long id)
+        {
+            Id = id;
+        }
         public long? Id { get; set; } = null;
     }
 }

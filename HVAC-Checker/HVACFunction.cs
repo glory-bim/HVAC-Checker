@@ -369,8 +369,101 @@ namespace HVAC_CheckEngine
         //3找到与风口相连的风机对象//一条路径 三通、四通只记录了一个id
         static List<Fan> GetFanConnectingAirterminal(AirTerminal airterminal)
         {
-            List<Fan> Fans = new List<Fan>();
-            return Fans;
+            List<Fan> fans = new List<Fan>();        
+            string strDbName = "/rme_basic_sample_project.GDB";
+            string path = GetCurrentPath(strDbName);
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return fans;
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            //创建一个连接
+            FindFansByAirterminal(dbConnection, airterminal.Id.ToString(), fans);
+            //关闭连接
+            dbConnection.Close();
+
+            return fans;      
+        }
+
+        private static void FindFansByAirterminal(SQLiteConnection dbConnection, String strId, List<Fan> inlets)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                sql = "select * from HVACFans Where Id = ";
+                sql += reader["linkElementId"].ToString();
+
+                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                if (readerDucts.Read())
+                {
+                    Fan inlet = new Fan(Convert.ToInt64(readerDucts["Id"].ToString()));
+                    inlets.Add(inlet);
+                }
+                else
+                {
+                    FindFansByDuct(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindFansByDuct3t(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindFansByDuct4t(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    FindFansByDuctDampers(dbConnection, reader["linkElementId"].ToString(), inlets);
+                }
+
+            }
+        }
+
+        private static void FindFansByDuct(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        {
+            string sql = "select * from Ducts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
+            if (readerDuct3T.Read())
+            {
+                FindFansByAirterminal(dbConnection, readerDuct3T["Id"].ToString(), ducts);
+            }
+        }
+        private static void FindFansByDuct3t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        {
+            string sql = "select * from Duct3Ts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
+            if (readerDuct3T.Read())
+            {
+                FindFansByAirterminal(dbConnection, readerDuct3T["Id"].ToString(), ducts);
+            }
+        }
+
+        private static void FindFansByDuct4t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        {
+            string sql = "select * from Duct4Ts Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
+            if (readerDuct4T.Read())
+            {
+                FindFansByAirterminal(dbConnection, readerDuct4T["Id"].ToString(), ducts);
+            }
+        }
+
+        private static void FindFansByDuctDampers(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        {
+            string sql = "select * from DuctDampers Where Id = ";
+            sql += strId;
+
+            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
+            if (readerDampers.Read())
+            {
+                FindFansByAirterminal(dbConnection, readerDampers["Id"].ToString(), ducts);
+            }
         }
 
         //4找到风机的排风口对象//怎么判断风口前端后端
@@ -472,10 +565,7 @@ namespace HVAC_CheckEngine
                 FindOutLets(dbConnection, readerDampers["Id"].ToString(), ducts);
             }
         }
-
-
-
-
+             
 
         //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
         public static List<Room> GetRoomsMoreThan(double dLength)
@@ -928,8 +1018,6 @@ namespace HVAC_CheckEngine
         //12找到属于某种类型的房间对象集合
         static List<Room> GetRooms(string roomType)
         {
-
-
             List<Room> rooms = new List<Room>();
             dynamic ProgramType = (new Program()).GetType();
 
@@ -997,11 +1085,32 @@ namespace HVAC_CheckEngine
         // 14判断房间属于地上房间或地下房间  //差参数
         static bool isOvergroundRoom(Room room)
         {
+            dynamic ProgramType = (new Program()).GetType();
+            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
+            int iSub = currentDirectory.IndexOf("\\bin");
+            currentDirectory = currentDirectory.Substring(0, iSub);
+            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
 
-            bool isUp = true;
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(path))
+                return false;
 
-            return isUp;
+            //创建一个连接
+            string connectionstr = @"data source =" + path;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Spaces Where  Id =";           
 
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                return true;
+            }  
+            else
+            {
+                return false;
+            }
         }
         //15获取所有楼层对象集合
         public static List<Floor> GetFloors()

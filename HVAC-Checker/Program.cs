@@ -29,8 +29,7 @@ namespace HVAC_CheckEngine
             List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
             airTerminals.Clear();
 
-            Fan fan = new Fan();
-            fan.Id =1230487612968402944;
+            Fan fan = new Fan(1230487612968402944);     
             List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);
             Console.ReadLine();
         }
