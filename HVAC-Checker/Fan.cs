@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    class Fan
+    public class Fan
     {
         public long? Id { get; set; } = null;
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    class Windows
+    public class Windows
     {
         public Windows(long id)
         {
