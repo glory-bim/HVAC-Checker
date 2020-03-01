@@ -641,7 +641,12 @@ namespace HVAC_CheckEngine
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
                 room.name = reader["name"].ToString();
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());            
+               // Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+                OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
+                double dLengthOBB = obb.GetLength();
+                if (dLengthOBB > dLength)
+                    rooms.Add(room);
             }
             //关闭连接
             dbConnection.Close();
