@@ -31,6 +31,9 @@ namespace HVAC_CheckEngine
 
             Fan fan = new Fan(1230487612968402944);     
             List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);
+
+            FireDistrict fireDis = new FireDistrict(573789);
+            HVACFunction.GetFireDistrictLength(fireDis);
             Console.ReadLine();
         }
     }

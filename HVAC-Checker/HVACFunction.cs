@@ -350,6 +350,57 @@ namespace HVAC_CheckEngine
             return poly;
         }
 
+
+        private static OBB GetSpaceOBB(string boundaryLoops, string sSpaceId)
+        {
+            List<List<XDBCurve>> xdbCurveLoops = ConvertJsonToBoundaryLoops(boundaryLoops);
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointIntList pointList = new PointIntList();
+            foreach (List<XDBCurve> xdbCurveLoop in xdbCurveLoops)
+            {
+               // PointIntList pointList = new PointIntList();
+
+                foreach (XDBCurve xdbCurve in xdbCurveLoop)
+                {
+                    if (xdbCurve is XDBBoundLine)
+                    {
+                        XDBBoundLine line = xdbCurve as XDBBoundLine;
+                        PointInt ptS = new PointInt((int)line.startPoint.x, (int)line.startPoint.y, (int)line.startPoint.z);
+                        pointList.Add(ptS);
+                        PointInt ptE = new PointInt((int)line.endPoint.x, (int)line.endPoint.y, (int)line.endPoint.z);
+                        pointList.Add(ptE);
+                    }
+                    else if (xdbCurve is XDBEllipse)
+                    {
+                        // 椭圆曲线进行离散，将离散点加入房间包围盒数据
+                        XDBEllipse xdbcurve = xdbCurve as XDBEllipse;
+                        int nSplitCount = 6; // 将椭圆曲线离散的点个数
+                        double dSplitAngle = xdbcurve.sweepAngle / (nSplitCount - 1);
+                        for (int i = 0; i < nSplitCount; i++)
+                        {
+                            PointInt ptInt = getEllipsePoint(xdbcurve, xdbcurve.startAngle + i * dSplitAngle);
+                            pointList.Add(ptInt);
+                        }
+                    }
+                    else
+                    {
+                        // 目前只考虑区域边界为直线，圆弧(椭圆曲线)两种情况
+                    }
+                }
+
+                if (pointList.Count > 0)
+                    PointLists.Add(pointList);
+            }
+
+            if (PointLists.Count == 0)
+            {
+                PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            }
+            OBB obb = pointList.GetOBB(sSpaceId);
+     
+            return obb;
+        }
+
         private static PointInt getEllipsePoint(XDBEllipse xdbellipse, Double angle)
         {
             double a = Math.Pow(xdbellipse.vector0.x, 2);
@@ -769,7 +820,7 @@ namespace HVAC_CheckEngine
 
                             AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
 
-
+                            
 
                             PointInt pt = aabb.Center();
                             if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
@@ -998,8 +1049,7 @@ namespace HVAC_CheckEngine
         SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
         m_dbConnection.Open();
         string sql = "select Area from Windows Where Id = ";
-        sql = sql + window.Id ;
-        //sql = sql + "'" + window.GetID() + "'";
+        sql = sql + window.Id ;   
 
         SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
         SQLiteDataReader reader = command.ExecuteReader();
@@ -1381,7 +1431,7 @@ namespace HVAC_CheckEngine
             }
         }
         //获得防烟分区长边长度
-        static double GetFireDistrictLength(FireDistrict fireDistrict)
+       public static double GetFireDistrictLength(FireDistrict fireDistrict)
         {
             double dLength = 0.0;  
             
@@ -1396,7 +1446,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces where Id = ";
-            sql += fireDistrict;
+            sql += fireDistrict.Id;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -1405,8 +1455,11 @@ namespace HVAC_CheckEngine
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
                 room.name = reader["name"].ToString();
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-              
+                // Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+                OBB  obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
+                dLength = obb.GetLength();           
+
             }
             //关闭连接
             dbConnection.Close();    

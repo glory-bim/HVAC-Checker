@@ -8,7 +8,7 @@ namespace HVAC_CheckEngine
 {
     public class FireDistrict : Room
     {
-        FireDistrict(long id):base(id)
+        public FireDistrict(long id):base(id)
         {
 
         }
