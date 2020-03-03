@@ -13,11 +13,12 @@ namespace HVAC_CheckEngine
     {
         static void Main(string[] args)
         {
-            //string type = "房间";
+            string type = "间";
             //string name = "CH/PH Stock 1";
-            //double area = 10.0;
-            //RoomPosition roomPosition = RoomPosition.overground;
-            //// HVACFunction.GetRooms(type, name, area, roomPosition);
+            string name = "CH";
+            double area = 10.0;
+            RoomPosition roomPosition = RoomPosition.overground;
+            HVACFunction.GetRooms(type, name, area, roomPosition);
             //Windows window = new Windows(322);
 
             //// HVACFunction.GetArea(window);
@@ -35,7 +36,7 @@ namespace HVAC_CheckEngine
             //FireDistrict fireDis = new FireDistrict(573789);
             //HVACFunction.GetFireDistrictLength(fireDis);
 
-            HVACFunction.GetRooms("间");
+           // HVACFunction.GetRooms("间");
             Console.ReadLine();
         }
     }

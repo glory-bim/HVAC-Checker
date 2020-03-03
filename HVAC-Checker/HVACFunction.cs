@@ -51,11 +51,25 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + path;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);            
             dbConnection.Open();          
-            string sql = "select * from Spaces Where userLabel = ";
-            sql = sql + "'"+type+"'";
-            sql = sql + "and name = " ;
+           // string sql = "select * from Spaces Where userLabel = ";
+
+
+            string sql = "select * from Spaces Where CHARINDEX(";
+            sql = sql + "'" + type + "'";
+
+            sql = sql + ",userLabel)> 0";
+
+            sql = sql + " and CHARINDEX(";
+
             sql = sql + "'" + name + "'";
-            sql = sql + "and dArea > ";
+
+            sql = sql + ",name)> 0";
+
+
+            // sql = sql + "'"+type+"'";
+            //  sql = sql + "and name = " ;
+           // sql = sql + "'" + name + "'";
+            sql = sql + " and dArea > ";
             sql = sql + area;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
