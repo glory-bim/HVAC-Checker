@@ -1071,7 +1071,7 @@ namespace HVAC_CheckEngine
     }
 
         //12找到属于某种类型的房间对象集合
-        static List<Room> GetRooms(string roomType)
+        public static List<Room> GetRooms(string roomType)
         {
             List<Room> rooms = new List<Room>();
             dynamic ProgramType = (new Program()).GetType();
@@ -1088,9 +1088,11 @@ namespace HVAC_CheckEngine
             //创建一个连接
             string connectionstr = @"data source =" + path;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
-            m_dbConnection.Open();
-            string sql = "select * from Spaces Where userLabel = ";
-            sql = sql + "'" + roomType + "'";
+            m_dbConnection.Open();    
+            string sql = "select * from Spaces Where CHARINDEX(";
+            sql = sql +"'"+ roomType +"'" ;
+
+            sql = sql + ",userLabel)> 0";
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -1474,4 +1476,4 @@ namespace HVAC_CheckEngine
     }
     
 }
-public enum RoomPosition { overground, underground, semi_underground }
+public enum RoomPosition { overground = 1, underground = 2, semi_underground= 4 }
