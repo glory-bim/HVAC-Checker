@@ -10,9 +10,9 @@ using System.IO;
 #if DEBUG
 namespace HVAC_CheckEngine
 {
+    using Region = List<Room>;
 
-
-   public class HVACFunction
+    public class HVACFunction
     {
         private
             string m_archXdb;
@@ -170,6 +170,12 @@ namespace HVAC_CheckEngine
         }
         //获得防烟分区长边长度
 
+        public static List<Region> GetAllConnectedRegion()
+        {
+            List<Region> regions= new List<Region>();
+            return regions;
+        }
+
         public static double GetFireDistrictLength(FireDistrict fan)
         {
             double dLength = 0.0;
@@ -180,8 +186,9 @@ namespace HVAC_CheckEngine
         //生成审查结果
         //各条文审查子函数
     }
-
+    [Flags]
+    public enum RoomPosition { overground=1, underground=2, semi_underground=4 }
 }
-public enum RoomPosition { overground, underground, semi_underground }
+
 
 #endif

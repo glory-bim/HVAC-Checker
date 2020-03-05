@@ -13,26 +13,7 @@ namespace HVAC_CheckEngine
     {
         static void Main(string[] args)
         {
-            string type = "房间";
-            string name = "CH/PH Stock 1";
-            double area = 10.0;
-            RoomPosition roomPosition = RoomPosition.overground;
-            // HVACFunction.GetRooms(type, name, area, roomPosition);
-            Windows window = new Windows(322);
-         
-            // HVACFunction.GetArea(window);
-            List<Floor> floors = HVACFunction.GetFloors();
-            string containedString = "Lea";
-
-            // List<Room> rooms = HVACFunction.GetRoomsContainingString(containedString);
-            Room room = new Room(573789);      
-            List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
-            airTerminals.Clear();
-
-            Fan fan = new Fan();
-            fan.Id =1230487612968402944;
-            List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);
-            Console.ReadLine();
+           
         }
     }
 

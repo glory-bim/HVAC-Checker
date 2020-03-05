@@ -6,29 +6,43 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-	struct ComponentAnnotation
+	public struct ComponentAnnotation
 	{
 		public long Id;       //构件id
 		public string type;   //构件类型
+		public string remark;//备注
 	};
 
 
 	//批注管理的结构体，最后转换为json返回
-	struct BimReview
+	public struct BimReview
 	{
 		public string compulsory;        //规范编号 
 		public string comment;       //审查意见  【xxx条通过】
 		public string standardCode; //规范编号  【3-2-1】
 		public bool isPassCheck;    //是否通过审查
-		public void AddViolationComponent(long Id,string componentType)
+		public BimReview(string compulsory_input,string standardCode_input)
+		{
+			compulsory = compulsory_input;
+			standardCode = standardCode_input;
+			comment = string.Empty;
+			isPassCheck = true;
+			violationComponents = new List<ComponentAnnotation>();
+		}
+		public void AddViolationComponent(long Id,string componentType,string remark)
 		{
 			ComponentAnnotation componentAnnotation = new ComponentAnnotation();
 			componentAnnotation.Id = Id;
 			componentAnnotation.type = componentType;
+			componentAnnotation.remark = remark;
+			if (violationComponents == null)
+			{
+				violationComponents = new List<ComponentAnnotation>();
+			}
 			violationComponents.Add(componentAnnotation);
 		}
-		public List<ComponentAnnotation> ViolationComponents { get { return violationComponents; } }
-		List<ComponentAnnotation> violationComponents;  // 违规构建【无】	
+		
+		public List<ComponentAnnotation> violationComponents;  // 违规构建【无】	
 	};
 	class CheckResult
 	{

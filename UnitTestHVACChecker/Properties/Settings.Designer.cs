@@ -32,5 +32,15 @@ namespace UnitTestHVACChecker.Properties {
                 return ((string)(this["ConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};dbq=D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据2.xlsx;defaultdir=D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据;driverid=1046;fil=excel 12.0;filedsn=D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\testDataSource2.dsn;maxbuffersize=2048;maxscanrows=8;pagetimeout=5;readonly=1;safetransactions=0;threads=3;uid=admin;usercommitsync=Yes")]
+        public string ConnectionString2 {
+            get {
+                return ((string)(this["ConnectionString2"]));
+            }
+        }
     }
 }
