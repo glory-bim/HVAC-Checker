@@ -18,6 +18,7 @@ namespace HVAC_CheckEngine
         
         public double? area { get; set; } = null;
         public RoomPosition? roomPosition { get; set; } = null;
+        public int ? storyNo { get; set; } = null;
         public long? Id { get; } = null;
     }
 }

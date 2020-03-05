@@ -15,40 +15,35 @@ namespace HVAC_CheckEngine
 
     public class HVACFunction
     {
-        private
-            string m_archXdb;
-            string m_hvacXdb;
-            static  string m_TestPath;
 
+        public static string m_archXdbPath { set; get; }
+        public static string m_hvacXdbPath { set; get; }
         public HVACFunction(string Archxdb,string HVACxdb)
         {
-            m_archXdb = Archxdb;
-            m_hvacXdb = HVACxdb;
+            m_archXdbPath = Archxdb;
+            m_hvacXdbPath = HVACxdb;
         }
 
-        private static string GetCurrentPath(string dbName)
+        public static string GetCurrentPath(string dbName)
         {
             dynamic ProgramType = (new Program()).GetType();
             string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
             int iSub = currentDirectory.IndexOf("\\bin");
             currentDirectory = currentDirectory.Substring(0, iSub);
-            m_TestPath = new DirectoryInfo(currentDirectory + dbName).FullName;
-            return m_TestPath;
+            string strPath = new DirectoryInfo(currentDirectory + dbName).FullName;
+            return strPath;
         }
 
         //1获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
         public static List<Room> GetRooms(string type, string name, double area, RoomPosition roomPosition)
         {
-            List<Room> rooms = new List<Room>();
-
-            string strDbName = "/建筑.GDB";
-            string path = GetCurrentPath(strDbName);
+            List<Room> rooms = new List<Room>();         
             //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return rooms;   
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);            
             dbConnection.Open();          
            // string sql = "select * from Spaces Where userLabel = ";
@@ -88,15 +83,14 @@ namespace HVAC_CheckEngine
         //  Room    某种构件  风口
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
         {
-            List<AirTerminal> airterminals = new List<AirTerminal>();
-            string strDbName = "/建筑.GDB";
-            string path = GetCurrentPath(strDbName);
+            List<AirTerminal> airterminals = new List<AirTerminal>();           
+     
             //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return airterminals;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces Where Id = ";
@@ -111,10 +105,9 @@ namespace HVAC_CheckEngine
                 Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
 
-                strDbName = "/机电.GDB";
-                path = GetCurrentPath(strDbName);
+       
                 //创建一个连接
-                connectionstr = @"data source =" + path;
+                connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
                 sql = "select * from AirTerminals";
@@ -432,15 +425,13 @@ namespace HVAC_CheckEngine
         }
 
         //3找到与风口相连的风机对象//一条路径 三通、四通只记录了一个id
-        static List<Fan> GetFanConnectingAirterminal(AirTerminal airterminal)
+        public static List<Fan> GetFanConnectingAirterminal(AirTerminal airterminal)
         {
-            List<Fan> fans = new List<Fan>();        
-            string strDbName = "/rme_basic_sample_project.GDB";
-            string path = GetCurrentPath(strDbName);
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<Fan> fans = new List<Fan>();       
+
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fans;
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             //创建一个连接
@@ -532,15 +523,12 @@ namespace HVAC_CheckEngine
         }
 
         //4找到风机的排风口对象//怎么判断风口前端后端
-        static List<AirTerminal> GetOutLetsOfFan(Fan fan)
+        public static List<AirTerminal> GetOutletsOfFan(Fan fan)
         {
-            List<AirTerminal> airTerminals = new List<AirTerminal>();
-            string strDbName = "/rme_basic_sample_project.GDB";
-            string path = GetCurrentPath(strDbName);
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<AirTerminal> airTerminals = new List<AirTerminal>();        
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return airTerminals;
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             //创建一个连接
@@ -635,15 +623,13 @@ namespace HVAC_CheckEngine
         //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
         public static List<Room> GetRoomsMoreThan(double dLength)
         {
-            List<Room> rooms = new List<Room>();  
-            string strDbName = "/建筑.GDB";
-            string path = GetCurrentPath(strDbName);
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<Room> rooms = new List<Room>();            
+        
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return rooms;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces";          
@@ -669,15 +655,14 @@ namespace HVAC_CheckEngine
 
 
         //6找到一个风机的进风口对象集合
-        public static List<AirTerminal> GetInletOfFan(Fan fan)
+        public static List<AirTerminal> GetInletsOfFan(Fan fan)
         {
             List<AirTerminal> inlets = new List<AirTerminal>();        
-            string strDbName = "/rme_basic_sample_project.GDB";
-            string path = GetCurrentPath(strDbName);
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+        //    string strDbName = "/rme_basic_sample_project.GDB";
+          
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return inlets;
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
 
@@ -1051,56 +1036,42 @@ namespace HVAC_CheckEngine
 
         //11获得一个窗户对象的有效面积  差公式 xdb差参数  开启角度  开启方式
         public static double GetArea(Windows window)  
-    {
-        double dArea = 0.0;
-        dynamic ProgramType = (new Program()).GetType();
-        string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-        int iSub = currentDirectory.IndexOf("\\bin");
-        currentDirectory = currentDirectory.Substring(0, iSub);
-        string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
+        {
+            double dArea = 0.0;  
 
-        //如果不存在，则创建一个空的数据库,
-        if (!System.IO.File.Exists(path))
-            return dArea;
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return dArea;
 
-        //创建一个连接
-        string connectionstr = @"data source =" + path;
-        SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
-        m_dbConnection.Open();
-        string sql = "select Area from Windows Where Id = ";
-        sql = sql + window.Id ;   
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select Area from Windows Where Id = ";
+            sql = sql + window.Id ;   
 
-        SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
-        SQLiteDataReader reader = command.ExecuteReader();
-        long lArea = 0;
-        string sArea = "";
-        while (reader.Read())
-            sArea= reader["Area"].ToString();   
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            long lArea = 0;
+            string sArea = "";
+            while (reader.Read())
+                sArea= reader["Area"].ToString();   
             
-        dArea = Convert.ToDouble(sArea);
-        //关闭连接
-        m_dbConnection.Close();
+            dArea = Convert.ToDouble(sArea);
+            //关闭连接
+            m_dbConnection.Close();
        
-        return dArea;
-    }
+            return dArea;
+        }
 
         //12找到属于某种类型的房间对象集合
         public static List<Room> GetRooms(string roomType)
         {
-            List<Room> rooms = new List<Room>();
-            dynamic ProgramType = (new Program()).GetType();
-
-            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-            int iSub = currentDirectory.IndexOf("\\bin");
-            currentDirectory = currentDirectory.Substring(0, iSub);
-            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
-
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<Room> rooms = new List<Room>();                
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return rooms;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();    
             string sql = "select * from Spaces Where CHARINDEX(";
@@ -1121,24 +1092,19 @@ namespace HVAC_CheckEngine
     //13找到名称包含某一字段的房间对象集合    
         public static List<Room> GetRoomsContainingString(string containedString)
         {
-            List<Room> rooms = new List<Room>();
-  
-            dynamic ProgramType = (new Program()).GetType();
-            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-            int iSub = currentDirectory.IndexOf("\\bin");
-            currentDirectory = currentDirectory.Substring(0, iSub);
-            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
-
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<Room> rooms = new List<Room>(); 
+     
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return rooms;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
-            string sql = "select * from Spaces Where name like ";
-            sql = sql + "'" + containedString + "'";
+
+            string sql = "select * from Spaces Where CHARINDEX(";
+            sql = sql +"'"+ containedString + "'" ;
+            sql = sql + ",name)> 0";       
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -1154,29 +1120,26 @@ namespace HVAC_CheckEngine
         }
 
         // 14判断房间属于地上房间或地下房间  //差参数
-        static bool isOvergroundRoom(Room room)
-        {
-            dynamic ProgramType = (new Program()).GetType();
-            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-            int iSub = currentDirectory.IndexOf("\\bin");
-            currentDirectory = currentDirectory.Substring(0, iSub);
-            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
-
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+        public static bool isOvergroundRoom(Room room)
+        {       
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return false;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
-            string sql = "select * from Spaces Where  Id =";           
+            string sql = "select userLabel from Spaces Where Id =";
+            sql += room.Id;           
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                return true;
+                if (reader["UserLabel"].ToString() == "地上房间")
+                    return true;
+                else
+                    return false;
             }  
             else
             {
@@ -1186,24 +1149,17 @@ namespace HVAC_CheckEngine
         //15获取所有楼层对象集合
         public static List<Floor> GetFloors()
         {
-            List<Floor> floors = new List<Floor>();
-            dynamic ProgramType = (new Program()).GetType();
-            string currentDirectory = Path.GetDirectoryName(ProgramType.Assembly.Location);
-            int iSub = currentDirectory.IndexOf("\\bin");
-            currentDirectory = currentDirectory.Substring(0, iSub);
-            string path = new DirectoryInfo(currentDirectory + "/建筑.GDB").FullName;
-
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            List<Floor> floors = new List<Floor>();         
+                    
+            if (!System.IO.File.Exists(m_archXdbPath))
                 return floors;
 
             //创建一个连接
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from Storeys  ";
      
-
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
           
@@ -1212,12 +1168,7 @@ namespace HVAC_CheckEngine
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));       
                 floor.storeyName = (reader["storeyName"].ToString());
                 floors.Add(floor);
-
-            }
-               
-
-
-
+            }                       
             return floors;
         }
 
@@ -1295,13 +1246,11 @@ namespace HVAC_CheckEngine
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
         public static List<Duct> GetDuctsOfFan(Fan fan)
     {
-            List<Duct> ducts = new List<Duct>();
-            string strDbName = "/测试.GDB";
-            string path = GetCurrentPath(strDbName);
+            List<Duct> ducts = new List<Duct>(); 
             //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return ducts;
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             //创建一个连接
@@ -1318,13 +1267,11 @@ namespace HVAC_CheckEngine
         }
 
         private static bool IfFindAirTerminal(string strId)
-        {
-            string strDbName = "/机电.GDB";
-            string path = GetCurrentPath(strDbName);
+        {        
             //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(path))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return false;
-            string connectionstr = @"data source =" + path;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
@@ -1451,8 +1398,8 @@ namespace HVAC_CheckEngine
                 return IfFindAirTerminal(readerDampers["Id"].ToString());
             }
         }
-        //获得防烟分区长边长度
-       public static double GetFireDistrictLength(FireDistrict fireDistrict)
+        //18获得防烟分区长边长度
+        public static double GetFireDistrictLength(FireDistrict fireDistrict)
         {
             double dLength = 0.0;  
             
@@ -1486,7 +1433,60 @@ namespace HVAC_CheckEngine
             dbConnection.Close();    
                        
             return dLength;
-        }                  
+        }
+
+        //19获得所有联通区域的集合 （联通区域是指与同一个走廊相连的所有房间的集合）
+        public static List<Region> GetConnectedRegion()
+        {
+            List<Region> regions = new List<Region>();
+            //找出所有走廊
+            List<Room> corridors = new List<Room>();
+
+
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return regions;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();       
+
+            string sql = "select * from Spaces Where CHARINDEX(";
+            sql = sql + "'" + "走廊" + "'";
+            sql = sql + ",userLabel)> 0";
+
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["Id"].ToString();
+                corridors.Add(room);
+            }
+            //每个走廊在门表中找关联房间
+            for (int i =0;i < corridors.Count();i++)
+            {               
+                sql = "select * from Doors Where FromRoomId =";
+                sql = sql + corridors.ElementAt<Room>(i).Id;            
+                
+                SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
+                while (reader.Read())
+                {              
+                    Room room = new Room(Convert.ToInt64(reader["ToRoomId"].ToString()));
+                    room.name = reader["ToRoomId"].ToString();
+                    Region region = new Region();
+                    region.rooms.Add(corridors.ElementAt<Room>(i));
+                }
+            }       
+                  
+                       
+            //关闭连接
+            dbConnection.Close();
+            return regions;
+        }
+
     }
     
 }
