@@ -92,8 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AirTerminal.cs" />
-    <Compile Include="BimReview.cs" />
-    <Compile Include="HVACChecker.cs" />
     <Compile Include="Duct.cs" />
     <Compile Include="Fan.cs" />
     <Compile Include="FireDistrict.cs" />

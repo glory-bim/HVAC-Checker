@@ -40,10 +40,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BCGL.Sharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\HVAC-Checker\BCGL.Sharp.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -89,9 +85,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HVAC-Checker\HVAC-Checker.csproj">
+    <ProjectReference Include="..\HVAC-Checker\HVAC_CheckEngine.csproj">
       <Project>{326A5BD0-1AC4-44C4-B01F-25A99751F82B}</Project>
-      <Name>HVAC-Checker</Name>
+      <Name>HVAC_CheckEngine</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29728.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC-Checker", "HVAC-Checker\HVAC-Checker.csproj", "{326A5BD0-1AC4-44C4-B01F-25A99751F82B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC_CheckEngine", "HVAC-Checker\HVAC_CheckEngine.csproj", "{326A5BD0-1AC4-44C4-B01F-25A99751F82B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC-CheckerTests", "HVAC-CheckerTests\HVAC-CheckerTests.csproj", "{F328D778-7C55-4C8A-A201-3EFB0398FE86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC_CheckEngineTests", "HVAC-CheckerTests\HVAC_CheckEngineTests.csproj", "{F328D778-7C55-4C8A-A201-3EFB0398FE86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

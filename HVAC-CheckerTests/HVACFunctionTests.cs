@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BCGL.Sharp;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Data.SQLite;
+
+
 using System.IO;
 
 
@@ -110,11 +108,11 @@ namespace HVAC_CheckEngine.Tests
         //        Assert.Fail();
         //    }
 
-        //    [TestMethod()]
-        //    public void GetRoomOfAirterminalTest()
-        //    {
-        //        Assert.Fail();
-        //    }
+        //[TestMethod()]
+        //public void GetRoomOfAirterminalTest()
+        //{
+        //    Assert.Fail();
+        //}
 
         [TestMethod()]
         public void GetAreaTest()

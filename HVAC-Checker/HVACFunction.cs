@@ -257,7 +257,7 @@ namespace HVAC_CheckEngine
         /// </summary>
         /// <param name="json">要反序列化的json字符串</param>
         /// <returns>返回一个List&lt;List&lt;XDBCurve&gt;&gt;值</returns>
-        private static List<List<XDBCurve>> ConvertJsonToBoundaryLoops(String json)
+        public static List<List<XDBCurve>> ConvertJsonToBoundaryLoops(String json)
         {
             if (String.IsNullOrEmpty(json))
                 return null;
@@ -301,14 +301,14 @@ namespace HVAC_CheckEngine
             }
             return xdbCurveLoops;
         }
-        
+
         /// <summary>
         /// 根据房间边界曲线，获得房间的包围盒（默认AABB）
         /// </summary>
         /// <param name="boundaryLoops"></param>
         /// <param name="sSpaceId"></param>
         /// <returns>Polygon2D包围盒数据</returns>
-        private static Polygon2D GetSpaceBBox(string boundaryLoops, string sSpaceId)
+        public static Polygon2D GetSpaceBBox(string boundaryLoops, string sSpaceId)
         {
             List<List<XDBCurve>> xdbCurveLoops = ConvertJsonToBoundaryLoops(boundaryLoops);
             List<PointIntList> PointLists = new List<PointIntList>();
@@ -358,7 +358,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static OBB GetSpaceOBB(string boundaryLoops, string sSpaceId)
+        public static OBB GetSpaceOBB(string boundaryLoops, string sSpaceId)
         {
             List<List<XDBCurve>> xdbCurveLoops = ConvertJsonToBoundaryLoops(boundaryLoops);
             List<PointIntList> PointLists = new List<PointIntList>();
@@ -408,7 +408,7 @@ namespace HVAC_CheckEngine
             return obb;
         }
 
-        private static PointInt getEllipsePoint(XDBEllipse xdbellipse, Double angle)
+        public static PointInt getEllipsePoint(XDBEllipse xdbellipse, Double angle)
         {
             double a = Math.Pow(xdbellipse.vector0.x, 2);
             double b = Math.Pow(xdbellipse.vector90.y, 2);
@@ -442,7 +442,7 @@ namespace HVAC_CheckEngine
             return fans;      
         }
 
-        private static void FindFansByAirterminal(SQLiteConnection dbConnection, String strId, List<Fan> inlets)
+        public static void FindFansByAirterminal(SQLiteConnection dbConnection, String strId, List<Fan> inlets)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -471,7 +471,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindFansByDuct(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        public static void FindFansByDuct(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += strId;
@@ -483,7 +483,7 @@ namespace HVAC_CheckEngine
                 FindFansByAirterminal(dbConnection, readerDuct3T["Id"].ToString(), ducts);
             }
         }
-        private static void FindFansByDuct3t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        public static void FindFansByDuct3t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
         {
             string sql = "select * from Duct3Ts Where Id = ";
             sql += strId;
@@ -496,7 +496,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindFansByDuct4t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        public static void FindFansByDuct4t(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
         {
             string sql = "select * from Duct4Ts Where Id = ";
             sql += strId;
@@ -509,7 +509,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindFansByDuctDampers(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
+        public static void FindFansByDuctDampers(SQLiteConnection dbConnection, String strId, List<Fan> ducts)
         {
             string sql = "select * from DuctDampers Where Id = ";
             sql += strId;
@@ -539,7 +539,7 @@ namespace HVAC_CheckEngine
             return airTerminals; 
         }
 
-        private static void FindOutLets(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
+        public static void FindOutLets(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -568,7 +568,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindOutletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindOutletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += strId;
@@ -580,7 +580,7 @@ namespace HVAC_CheckEngine
                 FindOutLets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
             }
         }
-        private static void FindOutletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindOutletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Duct3Ts Where Id = ";
             sql += strId;
@@ -593,7 +593,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindOutletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindOutletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Duct4Ts Where Id = ";
             sql += strId;
@@ -606,7 +606,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindOutletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindOutletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from DuctDampers Where Id = ";
             sql += strId;
@@ -677,7 +677,7 @@ namespace HVAC_CheckEngine
 
                 return inlets;
         }
-        private static void FindInlets(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
+        public static void FindInlets(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -707,7 +707,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindInletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindInletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += strId;
@@ -719,7 +719,7 @@ namespace HVAC_CheckEngine
                 FindInlets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
             }
         }
-        private static void FindInletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindInletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Duct3Ts Where Id = ";
             sql += strId;
@@ -732,7 +732,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindInletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindInletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from Duct4Ts Where Id = ";
             sql += strId;
@@ -745,7 +745,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindInletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
+        public static void FindInletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
         {
             string sql = "select * from DuctDampers Where Id = ";
             sql += strId;
@@ -1172,7 +1172,7 @@ namespace HVAC_CheckEngine
             return floors;
         }
 
-        private static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        public static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {
            
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
@@ -1204,7 +1204,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindDuctsByDuct3t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        public static void FindDuctsByDuct3t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {                  
                 string  sql = "select * from Duct3Ts Where Id = ";
                 sql += strId;
@@ -1217,7 +1217,7 @@ namespace HVAC_CheckEngine
                 }          
         }
 
-        private static void FindDuctsByDuct4t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        public static void FindDuctsByDuct4t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {
             string sql = "select * from Duct4Ts Where Id = ";
             sql += strId;
@@ -1230,7 +1230,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static void FindDuctsByDuctDuctDampers(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        public static void FindDuctsByDuctDuctDampers(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {
             string sql = "select * from DuctDampers Where Id = ";
             sql += strId;
@@ -1266,7 +1266,7 @@ namespace HVAC_CheckEngine
             return IfFindAirTerminal(fan.Id.ToString());                  
         }
 
-        private static bool IfFindAirTerminal(string strId)
+        public static bool IfFindAirTerminal(string strId)
         {        
             //如果不存在，则创建一个空的数据库,
             if (!System.IO.File.Exists(m_hvacXdbPath))
@@ -1309,9 +1309,9 @@ namespace HVAC_CheckEngine
             }
             return false;
          
-        }        
+        }
 
-        private static bool IfFindAirterminalByDuct(SQLiteConnection dbConnection, String strId)
+        public static bool IfFindAirterminalByDuct(SQLiteConnection dbConnection, String strId)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -1348,7 +1348,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static bool IfFindAirterminalByDuct3t(SQLiteConnection dbConnection, String strId)
+        public static bool IfFindAirterminalByDuct3t(SQLiteConnection dbConnection, String strId)
         {
             string sql = "select * from AirTerminals Where Id = ";
             sql += strId;
@@ -1365,7 +1365,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static bool IfFindAirterminalByDuct4t(SQLiteConnection dbConnection, String strId)
+        public static bool IfFindAirterminalByDuct4t(SQLiteConnection dbConnection, String strId)
         {
             string sql = "select * from AirTerminals Where Id = ";
             sql += strId;
@@ -1382,7 +1382,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        private static bool IfFindAirterminalByDuctDampers(SQLiteConnection dbConnection, String strId)
+        public static bool IfFindAirterminalByDuctDampers(SQLiteConnection dbConnection, String strId)
         {
             string sql = "select * from AirTerminals Where Id = ";
             sql += strId;
@@ -1488,6 +1488,6 @@ namespace HVAC_CheckEngine
         }
 
     }
-    
+    public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }
-public enum RoomPosition { overground = 1, underground = 2, semi_underground= 4 }
+
