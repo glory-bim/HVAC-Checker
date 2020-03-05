@@ -1435,6 +1435,7 @@ namespace HVAC_CheckEngine
             return dLength;
         }
 
+
         //19获得所有联通区域的集合 （联通区域是指与同一个走廊相连的所有房间的集合）
         public static List<Region> GetConnectedRegion()
         {
