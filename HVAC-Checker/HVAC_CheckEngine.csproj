@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{326A5BD0-1AC4-44C4-B01F-25A99751F82B}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>HVAC_Checker</RootNamespace>
-    <AssemblyName>HVAC-Checker</AssemblyName>
+    <RootNamespace>HVAC_CheckerEngine</RootNamespace>
+    <AssemblyName>HVAC-CheckerEngine</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
