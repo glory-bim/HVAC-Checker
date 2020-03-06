@@ -538,7 +538,7 @@ namespace HVAC_CheckEngine
         /// </summary>
         public string materialIds { get; set; }
     };
-    class GeometryFunction
+    public class GeometryFunction
     {
         /// <summary>
         /// 根据房间边界曲线，获得房间的包围盒（默认AABB）
@@ -557,7 +557,7 @@ namespace HVAC_CheckEngine
             return aabb;
 
             //OBB obb = ptlist.GetOBB(geo.Id.ToString());
-            //obb.ToDataList_OBB();
+           // obb.ToDataList_OBB();
         }
 
 
