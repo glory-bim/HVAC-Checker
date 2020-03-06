@@ -29,6 +29,6 @@ namespace HVAC_CheckEngine
 
         public long? Id { get; } = null;
 
-        public enum WindowOpenMode{HangWindow,SashWindow,BlindWindow,CasementWindow,PushWindow }//悬窗，推拉窗，百叶窗，平开窗，平推窗
+        public enum WindowOpenMode{HangWindow,SashWindow,BlindWindow,CasementWindow,PushWindow,FixWindow }//悬窗，推拉窗，百叶窗，平开窗，平推窗，固定窗
     }
 }

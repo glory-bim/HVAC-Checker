@@ -15,6 +15,8 @@ namespace HVAC_CheckEngine
         public string type { get; set; } = null;
         public string name { get; set; } = null;
         public string boundaryLoops { get; set; } = null;
+
+        public int? numberOfPeople { get; set; } = null;
         
         public double? area { get; set; } = null;
         public RoomPosition? roomPosition { get; set; } = null;

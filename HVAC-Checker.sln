@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC_CheckEngine", "HVAC-Ch
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HVAC_CheckEngineTests", "HVAC-CheckerTests\HVAC_CheckEngineTests.csproj", "{F328D778-7C55-4C8A-A201-3EFB0398FE86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestHVAC_CheckEngin", "UnitTestHVACChecker\UnitTestHVAC_CheckEngin.csproj", "{30F94794-55D7-4741-8762-1E966EC7F93C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,12 +27,20 @@ Global
 		{326A5BD0-1AC4-44C4-B01F-25A99751F82B}.Release|x64.Build.0 = Release|x64
 		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|x64.Build.0 = Debug|Any CPU
+		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|x64.ActiveCfg = Debug|x64
+		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Debug|x64.Build.0 = Debug|x64
 		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|x64.ActiveCfg = Release|Any CPU
-		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|x64.Build.0 = Release|Any CPU
+		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|x64.ActiveCfg = Release|x64
+		{F328D778-7C55-4C8A-A201-3EFB0398FE86}.Release|x64.Build.0 = Release|x64
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Debug|x64.ActiveCfg = Debug|x64
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Debug|x64.Build.0 = Debug|x64
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Release|x64.ActiveCfg = Release|x64
+		{30F94794-55D7-4741-8762-1E966EC7F93C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

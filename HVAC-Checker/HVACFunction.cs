@@ -11,7 +11,7 @@ using BCGL.Sharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-#if !DEBUG
+#if DEBUG
 namespace HVAC_CheckEngine
 {
 
@@ -1494,3 +1494,4 @@ namespace HVAC_CheckEngine
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }
 
+#endif

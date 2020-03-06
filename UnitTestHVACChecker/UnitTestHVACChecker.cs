@@ -761,7 +761,7 @@ namespace UnitTestHVACChecker
                 room.name = row.GetCell(13).StringCellValue;
                 room.area = row.GetCell(10).NumericCellValue;
                 room.roomPosition=(RoomPosition)row.GetCell(12).NumericCellValue;
-                room.numberOfPeople= row.GetCell(14).NumericCellValue;
+                room.numberOfPeople= (int)row.GetCell(14).NumericCellValue;
                 room.storyNo = (int)row.GetCell(15).NumericCellValue;
                 Rooms.Add(room);
              }
@@ -794,7 +794,7 @@ namespace UnitTestHVACChecker
                             room.name= row.GetCell(13).StringCellValue;
                             room.area = area;
                             room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                            room.numberOfPeople = row.GetCell(14).NumericCellValue;
+                            room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
                             room.storyNo = (int)row.GetCell(15).NumericCellValue;
                             Rooms.Add(room);
 
@@ -867,7 +867,7 @@ namespace UnitTestHVACChecker
                         room.name = row.GetCell(13).StringCellValue;
                         room.area = row.GetCell(10).NumericCellValue;
                         room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                        room.numberOfPeople = row.GetCell(14).NumericCellValue;
+                        room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
                         room.storyNo = (int)row.GetCell(15).NumericCellValue;
                         Rooms.Add(room);
                     }
