@@ -52,7 +52,10 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetWindowsInRoomTest()
         {
-            Assert.Fail();
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            HVACFunction.m_archXdbPath = strArchPath;
+            Room room = new Room(573789);
+            Assert.IsTrue(HVACFunction.GetWindowsInRoom(room).Count() > 0);
         }
 
         [TestMethod()]
@@ -60,7 +63,7 @@ namespace HVAC_CheckEngine.Tests
         {
             string strhvacXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//测试hvac.GDB";
             HVACFunction.m_hvacXdbPath = strhvacXdbPath;
-            AirTerminal airTerminal = new AirTerminal(1230487613786292224);
+            AirTerminal airTerminal = new AirTerminal(1230487613874372609);
             Assert.IsTrue(HVACFunction.GetFanConnectingAirterminal(airTerminal).Count() > 0);
         }
 
@@ -90,17 +93,25 @@ namespace HVAC_CheckEngine.Tests
             Assert.IsTrue(HVACFunction.GetInletsOfFan(fan).Count() > 0);              
         }
 
-        //    [TestMethod()]
-        //    public void GetDuctsCrossSpaceTest()
-        //    {
-        //        Assert.Fail();
-        //    }
+        [TestMethod()]
+        public void GetDuctsCrossSpaceTest()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            Room room = new Room(573789);
+            Assert.IsTrue(HVACFunction.GetDuctsCrossSpace(room).Count() > 0);
+        }
 
-        //    [TestMethod()]
-        //    public void GetDuctsCrossFireDistrictTest()
-        //    {
-        //        Assert.Fail();
-        //    }
+        [TestMethod()]
+        public void GetDuctsCrossFireDistrictTest()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            FireDistrict fireDistrict = new FireDistrict(573789);
+            Assert.IsTrue(HVACFunction.GetDuctsCrossFireDistrict(fireDistrict).Count()>0);
+        }
 
         //    [TestMethod()]
         //    public void GetDuctsCrossFireSideTest()
@@ -108,11 +119,15 @@ namespace HVAC_CheckEngine.Tests
         //        Assert.Fail();
         //    }
 
-        //[TestMethod()]
-        //public void GetRoomOfAirterminalTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void GetRoomOfAirterminalTest()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            AirTerminal airterminal = new AirTerminal(1225723061731328000);            
+            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id!=0);
+        }
 
         [TestMethod()]
         public void GetAreaTest()
@@ -184,18 +199,22 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetConnectedRegionTest()
         {
-            Assert.Fail();
+            HVACFunction.m_archXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            List<Region> regions = new List<Region>();
+            regions = HVACFunction.GetConnectedRegion();
+            Assert.IsTrue(regions.Count() > 0);
         }
 
 
 
-        //    [TestMethod()]
-        //    public void GetFireDistrictLengthTest()
-        //    {
-        //       // FireDistrict fireDis = new FireDistrict(573789);
-        //        double dLength = 0.0;
-        //      //  dLength = HVACFunction.GetFireDistrictLength(fireDis);
-        //        //Assert.IsTrue(dLength>0);
-        //    }
+        [TestMethod()]
+        public void GetFireDistrictLengthTest()
+        {
+             FireDistrict fireDis = new FireDistrict(573789);
+            double dLength = 0.0;
+            HVACFunction.m_archXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            dLength = HVACFunction.GetFireDistrictLength(fireDis);
+            Assert.IsTrue(dLength > 0);
+        }
     }
 }
