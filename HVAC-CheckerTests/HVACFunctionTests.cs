@@ -74,6 +74,7 @@ namespace HVAC_CheckEngine.Tests
             HVACFunction.m_hvacXdbPath = strhvacXdbPath;
             Fan fan = new Fan(1230487612968402944);
             Assert.IsTrue(HVACFunction.GetOutletsOfFan(fan).Count() > 0);
+            //Assert.IsTrue(false);
         }
 
         [TestMethod()]
@@ -90,7 +91,8 @@ namespace HVAC_CheckEngine.Tests
             string strhvacXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//测试hvac.GDB";
             HVACFunction.m_hvacXdbPath = strhvacXdbPath;
             Fan fan = new Fan(1230487612968402944);
-            Assert.IsTrue(HVACFunction.GetInletsOfFan(fan).Count() > 0);              
+            Assert.IsTrue(HVACFunction.GetInletsOfFan(fan).Count() > 0);
+            //Assert.IsTrue(false);
         }
 
         [TestMethod()]
@@ -188,11 +190,9 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void isAllBranchLinkingAirTerminalTest()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
-            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
-            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
-            Fan fan = new Fan(1235144480026263552);
-
+            string strhvacXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//测试hvac.GDB";
+            HVACFunction.m_hvacXdbPath = strhvacXdbPath;       
+            Fan fan = new Fan(1230487612968402944);
             Assert.IsTrue(HVACFunction.isAllBranchLinkingAirTerminal(fan));
         }
 
@@ -204,9 +204,7 @@ namespace HVAC_CheckEngine.Tests
             regions = HVACFunction.GetConnectedRegion();
             Assert.IsTrue(regions.Count() > 0);
         }
-
-
-
+        
         [TestMethod()]
         public void GetFireDistrictLengthTest()
         {
