@@ -52,9 +52,9 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetWindowsInRoomTest()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-arch.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
-            Room room = new Room(573789);
+            Room room = new Room(362135);
             Assert.IsTrue(HVACFunction.GetWindowsInRoom(room).Count() > 0);
         }
 
@@ -213,6 +213,7 @@ namespace HVAC_CheckEngine.Tests
             HVACFunction.m_archXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             dLength = HVACFunction.GetFireDistrictLength(fireDis);
             Assert.IsTrue(dLength > 0);
+
         }
     }
 }

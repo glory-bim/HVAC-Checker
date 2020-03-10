@@ -1398,6 +1398,81 @@ namespace HVAC_CheckEngine
             return regions;
         }
 
+        public static List<Room> GetConnectedRooms(Room room)
+        {
+            List<Room> rooms = new List<Room>();   
+            
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return rooms;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+
+            //每个走廊在门表中找关联房间
+            string sql = "select * from Doors Where FromRoomId = ";
+            sql = sql + room.Id;
+
+            SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
+            while (readerDoors.Read())
+            {
+                Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                rooms.Add(roomConnect);
+            }
+            //关闭连接
+            dbConnection.Close();
+            return rooms;
+        }
+
+        public static List<Door> GetDoorsBetweenTwoRooms(Room firstRoom, Room SecondRoom)
+        {
+            List<Door> doors = new List<Door>();
+
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return doors;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+
+            //每个走廊在门表中找关联房间
+            string sql = "select * from Doors Where FromRoomId = ";
+            sql = sql + firstRoom.Id + "and ToRoomId = ";
+            sql = sql + SecondRoom.Id;
+
+            SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
+            List<string> listStrLastId = new List<string>();
+            while (readerDoors.Read())
+            {
+                Door door = new Door(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                listStrLastId.Add(readerDoors["ToRoomId"].ToString());
+                doors.Add(door);
+            }
+
+            sql = "select * from Doors Where FromRoomId = ";
+            sql = sql + SecondRoom.Id + "and ToRoomId = ";
+            sql = sql + firstRoom.Id;
+
+            SQLiteCommand commandDoorsTo = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerDoorsTo = commandDoorsTo.ExecuteReader();
+            while (readerDoorsTo.Read())
+            {
+                Door door = new Door(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                if (!listStrLastId.Exists(x => x == readerDoors["linkElementId"].ToString()))
+                {
+                    doors.Add(door);
+                }
+            }
+
+
+            //关闭连接
+            dbConnection.Close();
+            return doors;
+        }
     }
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }

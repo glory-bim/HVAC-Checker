@@ -21,4 +21,14 @@ namespace HVAC_CheckEngine
         public int ? storyNo { get; set; } = null;
         public long? Id { get; } = null;
     }
+
+
+    public class Door
+    {
+        public Door(long id)
+        {
+            Id = id;
+        }
+        public long? Id { get; set; } = null;
+    }
 }
