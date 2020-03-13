@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Floor
+    public class Floor:Element
     {
-        public Floor(long id)
+        public Floor(long id):base(id)
         {
-            Id = id;
+            
         }
         public string storeyName { get; set; } = null;
         public double? elevation { get; set; } = null;
         public double? height { get; set; } = null;
 
         public int? FloorNumber { get; set; } = null;
-        public long? Id { get; set; } = null;
+       
     }
 }

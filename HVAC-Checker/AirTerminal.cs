@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class AirTerminal
+    public class AirTerminal:Element
     {
         public string systemType { get; set; }= null;
-        public AirTerminal(long id)
+        public AirTerminal(long id):base(id)
         {
-            Id = id;
+            
         }
-        public long? Id { get; } = null;
     }
 }

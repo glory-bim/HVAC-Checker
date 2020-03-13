@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Fan
+    public class Fan:Element
     {
-        public Fan(long id)
+        public Fan(long id):base(id)
         {
-            Id = id;
+
         }
-        public long? Id { get; set; } = null;
+        
     }
 }

@@ -1483,14 +1483,27 @@ namespace HVAC_CheckEngine
                     region.rooms.Add(corridors.ElementAt<Room>(i));
                 }
             }       
-                  
-                       
+         
             //关闭连接
             dbConnection.Close();
             return regions;
         }
+        public static List<Room> getConnectedRooms(Room room)
+        {
+            List<Room> rooms = new List<Room>();
+            return rooms;
+        }
 
+        public static List<Door> getDoorsBetweenTwoRooms(Room firstRoom,Room secondRoom)
+        {
+            List<Door> doors = new List<Door>();
+            return doors;
+        }
     }
+   
+
+
+    [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }
 

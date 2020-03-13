@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-   public class Room 
+   public class Room :Element
     {
-        public Room(long id)
+        public Room(long id):base(id)
         {
-            Id = id;
         }
         public string type { get; set; } = null;
         public string name { get; set; } = null;
@@ -21,6 +20,5 @@ namespace HVAC_CheckEngine
         public double? area { get; set; } = null;
         public RoomPosition? roomPosition { get; set; } = null;
         public int ? storyNo { get; set; } = null;
-        public long? Id { get; } = null;
     }
 }

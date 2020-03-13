@@ -95,7 +95,9 @@
     <Compile Include="AirTerminal.cs" />
     <Compile Include="assistantFunctions.cs" />
     <Compile Include="BimReview.cs" />
+    <Compile Include="door.cs" />
     <Compile Include="Duct.cs" />
+    <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
     <Compile Include="FireDistrict.cs" />
     <Compile Include="Floor.cs" />

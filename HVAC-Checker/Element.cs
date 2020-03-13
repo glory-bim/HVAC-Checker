@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Duct:Element
+    public class Element
     {
-        public Duct(long id):base(id)
+        public Element(long id)
         {
-            
+            Id = id;
         }
-        public double? airVelocity { get; set; } = null;
-       
+
+        public long? Id { get; } = null;
     }
 }

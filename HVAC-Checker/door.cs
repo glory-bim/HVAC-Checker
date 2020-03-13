@@ -6,13 +6,12 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Duct:Element
+    public class Door:Element
     {
-        public Duct(long id):base(id)
+        public Door(long id):base(id)
         {
             
         }
-        public double? airVelocity { get; set; } = null;
        
     }
 }
