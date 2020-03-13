@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
-    class AirTerminal
+    public class AirTerminal:Element
     {
+        public string systemType { get; set; }= null;
+        public AirTerminal(long id):base(id)
+        {
+            
+        }
     }
 }

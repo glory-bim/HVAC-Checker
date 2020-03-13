@@ -4,9 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
-    class Duct
+    public class Duct:Element
     {
+        public Duct(long id):base(id)
+        {
+            
+        }
+        public double? airVelocity { get; set; } = null;
+       
     }
 }

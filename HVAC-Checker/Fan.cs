@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HVAC_Checker
+namespace HVAC_CheckEngine
 {
-    class Fan
+    public class Fan:Element
     {
+        public Fan(long id):base(id)
+        {
+
+        }
+        
     }
 }
