@@ -89,7 +89,6 @@
     <Compile Include="Fan.cs" />
     <Compile Include="FireDistrict.cs" />
     <Compile Include="Floor.cs" />
-    <Compile Include="HVACFunction.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Room.cs" />
