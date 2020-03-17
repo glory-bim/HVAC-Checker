@@ -519,4 +519,261 @@ namespace UnitTestAssitantFunction
             }
         }
     }
+
+    [TestClass]
+    public class getFloorDivisionOfAirTerminalsBottomUp_test
+    {
+        [TestMethod]
+        public void test_getFloorDivisionOfAirTerminalsBottomUp_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+                
+
+                List<Room> rooms = HVACFunction.GetRooms("防烟楼梯间");
+
+                 List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(rooms[2]);
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_airTerminals = workbook.GetSheet("风口");
+
+                Dictionary<AirTerminal, List<Floor>> aimResult = new Dictionary<AirTerminal, List<Floor>>();
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 11; index <= 14; ++index)
+                {
+                    IRow row = (IRow)sheet_airTerminals.GetRow(index);
+                   
+                    long airTerminalId = Convert.ToInt64(row.GetCell(sheet_airTerminals.getColNumber("ID")).NumericCellValue);
+                    AirTerminal airTerminal = new AirTerminal(airTerminalId);
+                    airTerminal.systemType= row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
+                    airTerminal.storyNo= Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
+                    string affordStoryIdString= row.GetCell(sheet_airTerminals.getColNumber("负担的楼层")).ToString();
+                    List<Floor> floors = FakeHVACFunction.getAllFloorsByIdString(affordStoryIdString);
+                    aimResult[airTerminal] = floors;
+                }
+
+                //打开测试数据文件
+                //act
+                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsBottomUp(HVACFunction.GetFloors(), airTerminals);
+
+                //assert
+
+                Custom_Assert.AreDictionaryEqual(aimResult, result);
+            }
+
+        }
+
+       
+
+        
+
+    }
+
+    [TestClass]
+    public class getFloorDivisionOfAirTerminalsTopToBottom_test
+    {
+        [TestMethod]
+        public void test_getFloorDivisionOfAirTerminalsTopToBottom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+
+
+                List<Room> rooms = HVACFunction.GetRooms("防烟楼梯间");
+
+                List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(rooms[1]);
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_airTerminals = workbook.GetSheet("风口");
+
+                Dictionary<AirTerminal, List<Floor>> aimResult = new Dictionary<AirTerminal, List<Floor>>();
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 8; index <= 10; ++index)
+                {
+                    IRow row = (IRow)sheet_airTerminals.GetRow(index);
+
+                    long airTerminalId = Convert.ToInt64(row.GetCell(sheet_airTerminals.getColNumber("ID")).NumericCellValue);
+                    AirTerminal airTerminal = new AirTerminal(airTerminalId);
+                    airTerminal.systemType = row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
+                    airTerminal.storyNo = Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
+                    string affordStoryIdString = row.GetCell(sheet_airTerminals.getColNumber("负担的楼层")).ToString();
+                    List<Floor> floors = FakeHVACFunction.getAllFloorsByIdString(affordStoryIdString);
+                    aimResult[airTerminal] = floors;
+                }
+
+                //打开测试数据文件
+                //act
+                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(HVACFunction.GetFloors(), airTerminals);
+
+                //assert
+
+                Custom_Assert.AreDictionaryEqual(aimResult, result);
+            }
+
+        }
+
+    }
+
+    [TestClass]
+    public class getAffordHeightOfFanBottomUp_test
+    {
+        [TestMethod]
+        public void test_getAffordHeightOfFanBottomUp_test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+
+                FakeHVACFunction.roomSheetName_new = "房间";
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                //arrange
+
+
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_fans = workbook.GetSheet("风机");
+
+                Dictionary<AirTerminal, List<Floor>> aimResult = new Dictionary<AirTerminal, List<Floor>>();
+
+                Fan fan = new Fan(10);
+
+                double aimHight = 70000;
+                //打开测试数据文件
+                //act
+                ISheet sheet_rooms = workbook.GetSheet("房间");
+                IRow row = (IRow)sheet_rooms.GetRow(1);
+                Room stairCase = new Room(1);
+                
+
+                stairCase.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                stairCase.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                stairCase.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                stairCase.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                stairCase.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
+
+                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                int lowestStoryNo = stairCase.storyNo.Value;
+                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+
+                double hight = assistantFunctions.getAffordHeightOfFanByFloorDivision(fan,assistantFunctions.getFloorDivisionOfAirTerminalsBottomUp(floors, airTerminals));
+
+                //assert
+
+                Assert.AreEqual(aimHight, hight);
+            }
+
+        }
+
+
+    }
+
+    [TestClass]
+    public class getAffordHeightOfFanTopToBottom_test
+    {
+        [TestMethod]
+        public void test_getAffordHeightOfFanTopToBottom_test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+
+                FakeHVACFunction.roomSheetName_new = "房间";
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                //arrange
+
+
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_fans = workbook.GetSheet("风机");
+
+                Dictionary<AirTerminal, List<Floor>> aimResult = new Dictionary<AirTerminal, List<Floor>>();
+
+                Fan fan = new Fan(10);
+
+                double aimHight = 90000;
+                //打开测试数据文件
+                //act
+                ISheet sheet_rooms = workbook.GetSheet("房间");
+                IRow row = (IRow)sheet_rooms.GetRow(4);
+                Room stairCase = new Room(4);
+
+
+                stairCase.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                stairCase.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                stairCase.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                stairCase.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                stairCase.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
+
+                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                int lowestStoryNo = stairCase.storyNo.Value;
+                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+
+                double hight = assistantFunctions.getAffordHeightOfFanByFloorDivision(fan, assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(floors, airTerminals));
+
+                //assert
+
+                Assert.AreEqual(aimHight, hight);
+
+            }
+        }
+    }
+
 }

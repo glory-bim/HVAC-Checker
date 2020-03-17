@@ -1115,6 +1115,8 @@ namespace UnitTestHVACChecker
 
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.roomSheetName_new = "房间(通过测试)";
+
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
@@ -1129,7 +1131,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
                 //arrange
-                globalData.buildingHeight =50;
+                globalData.buildingHeight = 50;
                 globalData.buildingType = "公共建筑";
                 string comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。";
 
@@ -1172,7 +1174,7 @@ namespace UnitTestHVACChecker
         }
 
         [TestMethod]
-        public void test_publicBuilding_unPass()
+        public void test_publicBuilding_unPass_heighterThan50m()
         {
 
             using (ShimsContext.Create())
@@ -1228,9 +1230,496 @@ namespace UnitTestHVACChecker
             }
         }
 
+        [TestMethod]
+        public void test_residenceBuilding_unPass_heighterThan100m()
+        {
+
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(通过测试)";
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomOfAirterminalAirTerminal = FakeHVACFunction.GetRoomOfAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+                globalData.buildingHeight = 101;
+                globalData.buildingType = "住宅";
+                string comment = "设计不满足规范GB51251_2017中第3.1.5条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet("房间(通过测试)");
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                IRow row = (IRow)sheet_rooms.GetRow(8);
+                long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                componentAnnotation.Id = roomId;
+                componentAnnotation.type = type;
+                componentAnnotation.remark = string.Empty;
+                componentViolations.Add(componentAnnotation);
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_1_5();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_residenceBuilding_unPass_multicase()
+        {
+
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(通过不测试)";
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomOfAirterminalAirTerminal = FakeHVACFunction.GetRoomOfAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+                globalData.buildingHeight = 100;
+                globalData.buildingType = "住宅";
+                string comment = "设计不满足规范GB51251_2017中第3.1.5条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_1_5();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+       
+
+
+    }
+    [TestClass]
+    public class GB51251_2017_3_2_1_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间（通过≤10m）";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                //arrange
+                globalData.buildingHeight = 10;
+                globalData.buildingType = "住宅";
+                string comment = "设计满足规范GB51251_2017中第3.2.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass_lowerThan10m()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间（不通过≤10m）";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                //arrange
+                globalData.buildingHeight = 10;
+                globalData.buildingType = "住宅";
+                string comment = "可开启外窗设置不满足规范GB51251_2017中第3.2.1条条文规定。请专家复核楼梯间中是否有其他开口满足规范要求";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_pass_higherThan10m()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间（通过＞10m）";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                //arrange
+                globalData.buildingHeight = 11;
+                globalData.buildingType = "住宅";
+                string comment = "设计满足规范GB51251_2017中第3.2.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass_higherThan10m()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间（不通过＞10m）";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                //arrange
+                globalData.buildingHeight = 11;
+                globalData.buildingType = "住宅";
+                string comment = "可开启外窗设置不满足规范GB51251_2017中第3.2.1条条文规定。请专家复核楼梯间中是否有其他开口满足规范要求";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
     }
 
-        public static class FakeHVACFunction
+    [TestClass]
+    public class GB51251_2017_3_3_1_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+                //arrange
+               
+                string comment = "设计满足规范GB51251_2017中第3.3.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+                //arrange
+
+                string comment = "设计不满足规范GB51251_2017中第3.3.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    public static class FakeHVACFunction
     {
         public static string testDataTableName { get; set; }
 
@@ -1264,6 +1753,21 @@ namespace UnitTestHVACChecker
             return airTerminals;
         }
 
+        public static int getHighestStoryNoOfRoom_new(Room room)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            long roomId = room.Id.Value;
+            IRow row = (IRow)sheet_rooms.GetRow((int)roomId);
+
+            int storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
+            return storyNo;
+        }
+
         public static List<AirTerminal> GetRoomContainAirTerminal_new(Room room)
         {
             string importExcelPath = ExcelPath_new;
@@ -1278,7 +1782,7 @@ namespace UnitTestHVACChecker
             long roomId = room.Id.Value;
             IRow row = (IRow)sheet_rooms.GetRow((int)roomId);
             //从对应行中读取房间中所含的所有风口的集合
-            string idString= row.GetCell(2).StringCellValue;
+            string idString= row.GetCell(sheet_rooms.getColNumber("包含的风口")).ToString();
             airTerminals = getAllTerminalsByIdString(idString);
             return airTerminals;
         }
@@ -1373,7 +1877,7 @@ namespace UnitTestHVACChecker
             IRow row = (IRow)sheet_rooms.GetRow((int)room.Id.Value);
       
             //获得房间所含窗户的id字符串
-            string idList= row.GetCell(4).StringCellValue;
+            string idList= row.GetCell(sheet_rooms.getColNumber("房间包含窗户的ID")).ToString();
             List<Windows> windows = getAllWindowsByIdString(idList);
 
             return windows;
@@ -1411,7 +1915,7 @@ namespace UnitTestHVACChecker
             for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
             {
                 IRow row = (IRow)sheet_rooms.GetRow(index);
-                string idString = row.GetCell(sheet_rooms.getColNumber("包含的风口")).StringCellValue;
+                string idString = row.GetCell(sheet_rooms.getColNumber("包含的风口")).ToString();
                 List<AirTerminal> airTerminals = getAllTerminalsByIdString(idString);
                 if(airTerminals.findItem(airTerminal)!=null)
                 {
@@ -1564,7 +2068,7 @@ namespace UnitTestHVACChecker
             ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
             //获得房间的门ID字符串
             IRow row = (IRow)sheet_rooms.GetRow((int)room.Id);
-            string idString = row.GetCell(sheet_rooms.getColNumber("包含的门ID")).StringCellValue;
+            string idString = row.GetCell(sheet_rooms.getColNumber("包含的门ID")).ToString();
             //获得房间的所有门的集合
             List<Door> doors = getAllDoorsByIdString(idString);
             List<Room> rooms = new List<Room>();
@@ -1608,6 +2112,30 @@ namespace UnitTestHVACChecker
             List<Door> DoorsBetweenTwoRooms = doorsOfFirstRoom.getCommonItems(doorsOfSecondRoom);
             //返回集合DoorsToCorridor
             return DoorsBetweenTwoRooms;
+        }
+
+        public static List<Floor> GetAllFLoorsOfBuilding_new()
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_floors = workbook.GetSheet("楼层");
+           
+            List<Floor> floors = new List<Floor>();
+
+            //依次遍历所有楼层
+            for (int index = 1; index <= sheet_floors.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_floors.GetRow(index);
+                Floor floor = new Floor((long)row.GetCell(sheet_floors.getColNumber("ID")).NumericCellValue);
+                floor.storyNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
+                floor.height = row.GetCell(sheet_floors.getColNumber("楼层高度")).NumericCellValue;
+                floor.elevation = row.GetCell(sheet_floors.getColNumber("楼层标高")).NumericCellValue;
+                floors.Add(floor);
+            }
+
+            return floors;
         }
 
         public static List<Room> GetRoomsMoreThan(double dLength)
@@ -1717,6 +2245,7 @@ namespace UnitTestHVACChecker
                 IRow row = (IRow)sheet_airTerminals.GetRow((int)id);
                 AirTerminal airTerminal = new AirTerminal(id);
                 airTerminal.systemType= row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
+                airTerminal.storyNo= (int)row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue;
                 airTerminals.Add(airTerminal);
             }
             return airTerminals;
@@ -1751,12 +2280,49 @@ namespace UnitTestHVACChecker
         {
             List<long> idList = getIdList(IdString);
             List<Windows> windows = new List<Windows>();
+
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_windows = workbook.GetSheet("窗户");
+
             foreach (long id in idList)
             {
                 Windows window = new Windows(id);
+                IRow row = (IRow)sheet_windows.GetRow((int)id);
+                window.area= row.GetCell(sheet_windows.getColNumber("窗户面积")).NumericCellValue;
+                window.storyNo= (int)row.GetCell(sheet_windows.getColNumber("楼层编号")).NumericCellValue;
+                window.isExternalWindow= row.GetCell(sheet_windows.getColNumber("是否是外窗")).BooleanCellValue;
+                window.openMode= (Windows.WindowOpenMode)row.GetCell(sheet_windows.getColNumber("窗户类型")).NumericCellValue;
                 windows.Add(window);
             }
             return windows;
+        }
+
+        public static List<Floor> getAllFloorsByIdString(string idString)
+        {
+            List<long> idList = getIdList(idString);
+            List<Floor> floors = new List<Floor>();
+
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_floors = workbook.GetSheet("楼层");
+
+            foreach (long id in idList)
+            {
+                Floor floor = new Floor(id);
+                IRow row = (IRow)sheet_floors.GetRow((int)id);
+                floor.storyNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
+                floor.height = row.GetCell(sheet_floors.getColNumber("楼层高度")).NumericCellValue;
+                floor.elevation= row.GetCell(sheet_floors.getColNumber("楼层标高")).NumericCellValue;
+                floors.Add(floor);
+            }
+            return floors;
         }
 
         private static List<long> getIdList(string IdString)
@@ -1835,6 +2401,19 @@ namespace UnitTestHVACChecker
             for (int index = 0; index < minCountOfList; ++index)
             {
                 Assert.IsTrue(firstList.Exists(x => x.Id==secondList[index].Id));
+            }
+        }
+
+
+        public static void AreDictionaryEqual<T1,T2>(Dictionary<T1,List<T2>> firstDictionary, Dictionary<T1, List<T2>> secondDictionary) where T1 : Element
+                                                                                                                             where T2:Element
+        {
+            foreach(KeyValuePair<T1, List<T2>> pair in firstDictionary)
+            {
+                List<T2> floors = secondDictionary.getValueAccordingToKey(pair.Key);
+                if (floors == null)
+                    Assert.Fail("两字典不等");
+                Custom_Assert.AreListsEqual(pair.Value, floors);
             }
         }
     }

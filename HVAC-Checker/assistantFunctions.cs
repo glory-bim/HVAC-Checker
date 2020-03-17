@@ -37,7 +37,9 @@ namespace HVAC_CheckEngine
 
         public static bool isRoomHaveSomeSystem(Room room, string systemName)
         {
-            if (isRoomHaveSomeMechanicalSystem(room, systemName) || isRoomHaveSomeNatureSystem(room, systemName))
+            if (room == null)
+                throw new ArgumentException();
+            if (isRoomHaveSomeMechanicalSystem(room, systemName) || isRoomHaveNatureVentilateSystem(room))
             {
                 return true;
             }
@@ -47,6 +49,8 @@ namespace HVAC_CheckEngine
 
         public static bool isRoomHaveSomeMechanicalSystem(Room room, string systemName)
         {
+            if(room==null||systemName==null)
+                throw new ArgumentException();
             //如果房间中有某种系统类型的风口
             List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
             AirTerminal pressureAirTerminal = assistantFunctions.GetAirTerminalOfCertainSystem(airTerminals, systemName);
@@ -64,8 +68,10 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        public static bool isRoomHaveSomeNatureSystem(Room room, string systemName)
+        public static bool isRoomHaveNatureVentilateSystem(Room room)
         {
+            if(room==null)
+                throw new ArgumentException();
             //      如果房间中没有可开启外窗，则返回否
             List<Windows> windows = HVACFunction.GetWindowsInRoom(room);
             Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
@@ -80,12 +86,13 @@ namespace HVAC_CheckEngine
 
         public static bool isRegionHaveSomeSystem(Region region, string systemName)
         {
+            if(region==null||systemName==null)
+                throw new ArgumentException();
             List<Room> nonPublicRooms = region.rooms;
             nonPublicRooms.exceptPublicRooms();
             Room corridor = getCorridorOfConnectedRegion(region);
             if (isRoomHaveSomeSystem(corridor, "排烟"))
                 return true;
-
             foreach(Room room in nonPublicRooms)
             {
                 if (!assistantFunctions.isRoomHaveSomeSystem(room, "排烟"))
@@ -95,19 +102,25 @@ namespace HVAC_CheckEngine
             
         }
 
-        public static List<Room> filtrateRoomsBetweenFloor_aAndFloor_b(List<Room> rooms, int floor_a, int floor_b)
+        public static List<T> filtrateElementsBetweenFloor_aAndFloor_b<T>(List<T> elements, int floor_a, int floor_b)where T:Element
         {
-            List<Room> aimRooms = new List<Room>();
-            foreach (Room room in rooms)
+            if(elements == null)
+                throw new ArgumentException();
+            List<T> aimElements = new List<T>();
+            foreach (T element in elements)
             {
-                if (room.storyNo >= floor_a && room.storyNo <= floor_b)
-                    aimRooms.Add(room);
+                if (element.storyNo >= floor_a && element.storyNo <= floor_b)
+                    aimElements.Add(element);
             }
-            return aimRooms;
+            return aimElements;
         }
+
+       
 
         public static List<T> exceptSameItems<T>(this List<T> items, List<T> exceptedItems) where T : Element
         {
+            if(items==null||exceptedItems==null)
+                throw new ArgumentException();
             List<T> items_copy = new List<T>();
             items_copy.AddRange(items);
             foreach (T item in exceptedItems)
@@ -120,6 +133,8 @@ namespace HVAC_CheckEngine
 
         public static List<T> getCommonItems<T>(this List<T> firstItems, List<T> secondItems) where T : Element
         {
+            if (firstItems == null || secondItems == null)
+                throw new ArgumentException();
             List<T> commonItems = new List<T>();
             foreach (T item in firstItems)
             {
@@ -132,6 +147,9 @@ namespace HVAC_CheckEngine
 
         public static T findItem<T>(this List<T> items, T aimItem)where T:Element
         {
+            if(items==null)
+                throw new ArgumentException();
+
             Element aimElement = aimItem as Element;
             foreach (T item in items)
             {
@@ -146,6 +164,8 @@ namespace HVAC_CheckEngine
 
        public static bool isCommonOfenStayRoom(Room room)
         {
+            if(room==null)
+                throw new ArgumentException();
             List<string> commonOfenStayRoomTypes = new List<string>(CommonOfenStayRoomTypes);
 
             return commonOfenStayRoomTypes.Exists(type => type == room.type);
@@ -155,6 +175,9 @@ namespace HVAC_CheckEngine
 
         public static bool isPublicRoom(Room room)
         {
+            if (room == null)
+                throw new ArgumentException();
+
             List<string> publicRooms = new List<string>(PublicRooms);
 
             return publicRooms.Exists(type => type == room.type);
@@ -163,6 +186,9 @@ namespace HVAC_CheckEngine
 
         public static List<Room> getAllWindowlessRooms(List<Room> rooms)
         {
+            if (rooms == null)
+                throw new ArgumentException();
+
             List<Room> windowlessRooms = new List<Room>();
             foreach (Room room in rooms)
             {
@@ -182,6 +208,8 @@ namespace HVAC_CheckEngine
 
        public static List<Region> filtrateNeedSmokeExhaustRegions(List<Region> regions)
         {
+            if (regions == null)
+                throw new ArgumentException();
             List<Region> needSmokeExhaustRegions = new List<Region>();
             //依次遍历区域集合中的每一个区域
             foreach (Region region in regions)
@@ -209,8 +237,55 @@ namespace HVAC_CheckEngine
             return needSmokeExhaustRegions;
         }
 
+        public static List<AirTerminal> filtrateAirTerminalOfSomeSystem(List<AirTerminal> airTerminals,string system)
+        {
+            List<AirTerminal> aimAirTerminals = new List<AirTerminal>();
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if (airTerminal.systemType.Contains(system))
+                    aimAirTerminals.Add(airTerminal);
+            }
+            return aimAirTerminals;
+        }
+
+        public static Windows findWindowNoSmallerThanSomeArea(this List<Windows>windows,double area)
+        {
+            foreach(Windows window in windows)
+            {
+                if (window.area >= area)
+                    return window;
+            }
+            return null;
+        }
+
+        public static List<Fan>getAllFansConnectToAirTerminals(List<AirTerminal> airTerminals)
+        {
+            List<Fan> fans = new List<Fan>();
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                List<Fan> temp_fans = HVACFunction.GetFanConnectingAirterminal(airTerminal);
+                if (temp_fans.Count == 0)
+                    throw new modelException("风口没有连接风机");
+                if(!fans.Exists(x=>x.Id.Value==temp_fans[0].Id.Value))
+                    fans.Add(temp_fans[0]);
+            }
+            return fans;
+        }
+
+        public  static double calculateTotalAreaOfWindows(List<Windows> windows)
+        {
+            double sum = 0;
+            foreach(Windows window in windows)
+            {
+                sum += window.area.Value;
+            }
+            return sum;
+        }
         private static bool isOvergroundRegion(Region region)
         {
+            if (region == null)
+                throw new ArgumentException();
+
             if (region.rooms.Count == 0)
                 throw new ArgumentException("区域中没有房间");
             if (region.rooms[0].roomPosition == RoomPosition.overground)
@@ -221,6 +296,9 @@ namespace HVAC_CheckEngine
 
         public static double getSumOfAllRoomsAreaOfRooms(List<Room> rooms)
         {
+            if (rooms == null)
+                throw new ArgumentException();
+
             double sum = 0;
             foreach (Room room in rooms)
             {
@@ -232,6 +310,9 @@ namespace HVAC_CheckEngine
 
         private static List<Room> filtrateAllPublicRoom(List<Room> rooms)
         {
+            if(rooms==null)
+                throw new ArgumentException();
+
             List<Room> publicRooms = new List<Room>();
             foreach(Room room in rooms)
             {
@@ -243,6 +324,9 @@ namespace HVAC_CheckEngine
 
         public static List<Room> exceptPublicRooms(this  List<Room> rooms)
         {
+            if(rooms==null)
+                throw new ArgumentException();
+
             List<Room> publicRooms = assistantFunctions.filtrateAllPublicRoom(rooms);
             return rooms.exceptSameItems(publicRooms);
         }
@@ -250,6 +334,8 @@ namespace HVAC_CheckEngine
 
         public static bool isStairPressureAirSystemIndependent(Room stairCase)
         {
+            if (stairCase == null)
+                throw new ArgumentException();
             //获得楼梯间包含的所有风口集合airTerminalsInStairCase
             List<AirTerminal> airTerminalsInStairCase= HVACFunction.GetRoomContainAirTerminal(stairCase);
             if (airTerminalsInStairCase.Count == 0)
@@ -300,6 +386,8 @@ namespace HVAC_CheckEngine
         //  怎返回True
         public static bool isAtriaPressureAirSystemIndependent(Room atria)
         {
+            if (atria == null)
+                throw new ArgumentException();
             //获得前室中的风口的集合airTerminalsInAtria
             List<AirTerminal> airTerminalsInAtria = HVACFunction.GetRoomContainAirTerminal(atria);
             if (airTerminalsInAtria.Count == 0)
@@ -326,7 +414,7 @@ namespace HVAC_CheckEngine
             {
                 //  如果风口不在前室中
                 Room room = HVACFunction.GetRoomOfAirterminal(airTerminal);
-                if (!room.type.Contains("前室"))
+                if (room!=null&&!room.type.Contains("前室"))
                     //      则返回false
                     return false;
             }
@@ -342,6 +430,9 @@ namespace HVAC_CheckEngine
         //返回DoorsToCorridor
         public static List<Door> getDoorsToCorridorOfAtria(Room atria)
         {
+            if (atria == null)
+                throw new ArgumentException();
+
             //获得前室所有相连房间的集合linkedRooms
             List<Room> linkedRooms = HVACFunction.getConnectedRooms(atria);
             if (linkedRooms.Count <= 0)
@@ -369,6 +460,9 @@ namespace HVAC_CheckEngine
 
         public static bool isViolateRoomAlreadyInResult(Room room,BimReview result)
         {
+            if (room == null)
+                throw new ArgumentException();
+
             List<ComponentAnnotation> violateComponents = result.violationComponents;
             foreach(ComponentAnnotation violateComponent in violateComponents)
             {
@@ -380,7 +474,10 @@ namespace HVAC_CheckEngine
 
         private static Room getCorridorOfConnectedRegion(Region region)
         {
-            foreach(Room room in region.rooms)
+            if (region == null||region.rooms==null)
+                throw new ArgumentException();
+
+            foreach (Room room in region.rooms)
             {
                 if (room.type == "走廊" || room.type == "走道")
                     return room;
@@ -388,6 +485,166 @@ namespace HVAC_CheckEngine
             //如果区域没有走廊则抛出异常
             throw new ArgumentException("区域中没有走廊");
         }
+
+        //对楼层对象进行排序
+        //从最低楼层开始
+        //依次遍历每个楼层
+        //如果当前楼层有风口且目标风口为空
+        //则将当前楼层风口设为目标风口
+        //如果目标风口不为空
+        //则将目标风口及楼层列表加入到结果中
+        //并将本层风口设置为目标风口
+        //清空楼层列表
+        //将当前楼层加入到楼层列表中
+
+
+        public static Dictionary<AirTerminal,List<Floor>> getFloorDivisionOfAirTerminalsBottomUp(List<Floor>floors,List<AirTerminal>airTerminals)
+        {
+            
+            //对楼层对象进行排序
+            floors.Sort((x,y)=>x.storyNo.Value.CompareTo(y.storyNo.Value));
+            return getFloorDivisionOfAirTerminals(floors, airTerminals);
+           
+        }
+
+        public static Dictionary<AirTerminal, List<Floor>> getFloorDivisionOfAirTerminalsTopToBottom(List<Floor> floors, List<AirTerminal> airTerminals)
+        {
+
+            //对楼层对象进行排序
+            floors.Sort((x, y) => y.storyNo.Value.CompareTo(x.storyNo.Value));
+            return getFloorDivisionOfAirTerminals(floors, airTerminals);
+
+        }
+
+        private static Dictionary<AirTerminal, List<Floor>> getFloorDivisionOfAirTerminals(List<Floor> floors, List<AirTerminal> airTerminals)
+        {
+            Dictionary<AirTerminal, List<Floor>> FloorDivisionOfAirTerminals = new Dictionary<AirTerminal, List<Floor>>();
+            //从最低楼层开始
+            AirTerminal aimAirTerminal = null;
+            List<Floor> affordFloors = new List<Floor>();
+            //依次遍历每个楼层
+            foreach (Floor floor in floors)
+            {
+                //如果当前楼层有风口且目标风口为空
+                List<AirTerminal> airTerminalInCurrentFloor = getAirTerminalsInFloor(floor, airTerminals);
+                if (airTerminalInCurrentFloor.Count > 0 && aimAirTerminal == null)
+                {
+                    //则将当前楼层风口设为目标风口
+                    aimAirTerminal = airTerminalInCurrentFloor[0];
+                }
+                //如果目标风口不为空且当前楼层有风口
+                else if (airTerminalInCurrentFloor.Count > 0 && aimAirTerminal != null)
+                {
+                    //则将目标风口及楼层列表加入到结果中
+                    FloorDivisionOfAirTerminals.Add(aimAirTerminal, affordFloors);
+                    //将本层风口设置为目标风口
+                    
+                        aimAirTerminal = airTerminalInCurrentFloor[0];
+                    //清空楼层列表
+                    affordFloors = new List<Floor>();
+                }
+                //如果负担的楼层已经为3层
+                else if(affordFloors.Count==3)
+                {
+                    //如果目标风口不为空
+                    if(aimAirTerminal!=null)
+                    {
+                        //则将目标风口及楼层列表加入到结果中
+                        FloorDivisionOfAirTerminals.Add(aimAirTerminal, affordFloors);
+                        aimAirTerminal = null;
+                    }
+                    //清空楼层列表
+                    affordFloors = new List<Floor>();
+                }
+                //将当前楼层加入到楼层列表中
+                affordFloors.Add(floor);
+            }
+            if(aimAirTerminal!=null)
+                FloorDivisionOfAirTerminals.Add(aimAirTerminal, affordFloors);
+
+            return FloorDivisionOfAirTerminals;
+        }
+
+       
+
+
+        public static double getAffordHeightOfFanByFloorDivision(Fan fan,Dictionary<AirTerminal,List<Floor>>floorDivision)
+        {
+            //找到风机的所有加压送风口
+            List<AirTerminal> airTerminalsConnectToFan = HVACFunction.GetOutletsOfFan(fan);
+            if (airTerminalsConnectToFan.Count == 0)
+                return 0;
+
+            double lowestHeight = double.MaxValue;
+            double highestHeight = double.MinValue;
+
+            foreach (AirTerminal airTerminal in airTerminalsConnectToFan)
+            {
+                AirTerminal airTerminalInDictionary = floorDivision.findElementFromDictionary(airTerminal);
+                if (airTerminalInDictionary==null)
+                    throw new ArgumentException();
+
+                foreach (Floor floor in floorDivision[airTerminalInDictionary])
+                {
+                    if (lowestHeight > floor.elevation)
+                        lowestHeight = floor.elevation.Value;
+                    if (highestHeight < floor.elevation.Value + floor.height.Value)
+                        highestHeight = floor.elevation.Value + floor.height.Value;
+                }
+
+            }
+            return highestHeight - lowestHeight;
+        }
+
+
+       static private T1 findElementFromDictionary<T1,T2>(this Dictionary<T1, List<T2>>dictionary,T1 element) where T1:Element
+                                                                                             where T2:Element
+        {
+            foreach(KeyValuePair<T1, List<T2>> pair in dictionary)
+            {
+                if (pair.Key.Id.Value.Equals(element.Id.Value))
+                    return pair.Key;
+            }
+            return null;
+        }
+       
+
+        private static List<AirTerminal> getAirTerminalsInFloor(Floor floor,List<AirTerminal>airTerminals)
+        {
+            List<AirTerminal> aimAirTerminals = new List<AirTerminal>();
+            int storyNo = floor.storyNo.Value;
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if (airTerminal.storyNo == storyNo)
+                    aimAirTerminals.Add(airTerminal);
+            }
+            return aimAirTerminals;
+        }
+
+        public static List<T2> getValueAccordingToKey<T1, T2>(this Dictionary<T1, List<T2>> dictionary,T1 key) where T1:Element
+                                                                                                               where T2 : Element
+        {
+            foreach(KeyValuePair<T1, List<T2>> pair in dictionary)
+            {
+                if (pair.Key.Id == key.Id)
+                    return pair.Value;
+            }
+            return null;
+        } 
+
+        public static List<Floor> filterFloorsBetweenlowestAndHighestStoryNo(int lowestStoryNo,int HighestStoryNo)
+        {
+            List<Floor> allFloors = HVACFunction.GetFloors();
+            List<Floor> aimFloors = new List<Floor>();
+            foreach(Floor floor in allFloors)
+            {
+                if (floor.storyNo >= lowestStoryNo && floor.storyNo <= HighestStoryNo)
+                    aimFloors.Add(floor);
+            }
+            return aimFloors;
+        }
+
+
         private static string[] CommonOfenStayRoomTypes = { "办公室", "会议室", "报告厅", "商场" };
         private static string[] PublicRooms = { "走廊", "走道", "楼梯间", "前室", "避难间" };
     }

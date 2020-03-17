@@ -1010,9 +1010,10 @@ namespace HVAC_CheckEngine
                 rooms.Add(room);
             }
                
-        return rooms;
-    }
-    //13找到名称包含某一字段的房间对象集合    
+            return rooms;
+        }
+
+        //13找到名称包含某一字段的房间对象集合    
         public static List<Room> GetRoomsContainingString(string containedString)
         {
             List<Room> rooms = new List<Room>(); 
@@ -1089,11 +1090,12 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));       
-                floor.storeyName = (reader["storeyName"].ToString());
+                floor.storyNo = (int)(reader["storeyNo"]);
                 floors.Add(floor);
             }                       
             return floors;
         }
+       
 
         public static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {
@@ -1486,6 +1488,15 @@ namespace HVAC_CheckEngine
             List<Door> doors = new List<Door>();
             return doors;
         }
+
+
+        public static int getHighestStoryNoOfRoom(Room room)
+        {
+            int storyNo = 0;
+            return storyNo;
+        }
+
+       
     }
    
 

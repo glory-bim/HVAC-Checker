@@ -28,6 +28,7 @@ namespace HVAC_CheckEngine
             //获得建筑中所有防烟楼梯间、前室及避难间的集合
             List<Room> rooms = new List<Room>();
             List<Room> rooms_temp = null;
+      
             rooms_temp = HVACFunction.GetRooms("防烟楼梯间");
             if (rooms_temp != null)
                 rooms.AddRange(rooms_temp);
@@ -51,6 +52,7 @@ namespace HVAC_CheckEngine
                     string remark = string.Empty;
                     if (((globalData.buildingType.Contains("公共建筑") || globalData.buildingType.Contains("厂房") || globalData.buildingType.Contains("仓库")) && globalData.buildingHeight <= 50) ||
                        globalData.buildingType.Contains("住宅") && globalData.buildingHeight <= 100)
+                       //如果违规房间为防烟楼梯间则在此构件中备注需要专家审核
                         if (room.type.Contains("楼梯间"))
                         {
                             remark = "此楼梯间需要专家复核";
@@ -130,11 +132,11 @@ namespace HVAC_CheckEngine
                 }
 
 
-                //获取所有丙类生产场所，并放入房间集合中
+                //获取所有丙类生产场所，并放入房间集合中 rooms_Class_C_productPlant
                 rooms_Class_C_productPlant = HVACFunction.GetRooms("丙类生产");
 
 
-                //  对房间集合中的所有房间进行如下操作
+                
                 //  如果建筑类型为丙类厂房
                 if (globalData.buildingType.Contains("丙类厂房"))
                 {
@@ -145,10 +147,10 @@ namespace HVAC_CheckEngine
                     rooms_temp = rooms_temp.exceptSameItems(rooms_Class_C_productPlant);
                     //从rooms_temp除去公共房间
                     rooms_temp = rooms_temp.exceptPublicRooms();
-                    //将rooms_temp集合中的房间加入到rooms集合中
+                    //将rooms_temp集合中的房间加入到rooms_needSpecialRemark集合中
                     rooms_needSpecialRemark = rooms_temp;
                 }
-
+                //  对房间集合rooms中的所有房间进行如下操作
                 foreach (Room room in rooms)
                 {
                     // 判断他们是否有排烟系统。
@@ -161,11 +163,11 @@ namespace HVAC_CheckEngine
                         result.AddViolationComponent(room.Id.Value, room.type, remark);
                     }
                 }
-
+                //  对房间集合rooms_Class_C_productPlant中的所有房间进行如下操作
                 foreach (Room room in rooms_Class_C_productPlant)
                 {
                     // 判断他们是否有排烟系统。
-                    //  如果没有排烟系统，则在审查结果中记录审查不通过，并把当前房间ID加到审查结果中
+                    //  如果没有排烟系统，则在审查结果中记录审查不通过，并把当前房间ID加到审查结果中，并备注当前房间需要专家复审
                     if (!assistantFunctions.isRoomHaveSomeSystem(room, "排烟"))
                     {
                         result.isPassCheck = false;
@@ -174,7 +176,7 @@ namespace HVAC_CheckEngine
                         result.AddViolationComponent(room.Id.Value, room.type, remark);
                     }
                 }
-
+                //  对房间集合rooms_needSpecialRemark中的所有房间进行如下操作
                 foreach (Room room in rooms_needSpecialRemark)
                 {
                     // 判断他们是否有排烟系统。
@@ -241,13 +243,13 @@ namespace HVAC_CheckEngine
                 //    获得所有地上面积大于100平米的地上歌舞娱乐游艺场所的房间集合overgroundEntertainmentRooms
                 List<Room> greaterThan100sqmOvergroundEntertainmentRooms = HVACFunction.GetRooms("歌舞娱乐放映游艺场所", "", 100, RoomPosition.overground);
                 //    从greaterThan100sqmOvergroundEntertainmentRooms集合中筛选出位于1~3层的房间greaterThan100sqmF1_3FloorEntertainmentRooms，并将这些房间加入到房间结合中房间集合Rooms中
-                List<Room> greaterThan100sqmF1_3FloorEntertainmentRooms = assistantFunctions.filtrateRoomsBetweenFloor_aAndFloor_b(greaterThan100sqmOvergroundEntertainmentRooms, 1, 3);
+                List<Room> greaterThan100sqmF1_3FloorEntertainmentRooms = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(greaterThan100sqmOvergroundEntertainmentRooms, 1, 3);
                 Rooms.AddRange(greaterThan100sqmF1_3FloorEntertainmentRooms);
 
                 //    获得所有歌舞娱乐游艺娱乐场所的房间集合entertainmentRooms。 
                 List<Room> entertainmentRooms = HVACFunction.GetRooms("歌舞娱乐放映游艺场所");
                 //    从entertainmentRooms中筛选出1到三层的所有歌舞娱乐游艺场所的房间集合F1_3FloorEntertainmentRooms
-                List<Room> F1_3FloorEntertainmentRooms = assistantFunctions.filtrateRoomsBetweenFloor_aAndFloor_b(entertainmentRooms, 1, 3);
+                List<Room> F1_3FloorEntertainmentRooms = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(entertainmentRooms, 1, 3);
                 //    从entertainmentRooms集合中减去F1_3FloorEntertainmentRooms集合获得一个otherEntertainmentRooms。并将这个集合加入到房间集合Rooms中
 
                 List<Room> otherEntertainmentRooms = entertainmentRooms.exceptSameItems(F1_3FloorEntertainmentRooms);
@@ -419,7 +421,7 @@ namespace HVAC_CheckEngine
                     result.AddViolationComponent(room.Id.Value, room.type, remark);
                 }
             }
-            //依次判断needSmokeExhaustRegions集合中每个区域是否设置了排烟系统，如果没有设置排烟系统，则将这些房间加入到审查结果中
+            //依次判断needSmokeExhaustRegions集合中每个区域是否设置了排烟系统，如果没有设置排烟系统，则将违规房间加入到审查结果中
             //如果审查通过
             foreach (Region region in needSmokeExhaustRegions)
             {
@@ -552,7 +554,12 @@ namespace HVAC_CheckEngine
             foreach (Room stairCase in staircases)
             {
                 bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeMechanicalSystem(stairCase, "加压送风");
-                bool stairCaseMechanicalPressureSystemIsIndependent = assistantFunctions.isStairPressureAirSystemIndependent(stairCase);
+                bool stairCaseMechanicalPressureSystemIsIndependent = false;
+                if (stairCaseHaveMechanicalPressureSystem)
+                {
+                    stairCaseMechanicalPressureSystemIsIndependent = assistantFunctions.isStairPressureAirSystemIndependent(stairCase);
+                }
+               
                 //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
                 if (stairCaseHaveMechanicalPressureSystem && !stairCaseMechanicalPressureSystemIsIndependent)
                 {
@@ -586,6 +593,7 @@ namespace HVAC_CheckEngine
                             result.isPassCheck = false;
                             string remark = string.Empty;
                             result.AddViolationComponent(atria.Id.Value, atria.type, remark);
+                            continue;
                         }
                     }
                     //     如果前室设置了机械加压送风系统且机械加压送风系统未独立设置（加压送风口处于楼梯间中）
@@ -614,6 +622,218 @@ namespace HVAC_CheckEngine
             }
             return result;
         }
+
+        //采用自然通风方式的封闭楼梯间、防烟楼梯间，应在最高部位设置面积不小于1．0m2的可开启外窗或开口；当建筑高度大于10m时，
+        //尚应在楼梯间的外墙上每5层内设置总面积不小于2．0m2的可开启外窗或开口，且布置间隔不大于3层。
+
+        //获取所有的封闭楼梯间及防烟楼梯间的集合stairCases
+        //依次遍历每一个楼梯间
+        //如果楼梯间设置了自然通风系统
+        //  获得楼梯间的最低楼层编号及最高楼层编号
+        //  获得楼梯间内的所有窗户的集合
+        //  从窗户集合中筛选出位于最高楼层的窗户的集合
+        //  查找这些窗户中是否有面积大于等于1㎡的窗户
+        //  如果没有则将审查结果标记为不通过，则把当楼梯间记录进审查结果中，并提示专家审核是否最高部位有不小于1㎡的开口
+        //  如果建筑高度大于10m
+        //     从最底层起依次计算从当前层起向上五层内的所有窗的总面积（一直到当前楼层编号为【最高楼层编号-4】为止）
+        //     如果总面积小于2.0㎡，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足面积要求
+        //     从最低楼层起依次查找从当前楼层向上三层内是否有可开启外窗，（一直到当前楼层编号为【最高楼层编号-2】为止）
+        //     如果没有可开启外窗，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足设置要求
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
+
+        public static BimReview GB51251_2017_3_2_1()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB51251_2017", "3.2.1");
+            //获取所有的封闭楼梯间及防烟楼梯间的集合stairCases
+            List<Room> stairCases = new List<Room>();
+
+            stairCases.AddRange(HVACFunction.GetRooms("防烟楼梯间"));
+            stairCases.AddRange(HVACFunction.GetRooms("封闭楼梯间"));
+
+            //依次遍历每一个楼梯间
+            foreach(Room stairCase in stairCases)
+            {
+               
+                //如果楼梯间设置了自然通风系统
+                if (assistantFunctions.isRoomHaveNatureVentilateSystem(stairCase))
+                {
+                    //  获得楼梯间的最低楼层编号及最高楼层编号
+                    int lowestStoryNo = stairCase.storyNo.Value;
+                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                    //  获得楼梯间内的所有窗户的集合
+                    List<Windows> windows = HVACFunction.GetWindowsInRoom(stairCase);
+                    //  从窗户集合中筛选出位于最高楼层的窗户的集合
+                    List<Windows> windowsInHighestStory = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, highestStoryNo, highestStoryNo);
+                    //  查找这些窗户中是否有面积大于等于1㎡的窗户
+                    if(windowsInHighestStory.findWindowNoSmallerThanSomeArea(1)==null)
+                    {
+                        //  如果没有则将审查结果标记为不通过，则把当楼梯间记录进审查结果中，并提示专家审核是否最高部位有不小于1㎡的开口
+                        result.isPassCheck = false;
+                        string remark = string.Empty;
+                        remark = "需专家复核此楼梯间最高部位是否有不小于1㎡的其他开口";
+                        result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                        continue;
+                    }
+                    //  如果建筑高度大于10m
+                    if(globalData.buildingHeight>10)
+                    {
+                        bool isCurrentStairCaseViolate = false;
+
+                        //     从最底层起依次计算从当前层起向上五层内的所有窗的总面积（一直到当前楼层编号为【最高楼层编号-4】为止）
+                        for (int storyNo=lowestStoryNo;storyNo<=Math.Max(lowestStoryNo,highestStoryNo-4);++storyNo)
+                        {
+                            //     如果总面积小于2.0㎡，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足面积要求
+                            List<Windows> windowsInFiveStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo, Math.Min(highestStoryNo,storyNo + 4));
+                            if (assistantFunctions.calculateTotalAreaOfWindows(windowsInFiveStories) < 2)
+                            {
+                                result.isPassCheck = false;
+                                string remark = string.Empty;
+                                remark = "需专家复核此楼梯间是否还有其它开口满足面积要求";
+                                result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                                isCurrentStairCaseViolate = true;
+                                break;
+                            }
+                        }
+                        if (isCurrentStairCaseViolate)
+                            continue;
+                        //     从最低楼层起依次查找从当前楼层向上三层内是否有可开启外窗，（一直到当前楼层编号为【最高楼层编号-2】为止）
+                        for (int storyNo = lowestStoryNo; storyNo <= Math.Max(lowestStoryNo, highestStoryNo - 2); ++storyNo)
+                        {
+                            //     如果没有可开启外窗，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足设置要求
+                            List<Windows> windowsInThreeStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo,Math.Min(highestStoryNo, storyNo + 2));
+                            if (windowsInThreeStories.Count<=0)
+                            {
+                                result.isPassCheck = false;
+                                string remark = string.Empty;
+                                remark = "需专家复核此楼梯间是否还有其它开口满足设置要求";
+                                result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                                break;
+                            }
+                        }
+                       
+                    }
+
+                }
+            }
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.1条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "可开启外窗设置不满足规范GB51251_2017中第3.2.1条条文规定。请专家复核楼梯间中是否有其他开口满足规范要求";
+            }
+            return result;
+        }
+
+        //建筑高度大于100m的建筑，其机械加压送风系统应竖向分段独立设置，且每段高度不应超过100m。
+
+        //获得所有防烟楼梯间及封闭楼梯间
+        //依次遍历所有楼梯间
+        //如果楼梯间采用了机械加压送风系统
+        //获得此楼梯间的最低楼层编号及最高楼层编号
+        //获得楼梯间内的所有正压送风口
+        //自下向上获得每个风口负担的楼层划分
+        //自上向下获得每个风口负担的楼层划分
+        //找到此楼梯间的所有正压送风机
+        //依次遍历每台风机
+        //找到每台风机的所有加压送风口
+        //根据自下向上方式获得的风口楼层划分，确定风机负担的高度。
+        //如果风机有风机负担的高度大于100m
+        //则从新遍历所有风机
+        //根据自上向下的方式获得风口楼层划分，确定风机负担的高度
+        //如果风机负担的高度大于100m
+        //则标记审查不通过，并把当前楼梯间记录到审查结果中
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
+
+        public static BimReview GB51251_2017_3_3_1()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.1");
+            //获得所有防烟楼梯间及封闭楼梯间
+            List<Room> stairCases = new List<Room>();
+            stairCases.AddRange(HVACFunction.GetRooms("防烟楼梯间"));
+            stairCases.AddRange(HVACFunction.GetRooms("封闭楼梯间"));
+            //依次遍历所有楼梯间
+            foreach(Room stairCase in stairCases)
+            {
+                //如果楼梯间采用了机械加压送风系统
+                if(assistantFunctions.isRoomHaveSomeMechanicalSystem(stairCase,"加压送风"))
+                {
+
+                    //获得楼梯间内的所有正压送风口
+                    List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
+                    List<AirTerminal> pressureAirTerminals = assistantFunctions.filtrateAirTerminalOfSomeSystem(airTerminals, "加压送风");
+
+                    //获得此楼梯间的最低楼层编号及最高楼层编号
+                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                    int lowestStoryNo = stairCase.storyNo.Value;
+                    List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+
+                    //自下向上获得每个风口负担的楼层划分
+                    Dictionary<AirTerminal, List<Floor>> floorDivisionOfAirTerminalBottomUp = assistantFunctions.getFloorDivisionOfAirTerminalsBottomUp(floors, pressureAirTerminals);
+                    //自上向下获得每个风口负担的楼层划分
+                    Dictionary<AirTerminal, List<Floor>> floorDivisionOfAirTerminalTopToBottom = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(floors, pressureAirTerminals);
+
+                    //找到此楼梯间的所有正压送风机
+                    List<Fan> fans = assistantFunctions.getAllFansConnectToAirTerminals(pressureAirTerminals);
+                    bool isNeedReTraverse = false;
+                    //依次遍历每台风机
+                    foreach(Fan fan in fans)
+                    {
+                        //以自下向上方式获得确定正压送风机负担的高度。
+                        //如果风机有风机负担的高度大于100m
+                        if (assistantFunctions.getAffordHeightOfFanByFloorDivision(fan,floorDivisionOfAirTerminalBottomUp) > 100000)
+                        {
+                            isNeedReTraverse = true;
+                            break;
+                        }
+                           
+                    }
+                    //则从新遍历所有风机
+                    if(isNeedReTraverse)
+                        foreach(Fan fan in fans)
+                        {
+                            //根据自上向下的方式获得风口楼层划分，确定风机负担的高度
+                            //如果风机负担的高度大于100m
+                            //则标记审查不通过，并把当前楼梯间记录到审查结果中
+                            if (assistantFunctions.getAffordHeightOfFanByFloorDivision(fan, floorDivisionOfAirTerminalTopToBottom) > 100000)
+                            {
+                                result.isPassCheck = false;
+                                string remark = string.Empty;
+                                result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                                break;
+                            }
+                            
+                        }
+                }
+            }
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.3.1条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.3.1条条文规定。";
+            }
+            return result;
+        }
+
     }
     public class modelException : Exception
     {
