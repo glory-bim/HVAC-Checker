@@ -1335,7 +1335,7 @@ namespace UnitTestHVACChecker
             return fans;
         }
 
-        public static List<Windows> GetWindowsInRoom(Room room)
+        public static List<Window> GetWindowsInRoom(Room room)
         {
             string importExcelPath = ExcelPath;
             //打开数据文件
@@ -1348,19 +1348,19 @@ namespace UnitTestHVACChecker
             //查表确定此房间是否有可开启外窗
             bool hasOpenableOuterWindow = row.GetCell(4).BooleanCellValue;
             //如果有可开启外窗，则创建一个可开启外窗对象，并加入房间集合中
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
 
             if (hasOpenableOuterWindow)
             {
-                Windows window = new Windows(windowId);
-                window.openMode = Windows.WindowOpenMode.PushWindow;
+                Window window = new Window(windowId);
+                window.openMode = Window.WindowOpenMode.PushWindow;
                 window.isExternalWindow = true;
                 windows.Add(window);
             }
             return windows;
         }
 
-        public static List<Windows> GetWindowsInRoom_new(Room room)
+        public static List<Window> GetWindowsInRoom_new(Room room)
         {
             string importExcelPath = ExcelPath_new;
             //打开数据文件
@@ -1374,7 +1374,7 @@ namespace UnitTestHVACChecker
       
             //获得房间所含窗户的id字符串
             string idList= row.GetCell(4).StringCellValue;
-            List<Windows> windows = getAllWindowsByIdString(idList);
+            List<Window> windows = getAllWindowsByIdString(idList);
 
             return windows;
         }
@@ -1747,13 +1747,13 @@ namespace UnitTestHVACChecker
             return doors;
         }
 
-        private static List<Windows> getAllWindowsByIdString(string IdString)
+        private static List<Window> getAllWindowsByIdString(string IdString)
         {
             List<long> idList = getIdList(IdString);
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             foreach (long id in idList)
             {
-                Windows window = new Windows(id);
+                Window window = new Window(id);
                 windows.Add(window);
             }
             return windows;

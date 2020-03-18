@@ -22,13 +22,13 @@ namespace HVAC_CheckEngine
             return null;
         }
 
-        public static Windows GetOpenableOuterWindow(List<Windows> windows)
+        public static Window GetOpenableOuterWindow(List<Window> windows)
         {
             if (windows == null)
                 return null;
-            foreach(Windows window in windows)
+            foreach(Window window in windows)
             {
-                if (window.isExternalWindow.Value&& window.openMode != Windows.WindowOpenMode.FixWindow)
+                if (window.isExternalWindow.Value&& window.openMode != Window.WindowOpenMode.FixWindow)
                     return window;
             }
 
@@ -67,8 +67,8 @@ namespace HVAC_CheckEngine
         public static bool isRoomHaveSomeNatureSystem(Room room, string systemName)
         {
             //      如果房间中没有可开启外窗，则返回否
-            List<Windows> windows = HVACFunction.GetWindowsInRoom(room);
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
             if (aimWindow == null)
             {
                 return false;

@@ -108,17 +108,17 @@ namespace UnitTestAssitantFunction
         public void test_differentOrder()
         {
             //arrange
-            Windows window_1 = new Windows(1);
-            window_1.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第一个外窗类型"].ToString());
+            Window window_1 = new Window(1);
+            window_1.openMode = (Window.WindowOpenMode)Convert.ToInt32(context.DataRow["第一个外窗类型"].ToString());
             window_1.isExternalWindow = Convert.ToBoolean(context.DataRow["第一个外窗是否为可开启"].ToString());
-            Windows window_2 = new Windows(2);
-            window_2.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第二个外窗类型"].ToString());
+            Window window_2 = new Window(2);
+            window_2.openMode = (Window.WindowOpenMode)Convert.ToInt32(context.DataRow["第二个外窗类型"].ToString());
             window_2.isExternalWindow = Convert.ToBoolean(context.DataRow["第二个外窗是否为可开启"].ToString());
-            Windows window_3 = new Windows(3);
-            window_3.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第三个外窗类型"].ToString());
+            Window window_3 = new Window(3);
+            window_3.openMode = (Window.WindowOpenMode)Convert.ToInt32(context.DataRow["第三个外窗类型"].ToString());
             window_3.isExternalWindow = Convert.ToBoolean(context.DataRow["第三个外窗是否为可开启"].ToString());
 
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             windows.Add(window_1);
             windows.Add(window_2);
             windows.Add(window_3);
@@ -127,7 +127,7 @@ namespace UnitTestAssitantFunction
             int indexOfAimWindow = Int32.Parse(context.DataRow["目标外窗编号"].ToString());
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
 
             //assert
             Assert.IsNotNull(aimWindow);
@@ -137,24 +137,24 @@ namespace UnitTestAssitantFunction
 
         public void test_doNotHaveAimWindow()
         {
-            Windows window_1 = new Windows(1);
-            window_1.openMode = Windows.WindowOpenMode.FixWindow;
+            Window window_1 = new Window(1);
+            window_1.openMode = Window.WindowOpenMode.FixWindow;
             window_1.isExternalWindow = true;
-            Windows window_2 = new Windows(2);
-            window_2.openMode = Windows.WindowOpenMode.PushWindow;
+            Window window_2 = new Window(2);
+            window_2.openMode = Window.WindowOpenMode.PushWindow;
             window_2.isExternalWindow = false;
-            Windows window_3 = new Windows(3);
-            window_3.openMode = Windows.WindowOpenMode.FixWindow; ;
+            Window window_3 = new Window(3);
+            window_3.openMode = Window.WindowOpenMode.FixWindow; ;
             window_3.isExternalWindow = false;
 
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             windows.Add(window_1);
             windows.Add(window_2);
             windows.Add(window_3);
 
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
 
             //assert
             Assert.IsNull(aimWindow);
@@ -166,7 +166,7 @@ namespace UnitTestAssitantFunction
         {
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(null);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(null);
 
             //assert
             Assert.IsNull(aimWindow);

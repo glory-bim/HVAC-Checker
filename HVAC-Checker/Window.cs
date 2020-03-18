@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Windows:Element
+    public class Window:Element
     {
-        public Windows(long id):base(id)
+        public Window(long id):base(id)
         {
         }
         public bool? isExternalWindow { get; set; } = null;//是否为外窗

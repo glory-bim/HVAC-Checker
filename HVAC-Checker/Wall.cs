@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Fan:Element
+  
+    public class Wall : Element
     {
-        public Fan(long id):base(id)
+        public Wall(long id) : base(id)
         {
-
         }
-        public double? m_flowRate { get; set; } = null;
+      
+        public string boundaryLoops { get; set; } = null;
+
+     
     }
 }
