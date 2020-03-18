@@ -109,14 +109,16 @@ namespace UnitTestAssitantFunction
         {
             //arrange
             Windows window_1 = new Windows(1);
-            window_1.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第一个外窗类型"].ToString());
+           
             window_1.isExternalWindow = Convert.ToBoolean(context.DataRow["第一个外窗是否为可开启"].ToString());
+       
             Windows window_2 = new Windows(2);
-            window_2.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第二个外窗类型"].ToString());
             window_2.isExternalWindow = Convert.ToBoolean(context.DataRow["第二个外窗是否为可开启"].ToString());
+           
+
             Windows window_3 = new Windows(3);
-            window_3.openMode = (Windows.WindowOpenMode)Convert.ToInt32(context.DataRow["第三个外窗类型"].ToString());
             window_3.isExternalWindow = Convert.ToBoolean(context.DataRow["第三个外窗是否为可开启"].ToString());
+     
 
             List<Windows> windows = new List<Windows>();
             windows.Add(window_1);
@@ -138,13 +140,13 @@ namespace UnitTestAssitantFunction
         public void test_doNotHaveAimWindow()
         {
             Windows window_1 = new Windows(1);
-            window_1.openMode = Windows.WindowOpenMode.FixWindow;
+            
             window_1.isExternalWindow = true;
             Windows window_2 = new Windows(2);
-            window_2.openMode = Windows.WindowOpenMode.PushWindow;
+            
             window_2.isExternalWindow = false;
             Windows window_3 = new Windows(3);
-            window_3.openMode = Windows.WindowOpenMode.FixWindow; ;
+           
             window_3.isExternalWindow = false;
 
             List<Windows> windows = new List<Windows>();
@@ -590,6 +592,8 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.roomSheetName_new = "房间";
+
                 FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
@@ -602,7 +606,7 @@ namespace UnitTestAssitantFunction
 
                 List<Room> rooms = HVACFunction.GetRooms("防烟楼梯间");
 
-                List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(rooms[1]);
+                List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(rooms[4]);
 
                 //打开测试数据文件
                 string importExcelPath = FakeHVACFunction.ExcelPath_new;
@@ -629,7 +633,8 @@ namespace UnitTestAssitantFunction
 
                 //打开测试数据文件
                 //act
-                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(HVACFunction.GetFloors(), airTerminals);
+          
+                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(1, 15), airTerminals);
 
                 //assert
 

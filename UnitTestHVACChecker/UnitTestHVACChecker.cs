@@ -1857,7 +1857,7 @@ namespace UnitTestHVACChecker
             if (hasOpenableOuterWindow)
             {
                 Windows window = new Windows(windowId);
-                window.openMode = Windows.WindowOpenMode.PushWindow;
+                window.effectiveArea = 1;
                 window.isExternalWindow = true;
                 windows.Add(window);
             }
@@ -2295,7 +2295,7 @@ namespace UnitTestHVACChecker
                 window.area= row.GetCell(sheet_windows.getColNumber("窗户面积")).NumericCellValue;
                 window.storyNo= (int)row.GetCell(sheet_windows.getColNumber("楼层编号")).NumericCellValue;
                 window.isExternalWindow= row.GetCell(sheet_windows.getColNumber("是否是外窗")).BooleanCellValue;
-                window.openMode= (Windows.WindowOpenMode)row.GetCell(sheet_windows.getColNumber("窗户类型")).NumericCellValue;
+                window.effectiveArea= row.GetCell(sheet_windows.getColNumber("窗户有效面积")).NumericCellValue;
                 windows.Add(window);
             }
             return windows;

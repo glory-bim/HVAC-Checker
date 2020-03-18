@@ -1496,6 +1496,12 @@ namespace HVAC_CheckEngine
             return storyNo;
         }
 
+        public static List<Wall> getAllWallsOfRoom(Room room)
+        {
+            List<Wall> walls = new List<Wall>();
+            return walls;
+        }
+
        
     }
    

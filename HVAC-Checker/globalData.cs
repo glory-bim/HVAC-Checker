@@ -10,6 +10,7 @@ namespace HVAC_CheckEngine
     {
         public static double buildingHeight { get; set; }
         public static string buildingType { get; set; } 
-           
+          
+        public static bool haveSubentryMeasures { get; set; }
     }
 }

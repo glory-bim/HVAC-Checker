@@ -28,7 +28,7 @@ namespace HVAC_CheckEngine
                 return null;
             foreach(Windows window in windows)
             {
-                if (window.isExternalWindow.Value&& window.openMode != Windows.WindowOpenMode.FixWindow)
+                if (window.isExternalWindow.Value&& window.effectiveArea>0)
                     return window;
             }
 
