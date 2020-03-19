@@ -684,10 +684,23 @@ namespace HVAC_CheckEngine
                         bool isCurrentStairCaseViolate = false;
 
                         //     从最底层起依次计算从当前层起向上五层内的所有窗的总面积（一直到当前楼层编号为【最高楼层编号-4】为止）
-                        for (int storyNo=lowestStoryNo;storyNo<=Math.Max(lowestStoryNo,highestStoryNo-4);++storyNo)
+                        int storyNoUpperBound =0;
+                        if ((highestStoryNo - 4) * highestStoryNo <= 0)
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 5);
+                        else
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 4);
+                        
+                        for (int storyNo=lowestStoryNo;storyNo<= storyNoUpperBound;++storyNo)
                         {
                             //     如果总面积小于2.0㎡，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足面积要求
-                            List<Windows> windowsInFiveStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo, Math.Min(highestStoryNo,storyNo + 4));
+                            int highestStoryNoInCurrentIteration = 0;
+                            if ((storyNo + 4) * storyNo <= 0)
+                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 5);
+                            else
+                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 4);
+
+                          
+                            List<Windows> windowsInFiveStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo, highestStoryNoInCurrentIteration);
                             if (assistantFunctions.calculateTotalAreaOfWindows(windowsInFiveStories) < 2)
                             {
                                 result.isPassCheck = false;
@@ -701,10 +714,21 @@ namespace HVAC_CheckEngine
                         if (isCurrentStairCaseViolate)
                             continue;
                         //     从最低楼层起依次查找从当前楼层向上三层内是否有可开启外窗，（一直到当前楼层编号为【最高楼层编号-2】为止）
-                        for (int storyNo = lowestStoryNo; storyNo <= Math.Max(lowestStoryNo, highestStoryNo - 2); ++storyNo)
+
+                        
+                        if ((highestStoryNo - 2) * highestStoryNo <= 0)
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 3);
+                        else
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 2);
+
+                      
+                        for (int storyNo = lowestStoryNo; storyNo <= storyNoUpperBound; ++storyNo)
                         {
                             //     如果没有可开启外窗，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足设置要求
-                            List<Windows> windowsInThreeStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo,Math.Min(highestStoryNo, storyNo + 2));
+                            int highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 2);
+                            if (highestStoryNoInCurrentIteration == 0)
+                                highestStoryNoInCurrentIteration = 1;
+                            List<Windows> windowsInThreeStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo,highestStoryNoInCurrentIteration);
                             if (windowsInThreeStories.Count<=0)
                             {
                                 result.isPassCheck = false;
@@ -837,16 +861,105 @@ namespace HVAC_CheckEngine
         //设置机械加压送风系统的封闭楼梯间、防烟楼梯间，尚应在其顶部设置不小于1m2的固定窗。靠外墙的防烟楼梯间，尚应在其外墙上每5层内设置总面积不小于2m2的固定窗。
 
         //获得所有封闭楼梯间、防烟楼梯间的集合
+        //依次遍历每一个楼梯间
         //如果楼梯间设置了机械加压送风系统
         //获得楼梯间的最高楼层编号
         //获得楼梯间所有固定窗
         //筛选出最高楼层的固定窗
-        //如果最高楼层没有固定窗则将审查结果标记为不通过，并把当楼梯间记录进审查结果中
+        //如果最高楼层没有固定窗或固定窗面积小于1㎡则将审查结果标记为不通过，并把当楼梯间记录进审查结果中
         //获得楼梯间的所有外墙
         //如果楼梯间有外墙
-        //
+        //从最底层开会依次向上进行遍历
+        //计算五层以内的固定窗面积
+        //如果固定窗总面积小于2㎡，则将审查结果标记为不通过，并将当前楼梯间加入到审查结果中
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
+        public static BimReview GB51251_2017_3_3_11()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB51251_2017", "3.3.11");
+            //获得所有封闭楼梯间、防烟楼梯间的集合
+            List<Room> stairCases = new List<Room>();
+            stairCases.AddRange(HVACFunction.GetRooms("封闭楼梯间"));
+            stairCases.AddRange(HVACFunction.GetRooms("防烟楼梯间"));
+            //依次遍历每一个楼梯间
+            foreach(Room stairCase in stairCases)
+            {
+                //如果楼梯间设置了机械加压送风系统
+                if (assistantFunctions.isRoomHaveSomeMechanicalSystem(stairCase,"加压送风"))
+                {
+                    //获得楼梯间的最高楼层编号
+                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                    int lowestStoryNo = stairCase.storyNo.Value;
+                    //获得楼梯间所有固定窗
+                    List<Windows> fixWindows = assistantFunctions.getFixOuterWindowsOfRoom(stairCase);
+                    //筛选出最高楼层的固定窗
+                    List<Windows> windowsInHighestStory =assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows,highestStoryNo, highestStoryNo);
+                    //如果最高楼层没有固定窗或固定窗面积小于1平米则将审查结果标记为不通过，并把当楼梯间记录进审查结果中
+                    if(windowsInHighestStory.Count==0||assistantFunctions.calculateTotalAreaOfWindows(windowsInHighestStory)<1)
+                    {
+                        result.isPassCheck = false;
+                        string remark = string.Empty;
+                        result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                        continue;
+                    }
+                    //获得楼梯间的所有外墙
+                    List<Wall> outerWall = assistantFunctions.getOuterWallOfRoom(stairCase);
+                    //如果楼梯间有外墙
+                    if(outerWall.Count>0)
+                    {
+                        //从最底层开会依次向上进行遍历
+                        int storyNoUpperBound = 0;
+                        if ((highestStoryNo-4)*highestStoryNo<=0)
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 5);
+                        else
+                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 4);
 
+                       
+                       
+                        for (int currentStoryNo= stairCase.storyNo.Value; currentStoryNo <= storyNoUpperBound; ++currentStoryNo)
+                        {
+                            //计算五层以内的固定窗面积
+                            int highestStoryNoInCurrentIteration = 0;
+                            if ((currentStoryNo + 4) * currentStoryNo <= 0)
+                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, currentStoryNo + 5);
+                            else
+                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, currentStoryNo + 4);
+
+                           
+
+                            List < Windows > windowsInFiveStorys = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows, currentStoryNo, highestStoryNoInCurrentIteration) ;
+                            double areaOfFixWindows = assistantFunctions.calculateTotalAreaOfWindows(windowsInFiveStorys);
+                            //如果固定窗总面积小于2㎡，则将审查结果标记为不通过，并将当前楼梯间加入到审查结果中
+                            if (areaOfFixWindows<2)
+                            {
+                                result.isPassCheck = false;
+                                string remark = string.Empty;
+                                result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.3.11条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.3.11条条文规定。";
+            }
+            return result;         
+        }
     }
+
     public class modelException : Exception
     {
         public modelException(string message) : base(message)

@@ -35,7 +35,7 @@ namespace UnitTestHVACChecker
                 bool isPassCheck = false;
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
-  
+
                 //打开测试数据文件
                 IWorkbook Workbook = WorkbookFactory.Create(ExcelPath);
                 //读取测试数据表
@@ -85,7 +85,7 @@ namespace UnitTestHVACChecker
                 {
                     List<Room> Rooms = new List<Room>();
                     string systemType = context.DataRow["房间类型"].ToString();
-                    if(systemType==type)
+                    if (systemType == type)
                     {
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
@@ -93,7 +93,7 @@ namespace UnitTestHVACChecker
                         room.type = systemType;
                         Rooms.Add(room);
                     }
-                    
+
                     return Rooms;
                 };
 
@@ -108,7 +108,7 @@ namespace UnitTestHVACChecker
                 globalData.buildingHeight = Double.Parse(context.DataRow["楼层高度"].ToString());
                 globalData.buildingType = context.DataRow["建筑类型"].ToString();
                 string comment = context.DataRow["批注"].ToString();
-                bool isPassCheck =Boolean.Parse(context.DataRow["是否通过"].ToString());
+                bool isPassCheck = Boolean.Parse(context.DataRow["是否通过"].ToString());
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
                 if (!isPassCheck)
@@ -132,7 +132,7 @@ namespace UnitTestHVACChecker
                 Assert.AreEqual(isPassCheck, result.isPassCheck);
                 Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
             }
-        
+
         }
 
 
@@ -233,7 +233,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.type = type;
                         int remarkType = Convert.ToInt32(row.GetCell(16).ToString());
                         if (isNeedReCheck)
-                            if(remarkType==1)
+                            if (remarkType == 1)
                                 componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
                             else
                                 componentAnnotation.remark = "此房间需专家核对是否经常有人停留或可燃物较多";
@@ -263,24 +263,24 @@ namespace UnitTestHVACChecker
                 FakeHVACFunction.testDataTableName = "GB50016_2014_8_5_2逐条测试";
                 FakeHVACFunction.systemType = "排烟";
 
-               
+
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = (string roomType) =>
                 {
-                          List<Room> Rooms = new List<Room>();
-                          string Type = context.DataRow["房间类型"].ToString();
-                          if (Type.Contains(roomType))
-                          {
-                              long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
-                              Room room = new Room(Id);
-                              room.type = Type;
-                              room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                              room.name = context.DataRow["房间名称"].ToString();
-                              room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                              room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                              Rooms.Add(room);
-                          }
-                          return Rooms;
+                    List<Room> Rooms = new List<Room>();
+                    string Type = context.DataRow["房间类型"].ToString();
+                    if (Type.Contains(roomType))
+                    {
+                        long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
+                        Room room = new Room(Id);
+                        room.type = Type;
+                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                        room.name = context.DataRow["房间名称"].ToString();
+                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                        Rooms.Add(room);
+                    }
+                    return Rooms;
                 };
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = (string roomType, string roomName, double roomArea, RoomPosition roomPosition) =>
@@ -290,7 +290,7 @@ namespace UnitTestHVACChecker
                      double area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                      string name = context.DataRow["房间名称"].ToString();
                      RoomPosition position = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                     if (Type.Contains(roomType) && name.Contains(roomName) &&area>= roomArea &&((int)(roomPosition&position)!=0))
+                     if (Type.Contains(roomType) && name.Contains(roomName) && area >= roomArea && ((int)(roomPosition & position) != 0))
                      {
                          long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                          Room room = new Room(Id);
@@ -344,7 +344,7 @@ namespace UnitTestHVACChecker
                     componentAnnotation.Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                     componentAnnotation.type = context.DataRow["房间类型"].ToString();
                     bool isNeedReCheck = Boolean.Parse(context.DataRow["是否需要复核"].ToString());
-                    int remarkType= Convert.ToInt32(context.DataRow["复审类型"].ToString());
+                    int remarkType = Convert.ToInt32(context.DataRow["复审类型"].ToString());
                     if (isNeedReCheck)
                         if (remarkType == 1)
                             componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
@@ -380,10 +380,10 @@ namespace UnitTestHVACChecker
                     return new List<Room>();
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble=(double dLength) =>
-                {
-                    return new List<Room>();
-                };
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                  {
+                      return new List<Room>();
+                  };
                 FakeHVACFunction.testDataTableName = "GB50016_2014_8_5_2";
                 FakeHVACFunction.systemType = "排烟";
 
@@ -452,7 +452,7 @@ namespace UnitTestHVACChecker
                 globalData.buildingHeight = 32;
                 globalData.buildingType = "公共建筑";
                 string comment = "设计不满足规范GB50016_2014中第8.5.3条条文规定。请专家复核：相关违规房间是否人员长期停留或可燃物较多";
-          
+
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
                 //打开测试数据文件
@@ -496,7 +496,7 @@ namespace UnitTestHVACChecker
                 Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
             }
         }
-        
+
         [TestMethod]
         [DeploymentItem(@"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据.xlsx")]
         [DataSource("MyExcelDataSource5")]
@@ -522,7 +522,7 @@ namespace UnitTestHVACChecker
                         room.name = context.DataRow["房间名称"].ToString();
                         room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
                         room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.storyNo= Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -535,7 +535,7 @@ namespace UnitTestHVACChecker
                     double area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                     string name = context.DataRow["房间名称"].ToString();
                     RoomPosition position = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                    if (Type.Contains(roomType) && name.Contains(roomName) && area>=roomArea && ((int)(roomPosition & position) != 0))
+                    if (Type.Contains(roomType) && name.Contains(roomName) && area >= roomArea && ((int)(roomPosition & position) != 0))
                     {
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
@@ -594,13 +594,13 @@ namespace UnitTestHVACChecker
                     int remarkType = Convert.ToInt32(context.DataRow["复审类型"].ToString());
                     if (isNeedReCheck)
                     {
-                        if(remarkType==1)
+                        if (remarkType == 1)
                             componentAnnotation.remark = "需专家复核此房间是否人员经常停留";
                         else
                             componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
                     }
                     else
-                        componentAnnotation.remark = string.Empty; 
+                        componentAnnotation.remark = string.Empty;
                     componentViolations.Add(componentAnnotation);
                 }
                 //act
@@ -703,7 +703,7 @@ namespace UnitTestHVACChecker
                 globalData.buildingHeight = 32;
                 globalData.buildingType = "公共建筑";
                 string comment = "设计不满足规范GB50016_2014中第8.5.4条条文规定。请专家复核：相关违规房间是否人员长期停留或可燃物较多";
- 
+
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
                 //打开测试数据文件
@@ -767,7 +767,7 @@ namespace UnitTestHVACChecker
                 globalData.buildingHeight = 32;
                 globalData.buildingType = "公共建筑";
                 string comment = "设计满足规范GB50016_2014中第8.5.4条条文规定。";
-     
+
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
                 //打开测试数据文件
@@ -1352,7 +1352,7 @@ namespace UnitTestHVACChecker
             }
         }
 
-       
+
 
 
     }
@@ -1613,7 +1613,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
                 //arrange
-               
+
                 string comment = "设计满足规范GB51251_2017中第3.3.1条条文规定。";
 
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
@@ -1709,6 +1709,134 @@ namespace UnitTestHVACChecker
                 //act
                 BimReview result = new BimReview();
                 result = HVACChecker.GB51251_2017_3_3_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB51251_2017_3_3_11_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllWallsOfRoomRoom = FakeHVACFunction.GetWallsOfRoom_new;
+                //arrange
+
+                string comment = "设计满足规范GB51251_2017中第3.3.11条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_11.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_11();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllWallsOfRoomRoom = FakeHVACFunction.GetWallsOfRoom_new;
+                //arrange
+
+                string comment = "设计不满足规范GB51251_2017中第3.3.11条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_11.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_11();
 
 
                 //assert
@@ -1881,6 +2009,25 @@ namespace UnitTestHVACChecker
             List<Windows> windows = getAllWindowsByIdString(idList);
 
             return windows;
+        }
+
+        public static List<Wall> GetWallsOfRoom_new(Room room)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+            ISheet sheet_Walls = workbook.GetSheet("墙");
+            //找到与房间id对应的数据行
+
+            IRow row = (IRow)sheet_rooms.GetRow((int)room.Id.Value);
+
+            //获得房间所含窗户的id字符串
+            string idList = row.GetCell(sheet_rooms.getColNumber("包含的墙")).ToString();
+            List<Wall> walls = getAllWallsByIdString(idList);
+
+            return walls;
         }
 
         public static List<AirTerminal> GetOutputLetsOfFan_new(Fan fan)
@@ -2299,6 +2446,28 @@ namespace UnitTestHVACChecker
                 windows.Add(window);
             }
             return windows;
+        }
+
+        private static List<Wall> getAllWallsByIdString(string IdString)
+        {
+            List<long> idList = getIdList(IdString);
+            List<Wall> walls = new List<Wall>();
+
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_Walls = workbook.GetSheet("墙");
+
+            foreach (long id in idList)
+            {
+               Wall wall = new Wall(id);
+                IRow row = (IRow)sheet_Walls.GetRow((int)id);
+                wall.isOuterWall= row.GetCell(sheet_Walls.getColNumber("是否为外墙")).BooleanCellValue;
+                walls.Add(wall);
+            }
+            return walls;
         }
 
         public static List<Floor> getAllFloorsByIdString(string idString)
