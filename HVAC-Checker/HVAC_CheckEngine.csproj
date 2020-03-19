@@ -100,7 +100,7 @@
     <Compile Include="Duct.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
-    <Compile Include="FireDistrict.cs" />
+    <Compile Include="FireCompartment.cs" />
     <Compile Include="FlexibleShortTubes.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="GasMeter.cs" />
@@ -115,6 +115,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="Room.cs" />
+    <Compile Include="SmokeCompartment.cs" />
     <Compile Include="Wall.cs" />
     <Compile Include="WaterMeter.cs" />
     <Compile Include="Window.cs" />

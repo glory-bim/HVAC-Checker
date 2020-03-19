@@ -1268,7 +1268,7 @@ namespace HVAC_CheckEngine
         }
 
 
-
+         //《建筑防排烟系统技术标准》    GB51251--2017
         //4.24公共建筑、工业建筑防烟分区的最大允许面积及其长边最大允许长度应符合表4．2．4的规定，
         //    当工业建筑采用自然排烟系统时，其防烟分区的长边长度尚不应大于建筑内空间净高的8倍。
         public static BimReview GB51251_2017_4_2_4()
@@ -1526,22 +1526,18 @@ namespace HVAC_CheckEngine
         public static BimReview GB50490_2009_8_4_17()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.3.7");
-            List<Room> rooms = HVACFunction.GetRooms("避难");
+            BimReview result = new BimReview("GB50490_2009", "3.3.7");
 
-            foreach (Room room in rooms)
-            {
-                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
-                double dAreatotal = 0.0;
-                foreach (Window window in windows)
-                {
-                  //  dAreatotal += window.effectiveArea;
-                }
-                if (dAreatotal < room.area * 0.02)
+
+            string sName = "地下车站站厅";
+            List<SmokeCompartment> smokeCompartments = HVACFunction.GetSmokeCompartment(sName);           
+
+            foreach (SmokeCompartment smokeCompartment in smokeCompartments)
+            {               
+                if (smokeCompartment.m_dArea > 2000.0)
                 {
                     result.isPassCheck = false;
                 }
-
             }
 
             //如果审查通过

@@ -16,7 +16,7 @@ namespace HVAC_CheckEngine
         public double? elevation { get; set; } = null;
         public double? height { get; set; } = null;
 
-        public int? FloorNumber { get; set; } = null;
+        public int FloorNumber { get; set; } = 0;
        
     }
 }
