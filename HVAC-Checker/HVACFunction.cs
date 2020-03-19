@@ -17,7 +17,6 @@ namespace HVAC_CheckEngine
 
     public class HVACFunction
     {
-
         public static string m_archXdbPath { set; get; }
         public static string m_hvacXdbPath { set; get; }
 
@@ -1829,8 +1828,61 @@ namespace HVAC_CheckEngine
             return flexibleShortTubes;
         }
 
-        
-       
+        public static List<Duct> GetDucts(string strSystemName)
+        {
+            List<Duct> ducts = new List<Duct>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return ducts;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Ducts Where CHARINDEX(";
+            sql = sql + "'" + strSystemName + "'";
+
+            sql = sql + ",SystemName)> 0";
+
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Duct room = new Duct(Convert.ToInt64(reader["Id"].ToString()));
+                ducts.Add(room);
+            }
+
+            return ducts;
+        }
+
+
+        public static List<AirTerminal> GetAirterminals(string strSystemName)
+        {
+            List<AirTerminal> pipes = new List<AirTerminal>();
+
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return pipes;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();          
+            
+            string sql = "select * from AirTerminals Where CHARINDEX(";
+            sql = sql + "'" + strSystemName + "'";
+
+            sql = sql + ",SystemName)> 0";
+
+
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
+                pipes.Add(pipe);
+            }
+            return pipes;
+        }
+
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
