@@ -13,5 +13,6 @@ namespace HVAC_CheckEngine
               
     }
         public double? m_dArea { get; set; } = null;
+     
     }
 }

@@ -111,7 +111,7 @@ namespace HVAC_CheckEngine.Tests
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
-            FireDistrict fireDistrict = new FireDistrict(573789);
+            FireCompartment fireDistrict = new FireCompartment(573789);
             Assert.IsTrue(HVACFunction.GetDuctsCrossFireDistrict(fireDistrict).Count()>0);
         }
 
@@ -208,7 +208,7 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetFireDistrictLengthTest()
         {
-             FireDistrict fireDis = new FireDistrict(573789);
+            FireCompartment fireDis = new FireCompartment(573789);
             double dLength = 0.0;
             HVACFunction.m_archXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             dLength = HVACFunction.GetFireDistrictLength(fireDis);

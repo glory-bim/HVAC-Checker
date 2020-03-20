@@ -63,12 +63,7 @@ namespace HVAC_CheckEngine
 
             sql = sql + "'" + name + "'";
 
-            sql = sql + ",name)> 0";
-
-
-            // sql = sql + "'"+type+"'";
-            //  sql = sql + "and name = " ;
-            // sql = sql + "'" + name + "'";
+            sql = sql + ",name)> 0";           
             sql = sql + " and dArea > ";
             sql = sql + area;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
@@ -76,7 +71,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
-                room.name = reader["name"].ToString();
+                room.name = reader["name"].ToString();                
                 rooms.Add(room);
             }
             //关闭连接
@@ -1910,6 +1905,37 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 SmokeCompartment room = new SmokeCompartment(Convert.ToInt64(reader["Id"].ToString()));
+                smokeCompartments.Add(room);
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return smokeCompartments;
+        }
+
+
+
+        public static List<FireCompartment> GetFireCompartment(string sName)
+        {
+            List<FireCompartment> smokeCompartments = new List<FireCompartment>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return smokeCompartments;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string csSmokeCompartment = "防火分区";
+            string sql = "select * from Spaces where CHARINDEX(";
+            sql = sql + "'" + sName + "'";
+            sql = sql + ",name)> 0 and  userLabel = csSmokeCompartment ";
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                FireCompartment room = new FireCompartment(Convert.ToInt64(reader["Id"].ToString()));
                 smokeCompartments.Add(room);
             }
             //关闭连接

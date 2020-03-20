@@ -13,5 +13,6 @@ namespace HVAC_CheckEngine
 
         }
         public double? m_flowRate { get; set; } = null;
+        public string type { get; set; } = null;
     }
 }
