@@ -134,7 +134,7 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetAreaTest()
         {
-            Windows window = new Windows(322);
+            Window window = new Window(322);
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
             Assert.IsTrue(HVACFunction.GetArea(window)>0);

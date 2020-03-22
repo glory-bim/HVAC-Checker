@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Wall:Element
+  
+    public class Wall : Element
     {
         public Wall(long id) : base(id)
         {
-
         }
+      
+        public string boundaryLoops { get; set; } = null;
 
-        public bool? isOuterWall { get; set; }
+     
     }
 }

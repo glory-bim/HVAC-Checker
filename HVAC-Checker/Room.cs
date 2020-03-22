@@ -21,6 +21,17 @@ namespace HVAC_CheckEngine
         
         public double? area { get; set; } = null;
         public RoomPosition? roomPosition { get; set; } = null;
+        public int ? storyNo { get; set; } = null;
+        public double? m_volume { get; set; } = null;
     }
 
+
+    //public class Door
+    //{
+    //    public Door(long id)
+    //    {
+    //        Id = id;
+    //    }
+    //    public long? Id { get; set; } = null;
+    //}
 }

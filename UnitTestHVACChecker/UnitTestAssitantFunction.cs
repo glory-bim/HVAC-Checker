@@ -129,7 +129,7 @@ namespace UnitTestAssitantFunction
             int indexOfAimWindow = Int32.Parse(context.DataRow["目标外窗编号"].ToString());
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
 
             //assert
             Assert.IsNotNull(aimWindow);
@@ -149,14 +149,14 @@ namespace UnitTestAssitantFunction
            
             window_3.isExternalWindow = false;
 
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             windows.Add(window_1);
             windows.Add(window_2);
             windows.Add(window_3);
 
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
 
             //assert
             Assert.IsNull(aimWindow);
@@ -168,7 +168,7 @@ namespace UnitTestAssitantFunction
         {
 
             //act
-            Windows aimWindow = assistantFunctions.GetOpenableOuterWindow(null);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(null);
 
             //assert
             Assert.IsNull(aimWindow);

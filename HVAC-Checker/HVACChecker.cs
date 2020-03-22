@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using BCGL.Sharp;
 
 namespace HVAC_CheckEngine
 {
@@ -961,6 +961,952 @@ namespace HVAC_CheckEngine
     }
 
     public class modelException : Exception
+
+
+
+        /**
+        民用建筑供暖通风与空气调节设计规范 GB50736-2012：5.9.13条文：
+        室内供暖系统管道中的热媒流速，应根据系统的水力平衡要求及防噪声要求等因素确定，最大流速不宜超过表5．9．13的限值。
+        */      
+        public static BimReview GB50736_2012_5_9_13()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB50736_2012", "5.9.13");
+
+
+            //获取所有防烟楼梯间集合staircases
+            //依次遍历每个防烟楼梯间
+            List<Pipe> heatPipes = new List<Pipe>();
+
+            heatPipes = HVACFunction.GetPipes("采暖系统");
+                       
+            //     
+            foreach (Pipe pipe in heatPipes)
+            {
+                if (pipe.m_DN == 15)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }
+                else if (pipe.m_DN == 20)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }
+                else if (pipe.m_DN == 25)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }
+                else if (pipe.m_DN == 32)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }
+                else if (pipe.m_DN == 40)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }
+                else if (pipe.m_DN > 50)
+                {
+                    if (pipe.m_velocity > 0.8)
+                    {
+                        result.isPassCheck = false;
+                    }
+                    else
+                    {
+                        result.isPassCheck = true;
+                    }
+                }                                                    
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第5.9.13条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第5.9.13条条文规定。";
+            }
+            return result;
+        }
+
+        private static void AirterminalVelocityResult(AirTerminal airterminal, ref BimReview result)
+        {
+            Room room = HVACFunction.GetRoomOfAirterminal(airterminal);
+            if (room.type == "机房" || room.type == "库房")
+            {
+                if (airterminal.airVelocity > 4.5 && airterminal.airVelocity < 5.0)
+                {
+
+                }
+                if (airterminal.airVelocity > 8 && airterminal.airVelocity < 14)
+                {
+
+                }
+
+            }
+            else
+            {
+                if (airterminal.airVelocity > 5.0 && airterminal.airVelocity < 10.0)
+                {
+
+                }
+                if (airterminal.airVelocity > 3.5 && airterminal.airVelocity < 4.5)
+                {
+                    result.isPassCheck = true;
+                }
+            }
+        }
+
+
+        /**
+      民用建筑供暖通风与空气调节设计规范 GB50736-2012：6.6.5条文：
+       //机械通风的进排风口风速宜按表6．6．5采用   （加属性//）  
+      */
+        public static BimReview GB50736_2012_6_6_5()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB50736_2012", "6.6.5");         
+            List<AirTerminal> airTerminals = new List<AirTerminal>();
+            airTerminals = HVACFunction.GetAirterminals();
+            //     
+            foreach (AirTerminal airterminal in airTerminals)
+            {
+                PointInt pt1 = new PointInt(0,0,0);
+                PointInt pt2 = new PointInt(0, 0, 0);
+                string strId = "0";
+                AABB aabbAirterminal  = new AABB(pt1,pt2,strId);
+                HVACFunction.GetAirTerminalAABB(aabbAirterminal, Convert.ToString( airterminal.Id));
+
+
+                List<Room> rooms = new List<Room>();
+                rooms = HVACFunction.GetAllRooms();
+
+                foreach (Room room in rooms)
+                {
+                    //创建一个连接
+                    List<PointIntList> Points = new List<PointIntList>() ;
+                    string elementId = "";
+
+                    Polygon2D poly = new Polygon2D(Points, elementId);
+                    HVACFunction.GetRoomPolygon(poly, room);
+                    PointInt pt = aabbAirterminal.Center();
+                    if (!Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Center())
+                        && !Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirterminal)
+                        && !Geometry_Utils_BBox.IsPointInBBox2D(aabbAirterminal, poly.Center())
+                        && !Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Min)
+                        && !Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Max))
+                    {
+
+                        AirterminalVelocityResult(airterminal, ref result);
+
+                    }
+                }
+                               
+                List<Wall> walls = new List<Wall>();
+                walls = HVACFunction.GetOutSideWalls();
+                foreach (Wall wall in walls)
+                {                 
+                    AABB aabbWall = new AABB(pt1, pt2, strId);
+                    HVACFunction.GetWallAABB(aabbWall, Convert.ToString(wall.Id));
+
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbWall, aabbAirterminal))
+                    {
+                        AirterminalVelocityResult(airterminal, ref result);
+                    }             
+            }
+        }
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
+
+
+        /**
+        民用建筑供暖通风与空气调节设计规范 GB50736-2012：6.6.7条文：        
+        //667 风管与通风机及空气处理机组等振动设备的连接处，应装设柔性接头，其长度宜为150mm～300mm。  进出口都有FlexibleShortTubes
+   */
+        //初始化审查结果
+        //如果建筑类型为公共建筑、工业建筑且建筑高度大于50m或者建筑类型为住宅且建筑高度大于100m
+        //  则获得建筑中所有防烟楼梯间及前室的集合rooms
+        //  依次判断集合rooms中的房间是否使用了机械加压送风系统
+        //  如果没有设置机械加压送风系统，则在审查结果中标记审查不通过
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果批注中注明审查不通过相关内容
+        public static BimReview GB50736_2012_6_6_7()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50736_2012", "6.6.7");
+
+            List<Fan> fans = HVACFunction.GetAllFans();
+            foreach(Fan fan in fans)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+              if(flexiTubes.Count()>2)
+                {
+                 if((flexiTubes[0].m_length >150 && flexiTubes[0].m_length<300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                 else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+              else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+
+
+            List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
+            foreach (AssemblyAHU fan in aHUs)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
+
+
+        //民用建筑供暖通风与空气调节设计规范 GB50736-2012：9.1.5条文：  
+        //915锅炉房、换热机房和制冷机房的能量计量应符合下列规定：
+        //1  应计量燃料的消耗量；
+        //2  应计量耗电量；
+        //3  应计量集中供热系统的供热量；
+        //4  应计量补水量；
+        public static BimReview GB50736_2012_9_1_5()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50736_2012", "9.1.5");
+            List<GasMeter> gasMeters = HVACFunction.GetGasMeters();
+            if (gasMeters.Count() > 0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            List<HeatMeter> heatMeters = HVACFunction.GetHeatMeters();
+            if (heatMeters.Count() > 0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            List<WaterMeter> waterMeters = HVACFunction.GetWaterMeters();
+            if (waterMeters.Count() > 0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
+
+
+    // 452   锅炉房、换热机房和制冷机房应进行能量计量，能量计量应包括下列内容：
+    //1 燃料的消耗量；
+    //2 制冷机的耗电量； globle
+    //3 集中供热系统的供热量；
+    //4 补水量。
+
+        public static BimReview GB50189_2015_4_5_2()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50189_2015", "4.5.2");
+            List<GasMeter> gasMeters = HVACFunction.GetGasMeters();
+            if(gasMeters.Count()>0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            List<HeatMeter> heatMeters = HVACFunction.GetHeatMeters();
+            if (heatMeters.Count() > 0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            List<WaterMeter> waterMeters = HVACFunction.GetWaterMeters();
+            if (waterMeters.Count() > 0)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+            }
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
+
+
+        //    燃油或燃气锅炉房应设置自然通风或机械通风设施。燃气锅炉房应选用防爆型的事故排风机。当采取机械通风时，机械通风设施应设置导除静电的接地装置，通风量应符合下列规定：
+        //1 燃油锅炉房的正常通风量应按换气次数不少于3次／h确定，事故排风量应按换气次数不少于6次／h确定；
+        //2 燃气锅炉房的正常通风量应按换气次数不少于6次／h确定，事故排风量应按换气次数不少于12次／h确定。  有可开启外窗 机械通风 加高档风量参数
+
+
+        private static void CheckRoomVentilationRate(List<Room> rooms, ref BimReview result, int iNum)
+        {
+            foreach (Room room in rooms)
+            {
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(room, "机械通风");
+
+                //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
+                if (stairCaseHaveMechanicalPressureSystem)
+                {
+                    List<AirTerminal> airtermimals = HVACFunction.GetRoomContainAirTerminal(room);
+                    foreach (AirTerminal airtermimal in airtermimals)
+                    {
+                        List<Fan> fans = HVACFunction.GetFanConnectingAirterminal(airtermimal);
+                        foreach (Fan fan in fans)
+                        {
+                            List<AirTerminal> outlets = HVACFunction.GetOutletsOfFan(fan);
+                            foreach (AirTerminal outlet in outlets)
+                            {
+                                if (!airtermimals.Contains(outlet))
+                                {
+                                    result.isPassCheck = false;
+                                }
+
+
+                            }
+                            if (fan.m_flowRate > iNum * room.m_volume)
+                            {
+                                result.isPassCheck = true;
+                            }
+                            else
+                            {
+                                result.isPassCheck = false;
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+        }
+        public static BimReview GB50016_2014_9_3_16()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50016_2014", "9.3.16");
+            string strOil = "燃油";
+            string strGas = "燃气";
+            List<Room> roomOil = HVACFunction.GetRoomsContainingString(strOil);
+            List<Room> roomGas = HVACFunction.GetRoomsContainingString(strGas);
+            // List<Room> UnionRooms = roomOil.Concat(roomGas).ToList<Room>();
+
+            CheckRoomVentilationRate(roomOil, ref result, 3);
+            CheckRoomVentilationRate(roomGas, ref result, 6);
+
+            return result;
+        }
+
+
+                //前室采用自然通风方式时，独立前室、消防电梯前室可开启外窗或开口的面积不应小于2.0m2，
+                //共用前室、合用前室不应小于3．0m2。
+           
+                //如果审查通过
+                //则在审查结果批注中注明审查通过相关内容
+                //如果审查不通过
+                //则在审查结果中注明审查不通过的相关内容
+
+
+                public static BimReview GB51251_2017_3_2_2()
+                {
+                    //将审查结果初始化
+                    BimReview result = new BimReview("GB51251_2017", "3.2.2");
+
+
+                    //获取所有防烟楼梯间集合staircases
+                    //依次遍历每个防烟楼梯间
+                    List<Room> independentAnteRooms = new List<Room>();
+                    List<Room> fireElevatorAnteRooms = new List<Room>();
+                    independentAnteRooms = HVACFunction.GetRooms("独立前室");
+                    fireElevatorAnteRooms = HVACFunction.GetRooms("消防电梯前室");
+                    List<Room> UnionRooms = independentAnteRooms.Concat(fireElevatorAnteRooms).ToList<Room>();
+                    //     
+                    foreach (Room stairCase in UnionRooms)
+                    {
+                        bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+
+                        //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
+                        if (stairCaseHaveMechanicalPressureSystem)
+                        {
+                            //     找到此楼梯间的所有前室atrias
+                            List<Window> windows = new List<Window>();
+                            windows = HVACFunction.GetWindowsInRoom(stairCase);
+
+                            //     依次遍历每一个前室
+                            foreach (Window window in windows)
+                            {
+                                if (HVACFunction.GetArea(window) - 2.0 > 0.01)
+                                {
+                                    result.isPassCheck = true;
+                                }
+                                else
+                                {
+                                    result.isPassCheck = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
+                            result.isPassCheck = false;
+                            string remark = string.Empty;
+                            result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                        }
+
+                    }
+
+
+
+                    List<Room> sharedAnteRooms = HVACFunction.GetRooms("共用前室");
+                    List<Room> combinedAnteRooms = HVACFunction.GetRooms("合用前室");
+                    UnionRooms.Clear();
+                    UnionRooms = sharedAnteRooms.Concat(combinedAnteRooms).ToList<Room>();
+
+                    foreach (Room stairCase in UnionRooms)
+                    {
+                        bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+
+                        //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
+                        if (stairCaseHaveMechanicalPressureSystem)
+                        {
+                            //     找到此楼梯间的所有前室atrias
+                            List<Window> windows = new List<Window>();
+                            windows = HVACFunction.GetWindowsInRoom(stairCase);
+
+                            //     依次遍历每一个前室
+                            foreach (Window window in windows)
+                            {
+                                if (HVACFunction.GetArea(window) - 3.0 > 0.01)
+                                {
+                                    result.isPassCheck = true;
+                                }
+                                else
+                                {
+                                    result.isPassCheck = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
+                            result.isPassCheck = false;
+                            string remark = string.Empty;
+                            result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
+                        }
+
+                    }
+
+                    //如果审查通过
+                    //则在审查结果批注中注明审查通过相关内容
+                    if (result.isPassCheck)
+                    {
+                        result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+                    }
+                    //如果审查不通过
+                    //则在审查结果中注明审查不通过的相关内容
+                    else
+                    {
+                        result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+                    }
+                    return result;
+                }
+
+
+                //323采用自然通风方式的避难层（间）应设有不同朝向的可开启外窗，其有效面积不应小于该避难层（间）地面面积的2％，且每个朝向的面积不应小于2．0m2。加房间TYpe
+                public static BimReview GB51251_2017_3_2_3()
+                {
+                    //将审查结果初始化
+                    BimReview result = new BimReview("GB51251_2017", "3.2.2");
+                    List<Room> rooms = HVACFunction.GetRooms("避难");
+
+                foreach (Room room in rooms)
+                {
+                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+                double dAreatotal = 0.0;
+                foreach (Window window in windows)
+                {
+                  //  dAreatotal += window.effectiveArea;
+                }
+                if (dAreatotal < room.area * 0.02)
+                {
+                    result.isPassCheck = false;
+                }
+
+                }
+
+                //如果审查通过
+                //则在审查结果批注中注明审查通过相关内容
+                if (result.isPassCheck)
+                    {
+                        result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+                    }
+                    //如果审查不通过
+                    //则在审查结果中注明审查不通过的相关内容
+                    else
+                    {
+                        result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+                    }
+                    return result;
+                }
+
+        //机械加压送风系统应采用管道送风，且不应采用土建风道。送风管道应采用不燃材料制作且内壁应光滑。
+        //    当送风管道内壁为金属时，设计风速不应大于20m／s；当送风管道内壁为非金属时，设计风速不应大于15m／s；
+        //    送风管道的厚度应符合现行国家标准《通风与空调工程施工质量验收规范》GB 50243的规定。
+        //    风口找风机判断土建风道 加风管材料参数 正压送 systemtype风口 正压送风机
+        public static BimReview GB51251_2017_3_3_7()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+
+
+            List<AirTerminal> airTerminals = HVACFunction.GetAirterminals("机械加压送风");
+            foreach (AirTerminal airterminal in airTerminals)
+            {
+                //duct.mat
+
+                List<Fan> fans = HVACFunction.GetFanConnectingAirterminal(airterminal);
+               if( fans.Count < 0)
+                {
+                    result.isPassCheck = false;
+
+                }
+            }
+
+            List<Duct>  ducts = HVACFunction.GetDucts("机械加压送风");
+            foreach(Duct duct in ducts)
+            {
+                //duct.mat
+                if(duct.airVelocity>20.0)
+                {
+                    result.isPassCheck = false;
+                }
+
+
+            }
+
+         
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+
+
+
+        //4.24公共建筑、工业建筑防烟分区的最大允许面积及其长边最大允许长度应符合表4．2．4的规定，
+        //    当工业建筑采用自然排烟系统时，其防烟分区的长边长度尚不应大于建筑内空间净高的8倍。
+        public static BimReview GB51251_2017_4_2_4()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            List<Room> rooms = HVACFunction.GetRooms("防烟分区");
+
+            foreach (Room room in rooms)
+            {
+           
+               // if ( room.area>)
+                {
+                    result.isPassCheck = false;
+                }
+
+              //  room.le
+
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+
+
+
+        //机械排烟系统应采用管道排烟，且不应采用土建风道。排烟管道应采用不燃材料制作且内壁应光滑。当排烟管道内壁为金属时，管道设计风速不应大于20m／s；
+        //    当排烟管道内壁为非金属时，管道设计风速不应大于15m／s；
+        //    排烟管道的厚度应按现行国家标准《通风与空调工程施工质量验收规范》GB 50243的有关规定执行。
+        public static BimReview GB51251_2017_4_4_7()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            List<Room> rooms = HVACFunction.GetRooms("避难");
+
+            foreach (Room room in rooms)
+            {
+                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+                double dAreatotal = 0.0;
+                foreach (Window window in windows)
+                {
+                   // dAreatotal += window.effectiveArea;
+                }
+                if (dAreatotal < room.area * 0.02)
+                {
+                    result.isPassCheck = false;
+                }
+
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+
+
+        //842风管软接长度限制
+        public static BimReview GB51251_2017_8_4_2()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB50736_2017", "8.4.2");
+
+            List<Fan> fans = HVACFunction.GetAllFans();
+            foreach (Fan fan in fans)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+
+
+            List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
+            foreach (AssemblyAHU fan in aHUs)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
+
+        //843风管穿越建筑物变形缝空间时，应设置长度为200mm～300mm的柔性短管(图8．4．3-1)；
+        //风管穿越建筑物变形缝墙体时，应设置钢制套管，风管与套管之间应采用柔性防水材料填塞密实。
+        //    穿越建筑物变形缝墙体的风管两端外侧应设置长度为150mm～300mm的柔性短管，柔性短管距变形缝墙体的距离宜为150mm～200mm(图8．4．3-2)，
+        //柔性短管的保温性能应符合风管系统功能要求。保温不用管，专家审
+
+        public static BimReview GB51251_2017_8_4_3()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            List<Room> rooms = HVACFunction.GetRooms("避难");
+
+            foreach (Room room in rooms)
+            {
+                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+                double dAreatotal = 0.0;
+                foreach (Window window in windows)
+                {
+                  //  dAreatotal += window.effectiveArea;
+                }
+                if (dAreatotal < room.area * 0.02)
+                {
+                    result.isPassCheck = false;
+                }
+
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+
+
+        //管道穿越结构变形缝处应设置金属柔性短管(图11．1．4-1、图11．1．4-2)，
+        //金属柔性短管长度宜为150mm～300mm，并应满足结构变形的要求，其保温性能应符合管道系统功能要求。
+  public static BimReview GB51251_2017_11_1_4()
+        {
+            BimReview result = new BimReview("GB50736_2017", "11.1.4");
+
+            List<Fan> fans = HVACFunction.GetAllFans();
+            foreach (Fan fan in fans)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+
+
+            List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
+            foreach (AssemblyAHU fan in aHUs)
+            {
+
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+
+
+        }
+
+        //城市轨道交通技术规范GB 50490-2009 
+       // 8．4．17 地下车站站厅、站台公共区和设备及管理用房应划分防烟分区，且防烟分区不应跨越防火分区。
+       //站厅、站台公共区每个防烟分区的建筑面积不应超过2000m2，设备及管理用房每个防烟分区的建筑面积不应超过750m2。
+        public static BimReview GB50490_2009_8_4_17()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            List<Room> rooms = HVACFunction.GetRooms("避难");
+
+            foreach (Room room in rooms)
+            {
+                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+                double dAreatotal = 0.0;
+                foreach (Window window in windows)
+                {
+                  //  dAreatotal += window.effectiveArea;
+                }
+                if (dAreatotal < room.area * 0.02)
+                {
+                    result.isPassCheck = false;
+                }
+
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+    }
+        public class modelException : Exception
     {
         public modelException(string message) : base(message)
         { }
