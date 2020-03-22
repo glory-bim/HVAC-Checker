@@ -93,24 +93,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AirTerminal.cs" />
+    <Compile Include="AssemblyAHU.cs" />
     <Compile Include="assistantFunctions.cs" />
     <Compile Include="BimReview.cs" />
     <Compile Include="door.cs" />
     <Compile Include="Duct.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
-    <Compile Include="FireDistrict.cs" />
+    <Compile Include="FireCompartment.cs" />
+    <Compile Include="FlexibleShortTubes.cs" />
     <Compile Include="Floor.cs" />
+    <Compile Include="GasMeter.cs" />
     <Compile Include="GeometryFunction.cs" />
     <Compile Include="globalData.cs" />
+    <Compile Include="HeatMeter.cs" />
     <Compile Include="HVACChecker.cs" />
     <Compile Include="HVACFunction.cs" />
     <Compile Include="HVACFunctionStub.cs" />
+    <Compile Include="Pipe.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Region.cs" />
     <Compile Include="Room.cs" />
-    <Compile Include="Windows.cs" />
+    <Compile Include="SmokeCompartment.cs" />
+    <Compile Include="Wall.cs" />
+    <Compile Include="WaterMeter.cs" />
+    <Compile Include="Window.cs" />
     <Compile Include="XDBCurve.cs" />
   </ItemGroup>
   <ItemGroup>

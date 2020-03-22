@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Fan:Element
+  
+
+    public class WaterMeter : Element
     {
-        public Fan(long id):base(id)
+        public WaterMeter(long id) : base(id)
         {
 
         }
-        public double? m_flowRate { get; set; } = null;
-        public string type { get; set; } = null;
+
     }
 }

@@ -134,9 +134,9 @@ namespace HVAC_CheckEngine
             return airterminals;
         }
 
-        public static List<Windows> GetWindowsInRoom(Room room)
+        public static List<Window> GetWindowsInRoom(Room room)
         {
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             string strDbName = "/建筑.GDB";
             string path = GetCurrentPath(strDbName);
             //如果不存在，则创建一个空的数据库,
@@ -201,7 +201,7 @@ namespace HVAC_CheckEngine
                                 || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
                             {
 
-                                Windows window = new Windows(Convert.ToInt64(readerWindows["Id"].ToString()));
+                                Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
 
                                 windows.Add(window);
                             }
@@ -813,7 +813,7 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //8找到穿越防火分区的风管对象集合  userlable
-        public static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
+        public static List<Duct> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
         {          
             List<Duct> ducts = new List<Duct>();
             string strDbName = "/建筑.GDB";
@@ -1000,7 +1000,7 @@ namespace HVAC_CheckEngine
         }
 
         //11获得一个窗户对象的有效面积  差公式 xdb差参数  开启角度  开启方式
-        public static double GetArea(Windows window)  
+        public static double GetArea(Window window)  
         {
             double dArea = 0.0;  
 
@@ -1364,7 +1364,7 @@ namespace HVAC_CheckEngine
             }
         }
         //18获得防烟分区长边长度
-        public static double GetFireDistrictLength(FireDistrict fireDistrict)
+        public static double GetFireDistrictLength(FireCompartment fireDistrict)
         {
             double dLength = 0.0;  
             

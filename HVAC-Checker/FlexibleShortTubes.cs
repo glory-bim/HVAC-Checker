@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Fan:Element
+    public class FlexibleShortTubes:Element
     {
-        public Fan(long id):base(id)
+
+        public FlexibleShortTubes(long id) : base(id)
         {
 
         }
-        public double? m_flowRate { get; set; } = null;
-        public string type { get; set; } = null;
+
+        public double? m_length { get; set; } = null;
     }
 }

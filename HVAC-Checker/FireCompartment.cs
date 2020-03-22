@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class Fan:Element
+    public class FireCompartment : Room
     {
-        public Fan(long id):base(id)
+        public FireCompartment(long id):base(id)
         {
 
         }
-        public double? m_flowRate { get; set; } = null;
-        public string type { get; set; } = null;
     }
 }
