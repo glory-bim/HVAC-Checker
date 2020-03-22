@@ -108,19 +108,19 @@ namespace UnitTestAssitantFunction
         public void test_differentOrder()
         {
             //arrange
-            Windows window_1 = new Windows(1);
+            Window window_1 = new Window(1);
            
             window_1.isExternalWindow = Convert.ToBoolean(context.DataRow["第一个外窗是否为可开启"].ToString());
-       
-            Windows window_2 = new Windows(2);
+            window_1.effectiveArea= Convert.ToDouble(context.DataRow["第一个窗户的有效面积"].ToString()); 
+            Window window_2 = new Window(2);
             window_2.isExternalWindow = Convert.ToBoolean(context.DataRow["第二个外窗是否为可开启"].ToString());
-           
+            window_2.effectiveArea = Convert.ToDouble(context.DataRow["第二个窗户的有效面积"].ToString());
 
-            Windows window_3 = new Windows(3);
+            Window window_3 = new Window(3);
             window_3.isExternalWindow = Convert.ToBoolean(context.DataRow["第三个外窗是否为可开启"].ToString());
-     
+            window_3.effectiveArea = Convert.ToDouble(context.DataRow["第三个窗户的有效面积"].ToString());
 
-            List<Windows> windows = new List<Windows>();
+            List<Window> windows = new List<Window>();
             windows.Add(window_1);
             windows.Add(window_2);
             windows.Add(window_3);
@@ -139,13 +139,13 @@ namespace UnitTestAssitantFunction
 
         public void test_doNotHaveAimWindow()
         {
-            Windows window_1 = new Windows(1);
+            Window window_1 = new Window(1);
             
             window_1.isExternalWindow = true;
-            Windows window_2 = new Windows(2);
+            Window window_2 = new Window(2);
             
             window_2.isExternalWindow = false;
-            Windows window_3 = new Windows(3);
+            Window window_3 = new Window(3);
            
             window_3.isExternalWindow = false;
 
@@ -184,46 +184,7 @@ namespace UnitTestAssitantFunction
         }
     }
 
-    [TestClass]
-    public class getSumOfAllRoomsAreaOfRooms_test
-    {
-        [TestMethod]
-        public void test_getSumOfAllRoomsAreaOfRooms()
-        {
-            //打开测试数据文件
-            IWorkbook Workbook = WorkbookFactory.Create(ExcelPath);
-            //读取测试数据表
-            ISheet Sheet = Workbook.GetSheet("测试区域面积计算");
-
-            //arrang
-            List<Room> rooms = new List<Room>();
-            IRow row = null;
-            //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
-            for (int index = 1; index <= Sheet.LastRowNum - 1; ++index)
-            {
-
-                row = (IRow)Sheet.GetRow(index);
-                long roomId = Convert.ToInt64(row.GetCell(0).ToString());
-                Room room = new Room(roomId);
-                room.type = row.GetCell(1).ToString();
-                room.area = row.GetCell(2).NumericCellValue;
-                rooms.Add(room);
-            }
-            row = (IRow)Sheet.GetRow(9);
-            double aimSum = row.GetCell(2).NumericCellValue;
-
-            //act
-            double sum = assistantFunctions.getSumOfAllRoomsAreaOfRooms(rooms);
-
-            //assert
-
-            Assert.AreEqual(aimSum, sum);
-        }
-
-        private static string ExcelPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_assitantFunction.xlsx";
-
-        private static double error = 0.0001;
-    }
+    
 
     [TestClass]
     public class isStairPressureAirSystemIndependent_test
@@ -776,6 +737,206 @@ namespace UnitTestAssitantFunction
                 //assert
 
                 Assert.AreEqual(aimHight, hight);
+
+            }
+        }
+    }
+
+    [TestClass]
+    public class exceptSomeRooms_test
+    {
+        [TestMethod]
+        public void test_exceptSomeRooms_test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_exceptSomeRoom.xlsx";
+                FakeHVACFunction.roomSheetName_new = "房间（包含需要除去的房间）";
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet("房间（包含需要除去的房间）");
+
+                List<Room> aimRooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    bool isNeededRoom = row.GetCell(sheet_rooms.getColNumber("是否需要")).BooleanCellValue;
+                    if (isNeededRoom)
+                    {
+                        long Id = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        Room room = new Room(Id);
+                        room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                        room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        aimRooms.Add(room);
+                    }
+                }
+                //act
+                List<Room> rooms = HVACFunction.GetRooms("");
+
+                List<assistantFunctions.exceptRoomCondition> conditions = new List<assistantFunctions.exceptRoomCondition>();
+                assistantFunctions.exceptRoomCondition overgroundCorridorCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundCorridorCondition.area = 0;
+                overgroundCorridorCondition.type = "走廊";
+                overgroundCorridorCondition.name = "";
+                overgroundCorridorCondition.roomPosition = RoomPosition.overground;
+                overgroundCorridorCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.LargerThan;
+                conditions.Add(overgroundCorridorCondition);
+
+                assistantFunctions.exceptRoomCondition overgroundSmallerThan500sqmCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundSmallerThan500sqmCondition.area = 500;
+                overgroundSmallerThan500sqmCondition.type = "";
+                overgroundSmallerThan500sqmCondition.name = "";
+                overgroundSmallerThan500sqmCondition.roomPosition = RoomPosition.overground;
+                overgroundSmallerThan500sqmCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.SmallerThan;
+                conditions.Add(overgroundSmallerThan500sqmCondition);
+
+                rooms = rooms.exceptSomeRooms(conditions);
+
+                //assert
+
+                Custom_Assert.AreListsEqual(aimRooms, rooms);
+
+            }
+        }
+
+        [TestMethod]
+        public void test_exceptSomeRooms_emptyRoom_test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_exceptSomeRoom.xlsx";
+                FakeHVACFunction.roomSheetName_new = "房间（没有房间）";
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet("房间（没有房间）");
+
+                List<Room> aimRooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    bool isNeededRoom = row.GetCell(sheet_rooms.getColNumber("是否需要")).BooleanCellValue;
+                    if (isNeededRoom)
+                    {
+                        long Id = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        Room room = new Room(Id);
+                        room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                        room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        aimRooms.Add(room);
+                    }
+                }
+                //act
+                List<Room> rooms = HVACFunction.GetRooms("");
+
+                List<assistantFunctions.exceptRoomCondition> conditions = new List<assistantFunctions.exceptRoomCondition>();
+                assistantFunctions.exceptRoomCondition overgroundCorridorCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundCorridorCondition.area = 0;
+                overgroundCorridorCondition.type = "走廊";
+                overgroundCorridorCondition.name = "";
+                overgroundCorridorCondition.roomPosition = RoomPosition.overground;
+                overgroundCorridorCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.LargerAndEqualThan;
+                conditions.Add(overgroundCorridorCondition);
+
+                assistantFunctions.exceptRoomCondition overgroundSmallerThan500sqmCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundSmallerThan500sqmCondition.area = 500;
+                overgroundSmallerThan500sqmCondition.type = "";
+                overgroundSmallerThan500sqmCondition.name = "";
+                overgroundSmallerThan500sqmCondition.roomPosition = RoomPosition.overground;
+                overgroundSmallerThan500sqmCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.SmallerAndEqualThan;
+                conditions.Add(overgroundSmallerThan500sqmCondition);
+
+                rooms = rooms.exceptSomeRooms(conditions);
+
+                //assert
+
+                Custom_Assert.AreListsEqual(aimRooms, rooms);
+
+            }
+
+        }
+
+        [TestMethod]
+        public void test_exceptSomeRooms_largerAndEqual_smallerAndEqual_test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_exceptSomeRoom.xlsx";
+                FakeHVACFunction.roomSheetName_new = "房间（包含需要除去的房间大于等于小于等于）";
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+                //arrange
+
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet("房间（包含需要除去的房间大于等于小于等于）");
+
+                List<Room> aimRooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    bool isNeededRoom = row.GetCell(sheet_rooms.getColNumber("是否需要")).BooleanCellValue;
+                    if (isNeededRoom)
+                    {
+                        long Id = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        Room room = new Room(Id);
+                        room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                        room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        aimRooms.Add(room);
+                    }
+                }
+                //act
+                List<Room> rooms = HVACFunction.GetRooms("");
+
+                List<assistantFunctions.exceptRoomCondition> conditions = new List<assistantFunctions.exceptRoomCondition>();
+                assistantFunctions.exceptRoomCondition overgroundCorridorCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundCorridorCondition.area = 0;
+                overgroundCorridorCondition.type = "走廊";
+                overgroundCorridorCondition.name = "";
+                overgroundCorridorCondition.roomPosition = RoomPosition.overground;
+                overgroundCorridorCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.LargerAndEqualThan;
+                conditions.Add(overgroundCorridorCondition);
+
+                assistantFunctions.exceptRoomCondition overgroundSmallerThan500sqmCondition = new assistantFunctions.exceptRoomCondition();
+                overgroundSmallerThan500sqmCondition.area = 500;
+                overgroundSmallerThan500sqmCondition.type = "";
+                overgroundSmallerThan500sqmCondition.name = "";
+                overgroundSmallerThan500sqmCondition.roomPosition = RoomPosition.overground;
+                overgroundSmallerThan500sqmCondition.areaType = assistantFunctions.exceptRoomCondition.AreaType.SmallerAndEqualThan;
+                conditions.Add(overgroundSmallerThan500sqmCondition);
+
+                rooms = rooms.exceptSomeRooms(conditions);
+
+                //assert
+
+                Custom_Assert.AreListsEqual(aimRooms, rooms);
 
             }
         }

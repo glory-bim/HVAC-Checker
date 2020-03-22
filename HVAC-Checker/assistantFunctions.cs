@@ -39,13 +39,22 @@ namespace HVAC_CheckEngine
         {
             if (room == null)
                 throw new ArgumentException();
-            if (isRoomHaveSomeMechanicalSystem(room, systemName) || isRoomHaveNatureVentilateSystem(room))
+            if (isRoomHaveSomeMechanicalSystem(room, systemName))
+            {
+                return true;
+            }
+            else if ( systemName.Contains("排烟")&& isRoomHaveNatureSmokeExhaustSystem(room))
+            {
+                return true;
+            }
+            else if(isRoomHaveNatureVentilateSystem(room))
             {
                 return true;
             }
             else
                 return false;
         }
+
 
         public static bool isRoomHaveSomeMechanicalSystem(Room room, string systemName)
         {
@@ -81,6 +90,26 @@ namespace HVAC_CheckEngine
             }
             //如果有可开启外窗则返回是
             else
+                return true;
+        }
+
+        public static bool isRoomHaveNatureSmokeExhaustSystem(Room room)
+        {
+            if (room == null)
+                throw new ArgumentException();
+            //      如果房间中没有可开启外窗，则返回否
+            List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+            Window aimWindow = assistantFunctions.GetOpenableOuterWindow(windows);
+            if (aimWindow == null)
+            {
+                return false;
+            }
+            else if(!aimWindow.isSmokeExhaustWindow.Value)
+            {
+                return false;
+            }
+            //如果有可开启外窗则返回是
+            else 
                 return true;
         }
 
@@ -248,9 +277,9 @@ namespace HVAC_CheckEngine
             return aimAirTerminals;
         }
 
-        public static Windows findWindowNoSmallerThanSomeArea(this List<Windows> windows, double area)
+        public static Window findWindowNoSmallerThanSomeArea(this List<Window> windows, double area)
         {
-            foreach (Windows window in windows)
+            foreach (Window window in windows)
             {
                 if (window.area >= area)
                     return window;
@@ -260,22 +289,24 @@ namespace HVAC_CheckEngine
 
         public static List<Fan> getAllFansConnectToAirTerminals(List<AirTerminal> airTerminals)
         {
-            List<Fan> fans = new List<Fan>();
+           Dictionary<long,Fan> fans = new Dictionary<long, Fan>();
             foreach (AirTerminal airTerminal in airTerminals)
             {
                 List<Fan> temp_fans = HVACFunction.GetFanConnectingAirterminal(airTerminal);
                 if (temp_fans.Count == 0)
                     throw new modelException("风口没有连接风机");
-                if (!fans.Exists(x => x.Id.Value == temp_fans[0].Id.Value))
-                    fans.Add(temp_fans[0]);
+                if (!fans.ContainsKey(temp_fans[0].Id.Value))
+                    fans.Add(temp_fans[0].Id.Value, temp_fans[0]);
             }
-            return fans;
+            List<Fan> aimFans =new List<Fan>();
+            aimFans.AddRange(fans.Values);
+            return aimFans;
         }
 
-        public static double calculateTotalAreaOfWindows(List<Windows> windows)
+        public static double calculateTotalAreaOfWindows(List<Window> windows)
         {
             double sum = 0;
-            foreach (Windows window in windows)
+            foreach (Window window in windows)
             {
                 sum += window.area.Value;
             }
@@ -331,6 +362,67 @@ namespace HVAC_CheckEngine
             return rooms.exceptSameItems(publicRooms);
         }
 
+        public struct exceptRoomCondition
+        {
+            public string type;
+            public string name;
+            public double area;
+            public RoomPosition roomPosition;
+            public AreaType areaType;
+            public enum AreaType{ LargerThan,SmallerThan,LargerAndEqualThan,SmallerAndEqualThan}
+        }
+
+
+        public static List<Room>exceptSomeRooms(this List<Room> rooms,List<exceptRoomCondition> conditions)
+        {
+            List<Room> aimRooms = new List<Room>();
+            aimRooms.AddRange(rooms);
+            foreach(Room room in rooms)
+            {
+                foreach(exceptRoomCondition condition in conditions)
+                {
+                    bool isRemoveRoom = false;
+                    switch (condition.areaType)
+                    {
+                        case exceptRoomCondition.AreaType.LargerThan:
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area > condition.area &&
+                                room.roomPosition == condition.roomPosition)
+                            {
+                                aimRooms.Remove(room);
+                                isRemoveRoom = true;
+                            }
+                            break;
+                        case exceptRoomCondition.AreaType.LargerAndEqualThan:
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area >= condition.area &&
+                               room.roomPosition == condition.roomPosition)
+                            {
+                                aimRooms.Remove(room);
+                                isRemoveRoom = true;
+                            }
+                            break;
+                        case exceptRoomCondition.AreaType.SmallerThan:
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area < condition.area &&
+                               room.roomPosition == condition.roomPosition)
+                            {
+                                aimRooms.Remove(room);
+                                isRemoveRoom = true;
+                            }
+                            break;
+                        case exceptRoomCondition.AreaType.SmallerAndEqualThan:
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area <= condition.area &&
+                               room.roomPosition == condition.roomPosition)
+                            {
+                                aimRooms.Remove(room);
+                                isRemoveRoom = true;
+                            }
+                            break;
+                    }
+                    if (isRemoveRoom)
+                        break;
+                }
+            }
+            return aimRooms;
+        }
 
         public static bool isStairPressureAirSystemIndependent(Room stairCase)
         {
@@ -421,6 +513,45 @@ namespace HVAC_CheckEngine
             //如果所有风口都在前室中
             //  怎返回True
             return true;
+        }
+
+        static public List<Fan> getFansOfSomeSyetemType(string systemType)
+        {
+            //获得所有风机
+            List<Fan> fans = HVACFunction.GetAllFans();
+            List<Fan> aimFans = new List<Fan>();
+            //依次遍历每一台风机
+            foreach (Fan fan in fans)
+            {
+                //获得风机连接的所有排风口
+                List<AirTerminal> airTerminals = HVACFunction.GetInletsOfFan(fan);
+                //如果风口里面有排烟口则将风机加入到目标风机集合中
+                foreach (AirTerminal airTerminal in airTerminals)
+                {
+                    if (airTerminal.systemType.Contains(systemType))
+                    {
+                        aimFans.Add(fan);
+                        break;
+                    }
+                }
+            }
+            return aimFans;
+        }
+
+        static public double getAffordHeightOfSomkeFan(Fan smokeFan)
+        {
+            //获得风机连接的所有排风口
+            List<AirTerminal> airTerminals = HVACFunction.GetInletsOfFan(smokeFan);
+            double maxHeight = double.MinValue;
+            double minHeight = double.MaxValue;
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if (airTerminal.elevation > maxHeight)
+                    maxHeight = airTerminal.elevation.Value;
+                if (airTerminal.elevation < minHeight)
+                    minHeight = airTerminal.elevation.Value;
+            }
+            return maxHeight - minHeight;
         }
 
         //获得前室所有相连房间的集合linkedRooms
@@ -575,6 +706,7 @@ namespace HVAC_CheckEngine
             if (airTerminalsConnectToFan.Count == 0)
                 return 0;
 
+
             double lowestHeight = double.MaxValue;
             double highestHeight = double.MinValue;
 
@@ -644,11 +776,11 @@ namespace HVAC_CheckEngine
             return aimFloors;
         }
 
-        public static List<Windows> getFixOuterWindowsOfRoom(Room room)
+        public static List<Window> getFixOuterWindowsOfRoom(Room room)
         {
-            List<Windows> windows = HVACFunction.GetWindowsInRoom(room);
-            List<Windows> aimWindows = new List<Windows>();
-            foreach (Windows window in windows)
+            List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+            List<Window> aimWindows = new List<Window>();
+            foreach (Window window in windows)
             {
                 if (Math.Abs(window.effectiveArea.Value) < error&& window.isExternalWindow.Value)
                 {
@@ -670,6 +802,20 @@ namespace HVAC_CheckEngine
                 }
             }
             return outerWalls;
+        }
+
+       public static bool isAllAirTerminalInSameFloor(List<AirTerminal>airTerminals)
+        {
+            int storyNo = 0;
+            if (airTerminals.Count > 0)
+                storyNo = airTerminals[0].storyNo.Value;
+
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if (!airTerminal.storyNo.Value.Equals(storyNo))
+                    return false;
+            }
+            return true;
         }
 
         private static string[] CommonOfenStayRoomTypes = { "办公室", "会议室", "报告厅", "商场" };

@@ -1034,7 +1034,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));
-                floor.storeyName = (reader["storeyName"].ToString());
+                floor.storyNo = Convert.ToInt32((reader["storeyNo"].ToString()));
                 floors.Add(floor);
             }
             return floors;
@@ -1884,7 +1884,32 @@ namespace HVAC_CheckEngine
             return pipes;
         }
 
+        public static List<Wall>getAllWallsOfRoom(Room room)
+        {
+            List<Wall> walls = new List<Wall>();
+            return walls;
+        }
+
+        public static int getHighestStoryNoOfRoom(Room room)
+        {
+            return 0;
+        }
+
+        public static FireDistrict getFireDistrictContainAirTerminal(AirTerminal airTerminal)
+        {
+            FireDistrict fireDistrict = new FireDistrict(1);
+            return fireDistrict;
+        }
+
+        public static bool isAirTerminalInFireDistrict(AirTerminal airTerminal,FireDistrict fireDistrict)
+        {
+            return true;
+        }
+
     }
+
+
+
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }

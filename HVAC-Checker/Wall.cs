@@ -14,7 +14,6 @@ namespace HVAC_CheckEngine
         }
       
         public string boundaryLoops { get; set; } = null;
-
-     
+        public bool? isOuterWall { get; set; } = null;
     }
 }

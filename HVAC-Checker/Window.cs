@@ -14,7 +14,8 @@ namespace HVAC_CheckEngine
         public bool? isExternalWindow { get; set; } = null;//是否为外窗
         public double? area { get; set; } = null;
 
-        public double? effectiveArea { get; set; } 
+        public double? effectiveArea { get; set; }
 
+        public bool? isSmokeExhaustWindow { get; set; } = null;
     }
 }
