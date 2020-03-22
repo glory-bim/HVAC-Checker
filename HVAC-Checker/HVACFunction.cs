@@ -63,12 +63,7 @@ namespace HVAC_CheckEngine
 
             sql = sql + "'" + name + "'";
 
-            sql = sql + ",name)> 0";
-
-
-            // sql = sql + "'"+type+"'";
-            //  sql = sql + "and name = " ;
-            // sql = sql + "'" + name + "'";
+            sql = sql + ",name)> 0";           
             sql = sql + " and dArea > ";
             sql = sql + area;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
@@ -76,7 +71,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
-                room.name = reader["name"].ToString();
+                room.name = reader["name"].ToString();                
                 rooms.Add(room);
             }
             //关闭连接
@@ -727,7 +722,7 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //8找到穿越防火分区的风管对象集合  userlable
-        public static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
+        public static List<Duct> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
         {
             List<Duct> ducts = new List<Duct>();
             //如果不存在，则创建一个空的数据库,
@@ -1034,7 +1029,10 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));
-                floor.storyNo = Convert.ToInt32((reader["storeyNo"].ToString()));
+                floor.storeyName = (reader["storeyName"].ToString());
+                floor.FloorNumber = Convert.ToInt32(reader["storeyNo"].ToString());
+                floor.elevation = Convert.ToDouble(reader["elevation"].ToString());
+                floor.height = Convert.ToDouble(reader["height"].ToString());
                 floors.Add(floor);
             }
             return floors;
@@ -1260,7 +1258,7 @@ namespace HVAC_CheckEngine
             }
         }
         //18获得防烟分区长边长度
-        public static double GetFireDistrictLength(FireDistrict fireDistrict)
+        public static double GetFireDistrictLength(FireCompartment fireDistrict)
         {
             double dLength = 0.0;
             if (!System.IO.File.Exists(m_archXdbPath))
@@ -1884,26 +1882,155 @@ namespace HVAC_CheckEngine
             return pipes;
         }
 
-        public static List<Wall>getAllWallsOfRoom(Room room)
+
+
+//获取所有防烟分区
+        public static List<SmokeCompartment> GetSmokeCompartment(string sName)
+        {
+            List <SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();         
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return smokeCompartments;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string csSmokeCompartment = "防烟分区";
+            string sql = "select * from Spaces where CHARINDEX(";
+            sql = sql + "'" + sName + "'";
+            sql = sql + ",name)> 0 and  userLabel = csSmokeCompartment ";        
+          
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                SmokeCompartment room = new SmokeCompartment(Convert.ToInt64(reader["Id"].ToString()));
+                smokeCompartments.Add(room);
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return smokeCompartments;
+        }
+
+
+
+        public static List<FireCompartment> GetFireCompartment(string sName)
+        {
+            List<FireCompartment> smokeCompartments = new List<FireCompartment>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return smokeCompartments;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string csSmokeCompartment = "防火分区";
+            string sql = "select * from Spaces where CHARINDEX(";
+            sql = sql + "'" + sName + "'";
+            sql = sql + ",name)> 0 and  userLabel = csSmokeCompartment ";
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                FireCompartment room = new FireCompartment(Convert.ToInt64(reader["Id"].ToString()));
+                smokeCompartments.Add(room);
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return smokeCompartments;
+        }
+
+
+        public static List<Wall> GetAllWallsOfRoom(Room room)
         {
             List<Wall> walls = new List<Wall>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return walls;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();    
+            string sql = "select * from WallOfSpaceRelations where spaceId = ";
+            sql = sql + room.Id;          
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                Wall wall = new Wall(Convert.ToInt64(reader["wallId"].ToString()));
+                walls.Add(wall);
+            }
+            //关闭连接
+            dbConnection.Close();
             return walls;
         }
 
-        public static int getHighestStoryNoOfRoom(Room room)
-        {
-            return 0;
+
+
+        public class Icp : IComparer<Floor>
+        {        //按书名排序  
+            public int Compare(Floor x, Floor y)     
+            {            
+                if(x.elevation>y.elevation)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }   
         }
 
-        public static FireDistrict getFireDistrictContainAirTerminal(AirTerminal airTerminal)
+        public static int GetHighestStoryNoOfRoom(Room room)
         {
-            FireDistrict fireDistrict = new FireDistrict(1);
-            return fireDistrict;
-        }
+            List<Wall> walls = new List<Wall>();
+            int iStoryNo = -18;
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return iStoryNo;
 
-        public static bool isAirTerminalInFireDistrict(AirTerminal airTerminal,FireDistrict fireDistrict)
-        {
-            return true;
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select* from Spaces where Id = ";
+            sql = sql + room.Id;
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+
+                    double dHighestElevation = Convert.ToDouble(reader1["elevation"].ToString()) + Convert.ToDouble(reader["dHeight"].ToString());
+                    Floor floor = new Floor(0);
+                    floor.elevation = dHighestElevation;
+                    List<Floor> floors = GetFloors();
+                    floors.Add(floor);
+                    floors.Sort(new Icp());
+                    int imatch= floors.FindIndex(a => a.Id == 0);
+                    iStoryNo = floors[imatch + 1].FloorNumber;
+                }                                                    
+            }
+            //关闭连接
+            dbConnection.Close();
+            return iStoryNo;
         }
 
     }

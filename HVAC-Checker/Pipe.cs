@@ -15,5 +15,6 @@ namespace HVAC_CheckEngine
         }
         public double? m_DN { get; set; } = null;
         public double? m_velocity { get; set; } = null;
+        public string type { get; set; } = null;
     }
 }

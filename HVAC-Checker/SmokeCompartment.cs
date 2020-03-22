@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class AssemblyAHU : Element
+    public class SmokeCompartment : Room
     {
-        public AssemblyAHU(long id) : base(id)
+        public SmokeCompartment(long id) : base(id)
         {
-
-        }
-
-        public string type { get; set; } = null;
+              
+    }
+        public double? m_dArea { get; set; } = null;
+     
     }
 }

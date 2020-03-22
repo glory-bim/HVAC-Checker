@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class FireDistrict : Room
+    public class FireCompartment : Room
     {
-        public FireDistrict(long id):base(id)
+        public FireCompartment(long id):base(id)
         {
 
         }
