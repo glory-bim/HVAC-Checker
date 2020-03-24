@@ -2032,6 +2032,273 @@ namespace HVAC_CheckEngine
             return iStoryNo;
         }
 
+
+        public static FireCompartment GetFireCompartmentContainAirTerminal(AirTerminal airTerminal)
+        {
+            FireCompartment fireCompartment = new FireCompartment(1);
+
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return fireCompartment;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string csSmokeCompartment = "防火分区";
+            string sql = "select * from Spaces where userLabel = csSmokeCompartment ";
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                fireCompartment.name = reader["name"].ToString();
+                fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(fireCompartment.boundaryLoops, fireCompartment.Id.ToString());
+
+                //创建一个连接
+                connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+                dbConnectionHVAC.Open();
+                sql = "select * from AirTerminals Where Id =";
+                sql = sql + airTerminal.Id;
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+                if (readerAirTerminals.Read())
+                {
+
+                    string sTransformer = readerAirTerminals["transformer"].ToString();
+
+                    sql = "select * from LODRelations where graphicElementId = ";
+                    sql = sql + readerAirTerminals["Id"].ToString();
+
+                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
+                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                    while (readerHVAC1.Read())
+                    {
+                        sql = "select * from Geometrys where Id = ";
+                        sql = sql + readerHVAC1["geometryId"].ToString();
+                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
+                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                        while (readerHVACGeo.Read())
+                        {
+                            readerHVACGeo["Id"].ToString();
+
+                            Geometry geo = new Geometry();
+                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                            geo.vertices = readerHVACGeo["vertices"].ToString();
+                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                            geo.normals = readerHVACGeo["normals"].ToString();
+                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                return fireCompartment;
+                            }                           
+                        }
+                    }
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+            return fireCompartment;
+        }
+
+        public static bool IsAirTermianlInFireDistrict(AirTerminal airTerminal,FireCompartment fireDistrict)
+        {      
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return false;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + fireDistrict.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                fireDistrict.name = reader["name"].ToString();
+                fireDistrict.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(fireDistrict.boundaryLoops, fireDistrict.Id.ToString());                
+
+                //创建一个连接
+                connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+                dbConnectionHVAC.Open();
+                sql = "select * from AirTerminals Where Id =";
+                sql = sql + airTerminal.Id;
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+                while (readerAirTerminals.Read())
+                {
+
+                    string sTransformer = readerAirTerminals["transformer"].ToString();
+
+                    sql = "select * from LODRelations where graphicElementId = ";
+                    sql = sql + readerAirTerminals["Id"].ToString();
+
+                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
+                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                    while (readerHVAC1.Read())
+                    {
+                        sql = "select * from Geometrys where Id = ";
+                        sql = sql + readerHVAC1["geometryId"].ToString();
+                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
+                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                        while (readerHVACGeo.Read())
+                        {
+                            readerHVACGeo["Id"].ToString();
+
+                            Geometry geo = new Geometry();
+                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                            geo.vertices = readerHVACGeo["vertices"].ToString();
+                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                            geo.normals = readerHVACGeo["normals"].ToString();
+                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                            PointInt pt = aabb.Center();
+                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                            {
+
+                                return true;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+            return true;
+        }
+        public static List<SmokeCompartment> GetSmokeCompartmentsInRoom(Room room)
+        {
+            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();     
+  
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return smokeCompartments;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + room.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                room.name = reader["name"].ToString();
+                room.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+
+
+                //创建一个连接
+                connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+                dbConnectionHVAC.Open();
+                string csSmokeCompartment = "防烟分区";
+                sql = "select * from Spaces where userLabel = csSmokeCompartment ";
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+                while (readerAirTerminals.Read())
+                {
+                    room.name = readerAirTerminals["name"].ToString();
+                    room.boundaryLoops = readerAirTerminals["boundaryLoops"].ToString();
+                    Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());              
+
+                 if( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, polySmokeCompartment))
+                    {
+                        SmokeCompartment airTerminal = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                        smokeCompartments.Add(airTerminal);
+                    }           
+                 
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+
+            return smokeCompartments;         
+        }
+
+        public static bool IsSmokeCompartmentIntersectFireCompartment(SmokeCompartment smokeCompartment, FireCompartment fireCompartment)
+        {         
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return false;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + smokeCompartment.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                smokeCompartment.name = reader["name"].ToString();
+                smokeCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(smokeCompartment.boundaryLoops, smokeCompartment.Id.ToString());
+
+
+
+                //创建一个连接
+                connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+                dbConnectionHVAC.Open();
+                sql = "select * from Spaces Where Id = ";
+                sql = sql + fireCompartment.Id;
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+                while (readerAirTerminals.Read())
+                {
+                    fireCompartment.name = readerAirTerminals["name"].ToString();
+                    fireCompartment.boundaryLoops = readerAirTerminals["boundaryLoops"].ToString();
+                    Polygon2D polySmokeCompartment = GetSpaceBBox(fireCompartment.boundaryLoops, fireCompartment.Id.ToString());                                                        
+
+                    if ( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, polySmokeCompartment))                       
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                }
+            }
+            //关闭连接
+            dbConnection.Close();                           
+            return false;
+        }
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }

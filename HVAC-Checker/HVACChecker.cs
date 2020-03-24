@@ -964,6 +964,19 @@ namespace HVAC_CheckEngine
         //2  应计量耗电量；
         //3  应计量集中供热系统的供热量；
         //4  应计量补水量；
+
+        //获取燃气表集合
+        //获取热表集合
+        //获取水表集合
+        //如果集合里表数都大于0则通过，
+        //否则标记为不通过，没有的表记录进审查结果中
+        
+
+
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
         public static BimReview GB50736_2012_9_1_5()
         {
             //初始化审查结果
@@ -1009,11 +1022,21 @@ namespace HVAC_CheckEngine
         }
 
 
-    // 452   锅炉房、换热机房和制冷机房应进行能量计量，能量计量应包括下列内容：
-    //1 燃料的消耗量；
-    //2 制冷机的耗电量； globle
-    //3 集中供热系统的供热量；
-    //4 补水量。
+        // 452   锅炉房、换热机房和制冷机房应进行能量计量，能量计量应包括下列内容：
+        //1 燃料的消耗量；
+        //2 制冷机的耗电量； globle
+        //3 集中供热系统的供热量；
+        //4 补水量。
+        //获取燃气表集合
+        //获取热表集合
+        //获取水表集合
+        //如果集合里表数都大于0则通过，
+        //否则标记为不通过，没有的表记录进审查结果中
+
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
 
         public static BimReview GB50189_2015_4_5_2()
         {
@@ -1123,156 +1146,156 @@ namespace HVAC_CheckEngine
         }
 
 
-                //前室采用自然通风方式时，独立前室、消防电梯前室可开启外窗或开口的面积不应小于2.0m2，
-                //共用前室、合用前室不应小于3．0m2。
+        //前室采用自然通风方式时，独立前室、消防电梯前室可开启外窗或开口的面积不应小于2.0m2，
+        //共用前室、合用前室不应小于3．0m2。
            
-                //如果审查通过
-                //则在审查结果批注中注明审查通过相关内容
-                //如果审查不通过
-                //则在审查结果中注明审查不通过的相关内容
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
 
 
-                public static BimReview GB51251_2017_3_2_2()
+        public static BimReview GB51251_2017_3_2_2()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.2.2");
+
+
+            //获取所有防烟楼梯间集合staircases
+            //依次遍历每个防烟楼梯间
+            List<Room> independentAnteRooms = new List<Room>();
+            List<Room> fireElevatorAnteRooms = new List<Room>();
+            independentAnteRooms = HVACFunction.GetRooms("独立前室");
+            fireElevatorAnteRooms = HVACFunction.GetRooms("消防电梯前室");
+            List<Room> UnionRooms = independentAnteRooms.Concat(fireElevatorAnteRooms).ToList<Room>();
+            //     
+            foreach (Room stairCase in UnionRooms)
+            {
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+
+                //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
+                if (stairCaseHaveMechanicalPressureSystem)
                 {
-                    //将审查结果初始化
-                    BimReview result = new BimReview("GB51251_2017", "3.2.2");
+                    //     找到此楼梯间的所有前室atrias
+                    List<Window> windows = new List<Window>();
+                    windows = HVACFunction.GetWindowsInRoom(stairCase);
 
-
-                    //获取所有防烟楼梯间集合staircases
-                    //依次遍历每个防烟楼梯间
-                    List<Room> independentAnteRooms = new List<Room>();
-                    List<Room> fireElevatorAnteRooms = new List<Room>();
-                    independentAnteRooms = HVACFunction.GetRooms("独立前室");
-                    fireElevatorAnteRooms = HVACFunction.GetRooms("消防电梯前室");
-                    List<Room> UnionRooms = independentAnteRooms.Concat(fireElevatorAnteRooms).ToList<Room>();
-                    //     
-                    foreach (Room stairCase in UnionRooms)
+                    //     依次遍历每一个前室
+                    foreach (Window window in windows)
                     {
-                        bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
-
-                        //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
-                        if (stairCaseHaveMechanicalPressureSystem)
+                        if (HVACFunction.GetArea(window) - 2.0 > 0.01)
                         {
-                            //     找到此楼梯间的所有前室atrias
-                            List<Window> windows = new List<Window>();
-                            windows = HVACFunction.GetWindowsInRoom(stairCase);
-
-                            //     依次遍历每一个前室
-                            foreach (Window window in windows)
-                            {
-                                if (HVACFunction.GetArea(window) - 2.0 > 0.01)
-                                {
-                                    result.isPassCheck = true;
-                                }
-                                else
-                                {
-                                    result.isPassCheck = false;
-                                }
-                            }
+                            result.isPassCheck = true;
                         }
                         else
                         {
-                            //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
                             result.isPassCheck = false;
-                            string remark = string.Empty;
-                            result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
                         }
-
                     }
-
-
-
-                    List<Room> sharedAnteRooms = HVACFunction.GetRooms("共用前室");
-                    List<Room> combinedAnteRooms = HVACFunction.GetRooms("合用前室");
-                    UnionRooms.Clear();
-                    UnionRooms = sharedAnteRooms.Concat(combinedAnteRooms).ToList<Room>();
-
-                    foreach (Room stairCase in UnionRooms)
-                    {
-                        bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
-
-                        //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
-                        if (stairCaseHaveMechanicalPressureSystem)
-                        {
-                            //     找到此楼梯间的所有前室atrias
-                            List<Window> windows = new List<Window>();
-                            windows = HVACFunction.GetWindowsInRoom(stairCase);
-
-                            //     依次遍历每一个前室
-                            foreach (Window window in windows)
-                            {
-                                if (HVACFunction.GetArea(window) - 3.0 > 0.01)
-                                {
-                                    result.isPassCheck = true;
-                                }
-                                else
-                                {
-                                    result.isPassCheck = false;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
-                            result.isPassCheck = false;
-                            string remark = string.Empty;
-                            result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
-                        }
-
-                    }
-
-                    //如果审查通过
-                    //则在审查结果批注中注明审查通过相关内容
-                    if (result.isPassCheck)
-                    {
-                        result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
-                    }
-                    //如果审查不通过
-                    //则在审查结果中注明审查不通过的相关内容
-                    else
-                    {
-                        result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
-                    }
-                    return result;
                 }
-
-
-                //323采用自然通风方式的避难层（间）应设有不同朝向的可开启外窗，其有效面积不应小于该避难层（间）地面面积的2％，且每个朝向的面积不应小于2．0m2。加房间TYpe
-                public static BimReview GB51251_2017_3_2_3()
+                else
                 {
-                    //将审查结果初始化
-                    BimReview result = new BimReview("GB51251_2017", "3.2.2");
-                    List<Room> rooms = HVACFunction.GetRooms("避难");
-
-                foreach (Room room in rooms)
-                {
-                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
-                double dAreatotal = 0.0;
-                foreach (Window window in windows)
-                {
-                  //  dAreatotal += window.effectiveArea;
-                }
-                if (dAreatotal < room.area * 0.02)
-                {
+                    //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
                     result.isPassCheck = false;
+                    string remark = string.Empty;
+                    result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
                 }
 
+            }
+
+
+
+            List<Room> sharedAnteRooms = HVACFunction.GetRooms("共用前室");
+            List<Room> combinedAnteRooms = HVACFunction.GetRooms("合用前室");
+            UnionRooms.Clear();
+            UnionRooms = sharedAnteRooms.Concat(combinedAnteRooms).ToList<Room>();
+
+            foreach (Room stairCase in UnionRooms)
+            {
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+
+                //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
+                if (stairCaseHaveMechanicalPressureSystem)
+                {
+                    //     找到此楼梯间的所有前室atrias
+                    List<Window> windows = new List<Window>();
+                    windows = HVACFunction.GetWindowsInRoom(stairCase);
+
+                    //     依次遍历每一个前室
+                    foreach (Window window in windows)
+                    {
+                        if (HVACFunction.GetArea(window) - 3.0 > 0.01)
+                        {
+                            result.isPassCheck = true;
+                        }
+                        else
+                        {
+                            result.isPassCheck = false;
+                        }
+                    }
+                }
+                else
+                {
+                    //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
+                    result.isPassCheck = false;
+                    string remark = string.Empty;
+                    result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
                 }
 
-                //如果审查通过
-                //则在审查结果批注中注明审查通过相关内容
-                if (result.isPassCheck)
-                    {
-                        result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
-                    }
-                    //如果审查不通过
-                    //则在审查结果中注明审查不通过的相关内容
-                    else
-                    {
-                        result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
-                    }
-                    return result;
-                }
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
+
+
+        //323采用自然通风方式的避难层（间）应设有不同朝向的可开启外窗，其有效面积不应小于该避难层（间）地面面积的2％，且每个朝向的面积不应小于2．0m2。加房间TYpe
+        public static BimReview GB51251_2017_3_2_3()
+        {
+            //将审查结果初始化
+            BimReview result = new BimReview("GB51251_2017", "3.2.2");
+            List<Room> rooms = HVACFunction.GetRooms("避难");
+
+        foreach (Room room in rooms)
+        {
+        List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+        double dAreatotal = 0.0;
+        foreach (Window window in windows)
+        {
+            //  dAreatotal += window.effectiveArea;
+        }
+        if (dAreatotal < room.area * 0.02)
+        {
+            result.isPassCheck = false;
+        }
+
+        }
+
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+            }
+            return result;
+        }
 
         //机械加压送风系统应采用管道送风，且不应采用土建风道。送风管道应采用不燃材料制作且内壁应光滑。
         //    当送风管道内壁为金属时，设计风速不应大于20m／s；当送风管道内壁为非金属时，设计风速不应大于15m／s；
