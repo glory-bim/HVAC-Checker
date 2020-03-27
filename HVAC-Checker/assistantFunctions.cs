@@ -100,7 +100,7 @@ namespace HVAC_CheckEngine
             List<Room> aimRooms = new List<Room>();
             foreach (Room room in rooms)
             {
-                if (room.storyNo >= floor_a && room.storyNo <= floor_b)
+                if (room.m_iStoryNo >= floor_a && room.m_iStoryNo <= floor_b)
                     aimRooms.Add(room);
             }
             return aimRooms;
@@ -213,7 +213,7 @@ namespace HVAC_CheckEngine
         {
             if (region.rooms.Count == 0)
                 throw new ArgumentException("区域中没有房间");
-            if (region.rooms[0].roomPosition == RoomPosition.overground)
+            if (region.rooms[0].m_eRoomPosition == RoomPosition.overground)
                 return true;
             else
                 return false;
@@ -225,7 +225,7 @@ namespace HVAC_CheckEngine
             foreach (Room room in rooms)
             {
                 if (!isPublicRoom(room))
-                    sum += room.area.Value;
+                    sum += room.m_dArea.Value;
             }
             return sum;
         }

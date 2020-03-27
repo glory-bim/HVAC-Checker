@@ -119,13 +119,13 @@ namespace HVAC_CheckEngine
                 if (globalData.buildingHeight > 32)
                 {
                     //      则获得所有长度大于20m的疏散走道
-                    rooms_temp = HVACFunction.GetRoomsMoreThan(20);
+                    rooms_temp = HVACFunction.GetRoomsMoreThan("走廊",20);
                     rooms.AddRange(rooms_temp);
                 }
                 //  如果建筑高度小于等于32m则获得所长度大于40m的疏散走道
                 else
                 {
-                    rooms_temp = HVACFunction.GetRoomsMoreThan(40);
+                    rooms_temp = HVACFunction.GetRoomsMoreThan("走廊",40);
                     rooms.AddRange(rooms_temp);
                 }
 
@@ -259,7 +259,7 @@ namespace HVAC_CheckEngine
                 Rooms.AddRange(courtyards);
 
                 //    获得长度大于20m的疏散走道集合，并放入房间集合Rooms中
-                List<Room> corridorsMoreThan20m = HVACFunction.GetRoomsMoreThan(20);
+                List<Room> corridorsMoreThan20m = HVACFunction.GetRoomsMoreThan("走廊",20);
                 Rooms.AddRange(corridorsMoreThan20m);
             }
             //如果建筑类型为公共建筑
@@ -1113,7 +1113,7 @@ namespace HVAC_CheckEngine
 
 
                             }
-                            if (fan.m_flowRate > iNum * room.m_volume)
+                            if (fan.m_flowRate > iNum * room.m_dVolume)
                             {
                                 result.isPassCheck = true;
                             }
@@ -1275,7 +1275,7 @@ namespace HVAC_CheckEngine
         {
             //  dAreatotal += window.effectiveArea;
         }
-        if (dAreatotal < room.area * 0.02)
+        if (dAreatotal < room.m_dArea * 0.02)
         {
             result.isPassCheck = false;
         }
@@ -1385,23 +1385,23 @@ namespace HVAC_CheckEngine
 
                 foreach (Room room in rooms)
                 {
-                    if(room.m_dheight<3.0|| room.m_dheight == 3.0)
+                    if(room.m_dHeight<3.0|| room.m_dHeight == 3.0)
                     {
-                       if( room.area>500 || room.m_dMaxlength > 24)
+                       if( room.m_dArea>500 || room.m_dMaxlength > 24)
                         {
                             result.isPassCheck = false;
                         }
                     }
-                    else if (room.m_dheight > 3.0 && ( room.m_dheight < 6.0|| room.m_dheight == 6.0))
+                    else if (room.m_dHeight > 3.0 && ( room.m_dHeight < 6.0|| room.m_dHeight == 6.0))
                     {
-                        if (room.area > 1000 || room.m_dMaxlength > 36)
+                        if (room.m_dArea > 1000 || room.m_dMaxlength > 36)
                         {
                             result.isPassCheck = false;
                         }
                     }
-                    else if(room.m_dheight > 6.0)
+                    else if(room.m_dHeight > 6.0)
                     {
-                        if (room.area > 2000 || room.m_dMaxlength > 60)
+                        if (room.m_dArea > 2000 || room.m_dMaxlength > 60)
                         {
                             result.isPassCheck = false;
                         }
@@ -1415,7 +1415,7 @@ namespace HVAC_CheckEngine
 
                 foreach (Room room in rooms)
                 {
-                    if (room.area > 500 || room.m_dMaxlength > 8 * room.m_dheight)
+                    if (room.m_dArea > 500 || room.m_dMaxlength > 8 * room.m_dHeight)
                     {
                         result.isPassCheck = false;
                     }
@@ -1580,7 +1580,7 @@ namespace HVAC_CheckEngine
                 {
                   //  dAreatotal += window.effectiveArea;
                 }
-                if (dAreatotal < room.area * 0.02)
+                if (dAreatotal < room.m_dArea * 0.02)
                 {
                     result.isPassCheck = false;
                 }

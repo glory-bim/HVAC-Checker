@@ -52,7 +52,7 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetWindowsInRoomTest()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-arch.GDB";
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8.1.3.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
             Room room = new Room(362135);
             Assert.IsTrue(HVACFunction.GetWindowsInRoom(room).Count() > 0);
@@ -82,7 +82,7 @@ namespace HVAC_CheckEngine.Tests
         {           
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
-            Assert.IsTrue(HVACFunction.GetRoomsMoreThan(10.0).Count() > 0);
+            Assert.IsTrue(HVACFunction.GetRoomsMoreThan("走廊",10.0).Count() > 0);
         }
 
         [TestMethod()]

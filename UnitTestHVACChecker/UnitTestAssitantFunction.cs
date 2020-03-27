@@ -204,7 +204,7 @@ namespace UnitTestAssitantFunction
                 long roomId = Convert.ToInt64(row.GetCell(0).ToString());
                 Room room = new Room(roomId);
                 room.type = row.GetCell(1).ToString();
-                room.area = row.GetCell(2).NumericCellValue;
+                room.m_dArea = row.GetCell(2).NumericCellValue;
                 rooms.Add(room);
             }
             row = (IRow)Sheet.GetRow(9);

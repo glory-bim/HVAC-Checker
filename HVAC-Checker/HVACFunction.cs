@@ -71,8 +71,24 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
-                room.name = reader["name"].ToString();                
-                rooms.Add(room);
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                //    room.type
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
+                    rooms.Add(room);
             }
             //关闭连接
             dbConnection.Close();
@@ -154,7 +170,8 @@ namespace HVAC_CheckEngine
                             {
 
                                 AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-
+                                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
                                 airterminals.Add(airTerminal);
                             }
                         }
@@ -511,8 +528,8 @@ namespace HVAC_CheckEngine
             }
         }
 
-        //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
-        public static List<Room> GetRoomsMoreThan(double dLength)
+        //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花// 表里加type
+        public static List<Room> GetRoomsMoreThan(string roomType,double dLength)
         {
             List<Room> rooms = new List<Room>();
 
@@ -523,7 +540,9 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string sql = "select * from Spaces";
+            string sql = "select * from Spaces Where CHARINDEX(";
+            sql = sql + "'" + roomType + "'";
+            sql = sql + ",userLabel)> 0";
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 

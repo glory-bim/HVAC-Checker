@@ -274,10 +274,10 @@ namespace UnitTestHVACChecker
                               long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                               Room room = new Room(Id);
                               room.type = Type;
-                              room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                              room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                               room.name = context.DataRow["房间名称"].ToString();
-                              room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                              room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                              room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                             room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
                               Rooms.Add(room);
                           }
                           return Rooms;
@@ -295,10 +295,10 @@ namespace UnitTestHVACChecker
                          long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                          Room room = new Room(Id);
                          room.type = Type;
-                         room.area = area;
+                         room.m_dArea = area;
                          room.name = name;
-                         room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                         room.roomPosition = position;
+                         room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.m_eRoomPosition = position;
                          Rooms.Add(room);
                      }
                      return Rooms;
@@ -317,9 +317,9 @@ namespace UnitTestHVACChecker
                           Room room = new Room(Id);
                           room.type = roomType;
                           room.name = context.DataRow["房间名称"].ToString();
-                          room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                          room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                          room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                          room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                         room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                          room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
                           Rooms.Add(room);
 
                       }
@@ -518,11 +518,11 @@ namespace UnitTestHVACChecker
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
                         room.type = Type;
-                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                         room.name = context.DataRow["房间名称"].ToString();
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.storyNo= Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                       room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                       room.m_iStoryNo= Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -540,11 +540,11 @@ namespace UnitTestHVACChecker
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
                         room.type = Type;
-                        room.area = area;
+                        room.m_dArea = area;
                         room.name = name;
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.roomPosition = position;
-                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                       room.m_eRoomPosition = position;
+                       room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -563,10 +563,10 @@ namespace UnitTestHVACChecker
                         Room room = new Room(Id);
                         room.type = roomType;
                         room.name = context.DataRow["房间名称"].ToString();
-                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                       room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                       room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
 
                     }
@@ -1440,10 +1440,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(Id);
                 room.type = Type;
                 room.name = row.GetCell(13).StringCellValue;
-                room.area = row.GetCell(10).NumericCellValue;
-                room.roomPosition=(RoomPosition)row.GetCell(12).NumericCellValue;
-                room.numberOfPeople= (int)row.GetCell(14).NumericCellValue;
-                room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                room.m_dArea = row.GetCell(10).NumericCellValue;
+               room.m_eRoomPosition=(RoomPosition)row.GetCell(12).NumericCellValue;
+                room.m_iNumberOfPeople= (int)row.GetCell(14).NumericCellValue;
+               room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                 Rooms.Add(room);
              }
 
@@ -1470,10 +1470,10 @@ namespace UnitTestHVACChecker
                     Room room = new Room(Id);
                     room.type = Type;
                     room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                     rooms.Add(room);
                 }
 
@@ -1503,10 +1503,10 @@ namespace UnitTestHVACChecker
                             Room room = new Room(Id);
                             room.type = row.GetCell(1).StringCellValue;
                             room.name= row.GetCell(13).StringCellValue;
-                            room.area = area;
-                            room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                            room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                            room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                            room.m_dArea = area;
+                           room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                            room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+                           room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                             Rooms.Add(room);
 
                         }
@@ -1544,10 +1544,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(Id);
                 room.type = row.GetCell(1).StringCellValue;
                 room.name = row.GetCell(13).StringCellValue;
-                room.area = row.GetCell(10).NumericCellValue;
-                room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                room.m_dArea = row.GetCell(10).NumericCellValue;
+               room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+               room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                 region.rooms.Add(room);
             }
             if (region != null)
@@ -1632,10 +1632,10 @@ namespace UnitTestHVACChecker
                         Room room = new Room(Id);
                         room.type = roomType;
                         room.name = row.GetCell(13).StringCellValue;
-                        room.area = row.GetCell(10).NumericCellValue;
-                        room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                        room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                        room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                        room.m_dArea = row.GetCell(10).NumericCellValue;
+                       room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                        room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+                       room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                         Rooms.Add(room);
                     }
                 }
@@ -1655,10 +1655,10 @@ namespace UnitTestHVACChecker
             Room room = new Room(id);
             room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
             room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-            room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-            room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-            room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-            room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+            room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+           room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+            room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+           room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
 
             return room;
         }
@@ -1693,10 +1693,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(id);
                 room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue; ;
                 room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+               room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+               room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 rooms.Add(room);
             }
             return rooms;
