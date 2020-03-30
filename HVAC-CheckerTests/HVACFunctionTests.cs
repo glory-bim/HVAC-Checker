@@ -180,8 +180,8 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetDuctsOfFanTest()
         {
-            Fan fan = new Fan(1235144480026263552);
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            Fan fan = new Fan(1244249984593821696);
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-arch.GDB";
             string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             List<Duct> ducts = HVACFunction.GetDuctsOfFan(fan);

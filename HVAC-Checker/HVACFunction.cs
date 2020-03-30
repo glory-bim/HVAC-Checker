@@ -977,74 +977,40 @@ namespace HVAC_CheckEngine
 
         public static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
         {
-
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
+         
             while (reader.Read())
             {
-
-                sql = "select * from Ducts Where Id = ";
-                sql += reader["linkElementId"].ToString();
-
-                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
-                if (readerDucts.Read())
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
                 {
-                    Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                    sql = "select * from Ducts Where Id = ";
+                    sql += reader["linkElementId"].ToString();
 
-                    ducts.Add(duct);
-                    FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+                    SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                    if (readerDucts.Read())
+                    {
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+
+                        ducts.Add(duct);
+                        
+                        string strLastId = reader["linkElementId"].ToString();
+                        m_listStrLastId.Add(strLastId);
+                        FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+                    }
+                    else
+                    {
+                        FindDucts(dbConnection, reader["linkElementId"].ToString(), ducts);        
+                    }
                 }
-                else
-                {
-                    FindDuctsByDuct3t(dbConnection, reader["linkElementId"].ToString(), ducts);
-                    FindDuctsByDuct4t(dbConnection, reader["linkElementId"].ToString(), ducts);
-                    FindDuctsByDuctDuctDampers(dbConnection, reader["linkElementId"].ToString(), ducts);
-                }
+          
 
             }
         }
-
-        public static void FindDuctsByDuct3t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
-        {
-            string sql = "select * from Duct3Ts Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
-            if (readerDuct3T.Read())
-            {
-                FindDucts(dbConnection, readerDuct3T["Id"].ToString(), ducts);
-            }
-        }
-
-        public static void FindDuctsByDuct4t(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
-        {
-            string sql = "select * from Duct4Ts Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
-            if (readerDuct4T.Read())
-            {
-                FindDucts(dbConnection, readerDuct4T["Id"].ToString(), ducts);
-            }
-        }
-
-        public static void FindDuctsByDuctDuctDampers(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
-        {
-            string sql = "select * from DuctDampers Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
-            if (readerDampers.Read())
-            {
-                FindDucts(dbConnection, readerDampers["Id"].ToString(), ducts);
-            }
-        }
+              
 
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
         public static List<Duct> GetDuctsOfFan(Fan fan)
@@ -1056,6 +1022,8 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
+            m_listStrLastId = new List<string>();
+            m_listStrLastId.Clear();
             //创建一个连接
             FindDucts(dbConnection, fan.Id.ToString(), ducts);
 
