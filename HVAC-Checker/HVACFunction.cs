@@ -633,59 +633,7 @@ namespace HVAC_CheckEngine
                 }
             }
         }
-
-        public static void FindInletsByDuct(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
-        {
-            string sql = "select * from Ducts Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
-            if (readerDuct3T.Read())
-            {
-                FindInlets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
-            }
-        }
-        public static void FindInletsByDuct3t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
-        {
-            string sql = "select * from Duct3Ts Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
-            if (readerDuct3T.Read())
-            {
-                FindInlets(dbConnection, readerDuct3T["Id"].ToString(), ducts);
-            }
-        }
-
-        public static void FindInletsByDuct4t(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
-        {
-            string sql = "select * from Duct4Ts Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
-            if (readerDuct4T.Read())
-            {
-                FindInlets(dbConnection, readerDuct4T["Id"].ToString(), ducts);
-            }
-        }
-
-        public static void FindInletsByDuctDampers(SQLiteConnection dbConnection, String strId, List<AirTerminal> ducts)
-        {
-            string sql = "select * from DuctDampers Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
-            if (readerDampers.Read())
-            {
-                FindInlets(dbConnection, readerDampers["Id"].ToString(), ducts);
-            }
-        }
-
-
+         
         //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
         public static List<Duct> GetDuctsCrossSpace(Room room)
         {
