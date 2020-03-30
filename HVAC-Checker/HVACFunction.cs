@@ -704,10 +704,10 @@ namespace HVAC_CheckEngine
 
             if (readerSpace.Read())
             {
-                fireDistrict.name = readerSpace["name"].ToString();
-                fireDistrict.boundaryLoops = readerSpace["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(fireDistrict.boundaryLoops, fireDistrict.Id.ToString());
-
+                //fireDistrict.name = readerSpace["name"].ToString();
+                //fireDistrict.boundaryLoops = readerSpace["boundaryLoops"].ToString();
+                //Polygon2D poly = GetSpaceBBox(fireDistrict.boundaryLoops, fireDistrict.Id.ToString());
+                AABB aabbFireDistrict = GetAABB(readerSpace, dbConnection);
 
                 //创建一个连接
                 connectionstr = @"data source =" + m_hvacXdbPath;
@@ -718,54 +718,19 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
                 {
-                    string sTransformer = readerDucts["transformer"].ToString();
-                    sql = "select * from LODRelations where graphicElementId = ";
-                    sql = sql + readerDucts["Id"].ToString();
-
-                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
-                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                    while (readerHVAC1.Read())
+                    AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
+                    if ( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbFireDistrict, aabbDuct))
                     {
-                        sql = "select * from Geometrys where Id = ";
-                        sql = sql + readerHVAC1["geometryId"].ToString();
-                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
-                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                        while (readerHVACGeo.Read())
-                        {
-                            readerHVACGeo["Id"].ToString();
 
-                            Geometry geo = new Geometry();
-                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                            geo.vertices = readerHVACGeo["vertices"].ToString();
-                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                            geo.normals = readerHVACGeo["normals"].ToString();
-                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
 
-                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                                ducts.Add(duct);
-                            }
-                        }
+                        ducts.Add(duct);
                     }
                 }
             }
+                
             //关闭连接
             dbConnection.Close();
-
-
             return ducts;
         }
         //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
