@@ -95,6 +95,48 @@ namespace HVAC_CheckEngine
             return rooms;
         }
 
+        private static AABB GetAABB(SQLiteDataReader readerElement, SQLiteConnection dbConnection)
+        {
+            string sTransformer = readerElement["transformer"].ToString();
+
+            string sql = "select * from LODRelations where graphicElementId = ";
+            sql = sql + readerElement["Id"].ToString();
+
+            SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+            PointInt ptMin = new PointInt(0, 0, 0);
+            PointInt ptMax = new PointInt(0, 0, 0);
+            string strId = "";
+            AABB aabb = new AABB(ptMin, ptMax, strId);
+            if (readerHVAC1.Read())
+            {
+                sql = "select * from Geometrys where Id = ";
+                sql = sql + readerHVAC1["geometryId"].ToString();
+                SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+            
+                if (readerHVACGeo.Read())
+                {
+                    readerHVACGeo["Id"].ToString();
+
+                    Geometry geo = new Geometry();
+                    geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                    geo.vertices = readerHVACGeo["vertices"].ToString();
+                    geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                    geo.normals = readerHVACGeo["normals"].ToString();
+                    geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                    geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                    geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                    geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                    aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+                    return aabb;
+                
+                }
+            }
+            return aabb;
+        }
+
         //2 判断房间是否有某种构件并返回构件对象
         //  Room    某种构件  风口
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
@@ -116,10 +158,10 @@ namespace HVAC_CheckEngine
 
             if (reader.Read())
             {
-                room.name = reader["name"].ToString();
-                room.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-
+                //room.name = reader["name"].ToString();
+                //room.boundaryLoops = reader["boundaryLoops"].ToString();
+                //Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+                AABB aabbRoom = GetAABB(reader, dbConnection);
 
 
                 //创建一个连接
@@ -131,50 +173,13 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
                 {
-
-                    string sTransformer = readerAirTerminals["transformer"].ToString();
-
-                    sql = "select * from LODRelations where graphicElementId = ";
-                    sql = sql + readerAirTerminals["Id"].ToString();
-
-                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
-                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                    while (readerHVAC1.Read())
+                    AABB aabbAirTerminal =  GetAABB(readerAirTerminals, dbConnectionHVAC);                    
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))                      
                     {
-                        sql = "select * from Geometrys where Id = ";
-                        sql = sql + readerHVAC1["geometryId"].ToString();
-                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
-                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                        while (readerHVACGeo.Read())
-                        {
-                            readerHVACGeo["Id"].ToString();
-
-                            Geometry geo = new Geometry();
-                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                            geo.vertices = readerHVACGeo["vertices"].ToString();
-                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                            geo.normals = readerHVACGeo["normals"].ToString();
-                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
-
-                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-                                airterminals.Add(airTerminal);
-                            }
-                        }
+                        AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                        airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                        airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                        airterminals.Add(airTerminal);
                     }
                 }
             }
@@ -201,59 +206,65 @@ namespace HVAC_CheckEngine
 
             if (reader.Read())
             {
-                room.name = reader["name"].ToString();
-                room.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+                // room.name = reader["name"].ToString();
+                //  room.boundaryLoops = reader["boundaryLoops"].ToString();
+                //  Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+                AABB aabbRoom = GetAABB(reader, dbConnection);           
 
                 sql = "select * from Windows";
                 SQLiteCommand commandWindows = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerWindows = commandWindows.ExecuteReader();
                 while (readerWindows.Read())
                 {
-
-                    string sTransformer = readerWindows["transformer"].ToString();
-
-                    sql = "select * from LODRelations where graphicElementId = ";
-                    sql = sql + readerWindows["Id"].ToString();
-
-                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
-                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                    while (readerHVAC1.Read())
+                    AABB aabbAirTerminal = GetAABB(readerWindows, dbConnection);
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
                     {
-                        sql = "select * from Geometrys where Id = ";
-                        sql = sql + readerHVAC1["geometryId"].ToString();
-                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                        while (readerHVACGeo.Read())
-                        {
-                            readerHVACGeo["Id"].ToString();
-
-                            Geometry geo = new Geometry();
-                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                            geo.vertices = readerHVACGeo["vertices"].ToString();
-                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                            geo.normals = readerHVACGeo["normals"].ToString();
-                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
-
-                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
-
-                                windows.Add(window);
-                            }
-                        }
+                        Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
+                        windows.Add(window);
                     }
+                    //string sTransformer = readerWindows["transformer"].ToString();
+
+                    //sql = "select * from LODRelations where graphicElementId = ";
+                    //sql = sql + readerWindows["Id"].ToString();
+
+                    //SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+                    //SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+                    //while (readerHVAC1.Read())
+                    //{
+                    //    sql = "select * from Geometrys where Id = ";
+                    //    sql = sql + readerHVAC1["geometryId"].ToString();
+                    //    SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                    //    SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+                    //    while (readerHVACGeo.Read())
+                    //    {
+                    //        readerHVACGeo["Id"].ToString();
+
+                    //        Geometry geo = new Geometry();
+                    //        geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                    //        geo.vertices = readerHVACGeo["vertices"].ToString();
+                    //        geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                    //        geo.normals = readerHVACGeo["normals"].ToString();
+                    //        geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                    //        geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                    //        geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                    //        geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                    //        AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
+
+                    //        PointInt pt = aabb.Center();
+                    //        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
+                    //            || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
+                    //            || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
+                    //            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
+                    //            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
+                    //        {
+
+                    //            Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
+
+                    //            windows.Add(window);
+                    //        }
+                    //    }
+                    //}
                 }
             }
             //关闭连接
@@ -548,9 +559,25 @@ namespace HVAC_CheckEngine
 
             while (reader.Read())
             {
-                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
-                room.name = reader["name"].ToString();
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));         
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                //    room.type
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 // Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
                 OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
@@ -840,7 +867,6 @@ namespace HVAC_CheckEngine
             Room room = new Room(lid);
             if (!System.IO.File.Exists(m_hvacXdbPath))
                 return room;
-
             //创建一个连接
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
@@ -851,68 +877,44 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {
-                string sTransformer = reader["transformer"].ToString();
-                sql = "select * from LODRelations where graphicElementId = ";
-                sql = sql + reader["Id"].ToString();
+                AABB aabbTerminal = GetAABB(reader, dbConnection);
+                if (!System.IO.File.Exists(m_archXdbPath))
+                    return room;
+                //创建一个连接
+                string connectionArchstr = @"data source =" + m_archXdbPath;
+                SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
+                dbConnectionArch.Open();
+                sql = "select * from Spaces";
+                SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
+                SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
 
-                SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                if (readerHVAC1.Read())
+                while (readerRoom.Read())
                 {
-                    sql = "select * from Geometrys where Id = ";
-                    sql = sql + readerHVAC1["geometryId"].ToString();
-                    SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
-                    SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                    if (readerHVACGeo.Read())
+                    AABB aabbRoom = GetAABB(readerRoom, dbConnectionArch);
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbTerminal, aabbRoom))
                     {
-                        readerHVACGeo["Id"].ToString();
+                        room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                        room.name = reader["name"].ToString();
+                        room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                        room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                        //room.m_dMaxlength
+                        //     room.m_dVolume
+                        //    room.m_eRoomPosition
+                        room.type = readerRoom["userLabel"].ToString();
+                        sql = "select * from Storeys where  Id =  ";
+                        sql = sql + reader["storeyId"].ToString();
+                        SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader reader1 = command1.ExecuteReader();
 
-                        Geometry geo = new Geometry();
-                        geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                        geo.vertices = readerHVACGeo["vertices"].ToString();
-                        geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                        geo.normals = readerHVACGeo["normals"].ToString();
-                        geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                        geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                        geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                        geo.materialIds = readerHVACGeo["materialIds"].ToString();
-
-                        AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-
-                        //如果不存在，则创建一个空的数据库,
-                        if (!System.IO.File.Exists(m_archXdbPath))
-                            return room;
-
-                        //创建一个连接
-                        string connectionArchstr = @"data source =" + m_archXdbPath;
-                        SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
-                        dbConnectionArch.Open();
-                        sql = "select * from Spaces";
-                        SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
-                        SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
-
-                        while (readerRoom.Read())
+                        if (reader1.Read())
                         {
-                            room.name = readerRoom["name"].ToString();
-                            room.boundaryLoops = readerRoom["boundaryLoops"].ToString();
-                            Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-
-                            }
+                            room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
                         }
-                    }
+                       
+                    }               
                 }
-            }
+            }      
             //关闭连接               
             return room;
         }
@@ -966,6 +968,23 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, m_dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 rooms.Add(room);
             }
 
@@ -992,8 +1011,24 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));          
                 room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, m_dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 rooms.Add(room);
             }
 
@@ -1382,7 +1417,7 @@ namespace HVAC_CheckEngine
             SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
             while (readerDoors.Read())
             {
-                Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));           
                 rooms.Add(roomConnect);
             }
             //关闭连接
@@ -1437,11 +1472,7 @@ namespace HVAC_CheckEngine
             dbConnection.Close();
             return doors;
         }
-        public static List<Room> getConnectedRooms(Room room)
-        {
-            List<Room> rooms = new List<Room>();
-            return rooms;
-        }
+  
 
         public static List<Door> getDoorsBetweenTwoRooms(Room firstRoom, Room secondRoom)
         {
@@ -1653,6 +1684,23 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, m_dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 rooms.Add(room);
             }
 
@@ -2318,6 +2366,58 @@ namespace HVAC_CheckEngine
             dbConnection.Close();                           
             return false;
         }
+    
+        public static List<FireDamper> GetFireDamperOfDuct(Duct duct)
+        {
+            List<FireDamper> fireDampers = new List<FireDamper>();
+
+          
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return fireDampers;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            m_listStrLastId = new List<string>();
+            FindFireDampers(dbConnection, duct.Id.ToString(), fireDampers);
+            //关闭连接
+            dbConnection.Close();
+
+            return fireDampers;
+        }
+
+
+        public static void FindFireDampers(SQLiteConnection dbConnection, String strId, List<FireDamper> inlets)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+                {
+                    sql = "select * from DuctDampers Where Id = ";
+                    sql += reader["linkElementId"].ToString();
+
+                    SQLiteCommand commandAirterminal = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerAirTerminal = commandAirterminal.ExecuteReader();
+                    if (readerAirTerminal.Read())
+                    {
+                        FireDamper inlet = new FireDamper(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
+                        inlets.Add(inlet);
+                    }
+                    else
+                    {
+                        string strLastId = reader["linkElementId"].ToString();
+                        m_listStrLastId.Add(strLastId);
+                        FindFireDampers(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    }
+                }
+            }
+        }
+
+
+
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }

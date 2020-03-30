@@ -101,6 +101,7 @@
     <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
     <Compile Include="FireCompartment.cs" />
+    <Compile Include="FireDamper.cs" />
     <Compile Include="FlexibleShortTubes.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="GasMeter.cs" />

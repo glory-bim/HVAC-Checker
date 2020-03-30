@@ -55,6 +55,7 @@ namespace HVAC_CheckEngine.Tests
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8.1.3.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
             Room room = new Room(362135);
+            int iCount = HVACFunction.GetWindowsInRoom(room).Count();
             Assert.IsTrue(HVACFunction.GetWindowsInRoom(room).Count() > 0);
         }
 
@@ -124,11 +125,11 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetRoomOfAirterminalTest()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
-            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
-            AirTerminal airterminal = new AirTerminal(1225723061731328000);            
-            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id!=0);
+            AirTerminal airterminal = new AirTerminal(1244249984430243840);            
+            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id == 362374);
         }
 
         [TestMethod()]

@@ -562,7 +562,7 @@ namespace HVAC_CheckEngine
                     result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
                 }
                 //     找到此楼梯间的所有前室atrias
-                List<Room> atriasLinkToStairCase = HVACFunction.getConnectedRooms(stairCase);
+                List<Room> atriasLinkToStairCase = HVACFunction.GetConnectedRooms(stairCase);
                 //     依次遍历每一个前室
                 foreach (Room atria in atriasLinkToStairCase)
                 {

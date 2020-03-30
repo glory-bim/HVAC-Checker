@@ -343,7 +343,7 @@ namespace HVAC_CheckEngine
         public static List<Door> getDoorsToCorridorOfAtria(Room atria)
         {
             //获得前室所有相连房间的集合linkedRooms
-            List<Room> linkedRooms = HVACFunction.getConnectedRooms(atria);
+            List<Room> linkedRooms = HVACFunction.GetConnectedRooms(atria);
             if (linkedRooms.Count <= 0)
                 throw new modelException("前室没有与其他房间相连");
             //从linkedRooms中筛选出非楼梯间房间

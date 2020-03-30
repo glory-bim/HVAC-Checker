@@ -198,7 +198,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+            //    HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -304,27 +304,27 @@ namespace UnitTestHVACChecker
                      return Rooms;
                  };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
-                  {
-                      List<Room> Rooms = new List<Room>();
-                      string roomType = context.DataRow["房间类型"].ToString();
-                      double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
-                      if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
-                      {
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                //  {
+                //      List<Room> Rooms = new List<Room>();
+                //      string roomType = context.DataRow["房间类型"].ToString();
+                //      double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
+                //      if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
+                //      {
 
 
-                          long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
-                          Room room = new Room(Id);
-                          room.type = roomType;
-                          room.name = context.DataRow["房间名称"].ToString();
-                          room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                         room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                          room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                          Rooms.Add(room);
+                //          long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
+                //          Room room = new Room(Id);
+                //          room.type = roomType;
+                //          room.name = context.DataRow["房间名称"].ToString();
+                //          room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                //         room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                //          room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                //          Rooms.Add(room);
 
-                      }
-                      return Rooms;
-                  };
+                //      }
+                //      return Rooms;
+                //  };
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -380,10 +380,10 @@ namespace UnitTestHVACChecker
                     return new List<Room>();
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble=(double dLength) =>
-                {
-                    return new List<Room>();
-                };
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble=(double dLength) =>
+                //{
+                //    return new List<Room>();
+                //};
                 FakeHVACFunction.testDataTableName = "GB50016_2014_8_5_2";
                 FakeHVACFunction.systemType = "排烟";
 
@@ -440,7 +440,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+             //   HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -550,28 +550,28 @@ namespace UnitTestHVACChecker
                     return Rooms;
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
-                {
-                    List<Room> Rooms = new List<Room>();
-                    string roomType = context.DataRow["房间类型"].ToString();
-                    double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
-                    if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
-                    {
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                //{
+                //    List<Room> Rooms = new List<Room>();
+                //    string roomType = context.DataRow["房间类型"].ToString();
+                //    double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
+                //    if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
+                //    {
 
 
-                        long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
-                        Room room = new Room(Id);
-                        room.type = roomType;
-                        room.name = context.DataRow["房间名称"].ToString();
-                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                       room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                       room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
-                        Rooms.Add(room);
+                //        long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
+                //        Room room = new Room(Id);
+                //        room.type = roomType;
+                //        room.name = context.DataRow["房间名称"].ToString();
+                //        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                //       room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                //        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                //       room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                //        Rooms.Add(room);
 
-                    }
-                    return Rooms;
-                };
+                //    }
+                //    return Rooms;
+                //};
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -629,10 +629,10 @@ namespace UnitTestHVACChecker
                     return new List<Room>();
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
-                {
-                    return new List<Room>();
-                };
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                //{
+                //    return new List<Room>();
+                //};
                 FakeHVACFunction.testDataTableName = "GB50016_2014_8_5_3";
                 FakeHVACFunction.systemType = "排烟";
 
@@ -689,7 +689,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -753,7 +753,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -819,7 +819,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
