@@ -530,9 +530,8 @@ namespace HVAC_CheckEngine
                         inlets.Add(inlet);
                     }
                     else
-                    {
-                        string strLastId = reader["linkElementId"].ToString();
-                        m_listStrLastId.Add(strLastId);
+                    {                       
+                        m_listStrLastId.Add(strId);
                         FindOutLets(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
@@ -625,9 +624,8 @@ namespace HVAC_CheckEngine
                         inlets.Add(inlet);
                     }
                     else
-                    {
-                        string strLastId = reader["linkElementId"].ToString();
-                        m_listStrLastId.Add(strLastId);
+                    {                       
+                        m_listStrLastId.Add(strId);
                         FindInlets(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
@@ -1017,21 +1015,16 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                        ducts.Add(duct);
-
-                        string strLastId = readerDucts["Id"].ToString();
-                        m_listStrLastId.Add(strLastId);
+                        ducts.Add(duct);                       
+                        m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
                     }
                     else
-                    {
-                        string strLastId = reader["linkElementId"].ToString();
-                        m_listStrLastId.Add(strLastId);
+                    {                    
+                        m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, reader["linkElementId"].ToString(), ducts);
                     }
-                }
-                m_listStrLastId.Add(strId);
+                }             
             }
         }
         //17判断是否风机所连风系统所有支路都连接了风口  //管堵
@@ -2166,9 +2159,8 @@ namespace HVAC_CheckEngine
                         inlets.Add(inlet);
                     }
                     else
-                    {
-                        string strLastId = reader["linkElementId"].ToString();
-                        m_listStrLastId.Add(strLastId);
+                    {                        
+                        m_listStrLastId.Add(strId);
                         FindFireDampers(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
