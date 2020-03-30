@@ -972,10 +972,7 @@ namespace HVAC_CheckEngine
             }
             return floors;
         }
-
-   
-              
-
+                      
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
         public static List<Duct> GetDuctsOfFan(Fan fan)
         {
@@ -2168,6 +2165,98 @@ namespace HVAC_CheckEngine
         }
 
 
+        public static List<Room> GetALLRoomsHaveFireDoor()
+        {
+            List<Room> rooms = new List<Room>();
+
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return rooms;
+
+            string connectionArchstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
+            dbConnectionArch.Open();
+            string sql = "select * from Doors";
+            SQLiteCommand commandDoor = new SQLiteCommand(sql, dbConnectionArch);
+            SQLiteDataReader readerDoor = commandDoor.ExecuteReader();
+
+            while (readerDoor.Read())
+            {                    
+                Room  room = new Room(Convert.ToInt64(readerDoor["FromRoomId"].ToString()));
+
+                sql = "select * from Space where  Id =  ";
+                sql = sql + readerDoor["FromRoomId"].ToString();
+                SQLiteCommand commandSpace = new SQLiteCommand(sql, dbConnectionArch);
+                SQLiteDataReader readerSpace = commandSpace.ExecuteReader();
+                if(readerSpace.Read())
+                {
+                    room.name = readerSpace["name"].ToString();
+                    room.m_dHeight = Convert.ToDouble(readerSpace["dHeight"].ToString());
+                    room.m_dArea = Convert.ToDouble(readerSpace["dArea"].ToString());
+                    room.m_iNumberOfPeople = Convert.ToInt32(readerSpace["nNumberOfPeople"].ToString());
+                    //room.m_dMaxlength
+                    //     room.m_dVolume
+                    //    room.m_eRoomPosition
+                    room.type = readerSpace["userLabel"].ToString();
+                    sql = "select * from Storeys where  Id =  ";
+                    sql = sql + readerSpace["storeyId"].ToString();
+                    SQLiteCommand command1 = new SQLiteCommand(sql, dbConnectionArch);
+                    SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                    if (reader1.Read())
+                    {
+                        room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                    }
+
+                }
+
+
+                rooms.Add(room);
+
+
+
+
+            }
+            return rooms;         
+        }
+
+
+
+        public static List<Duct> GetAllDuctsInRoom(Room room)
+        {
+            List<Duct> ducts = new List<Duct>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return ducts;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from Spaces Where Id = ";
+            sql = sql + room.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {                
+                AABB aabbRoom = GetAABB(reader, dbConnection);
+
+                sql = "select * from Ducts";
+                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                while (readerDucts.Read())
+                {
+                    AABB aabbAirTerminal = GetAABB(readerDucts, dbConnection);
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
+                    {
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        ducts.Add(duct);
+                    }               
+                }
+            }
+            //关闭连接
+            dbConnection.Close();
+            return ducts;
+        }
 
     }
     [Flags]
