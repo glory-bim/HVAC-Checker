@@ -1220,96 +1220,8 @@ namespace HVAC_CheckEngine
                 }
             }
             return false;
-
         }
-
-        public static bool IfFindAirterminalByDuct(SQLiteConnection dbConnection, String strId)
-        {
-            string sql = "select * from MepConnectionRelations Where mainElementId = ";
-            sql += strId;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                sql = "select * from AirTerminals Where Id = ";
-                sql += reader["linkElementId"].ToString();
-
-                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
-                if (readerDucts.Read())
-                {
-                    return true;
-                }
-                else
-                {
-                    if (IfFindAirterminalByDuct3t(dbConnection, reader["linkElementId"].ToString()) ||
-                         IfFindAirterminalByDuct4t(dbConnection, reader["linkElementId"].ToString()) ||
-                         IfFindAirterminalByDuctDampers(dbConnection, reader["linkElementId"].ToString())
-                         )
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-            }
-
-            return false;
-        }
-
-        public static bool IfFindAirterminalByDuct3t(SQLiteConnection dbConnection, String strId)
-        {
-            string sql = "select * from AirTerminals Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct3T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct3T = commandDuct3T.ExecuteReader();
-            if (readerDuct3T.Read())
-            {
-                return true;
-            }
-            else
-            {
-                return IfFindAirTerminal(readerDuct3T["Id"].ToString());
-            }
-        }
-
-        public static bool IfFindAirterminalByDuct4t(SQLiteConnection dbConnection, String strId)
-        {
-            string sql = "select * from AirTerminals Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuct4T = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDuct4T = commandDuct4T.ExecuteReader();
-            if (readerDuct4T.Read())
-            {
-                return true;
-            }
-            else
-            {
-                return IfFindAirTerminal(readerDuct4T["Id"].ToString());
-            }
-        }
-
-        public static bool IfFindAirterminalByDuctDampers(SQLiteConnection dbConnection, String strId)
-        {
-            string sql = "select * from AirTerminals Where Id = ";
-            sql += strId;
-
-            SQLiteCommand commandDuctDampers = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerDampers = commandDuctDampers.ExecuteReader();
-            if (readerDampers.Read())
-            {
-                return true;
-            }
-            else
-            {
-                return IfFindAirTerminal(readerDampers["Id"].ToString());
-            }
-        }
+             
         //18获得防烟分区长边长度
         public static double GetFireDistrictLength(FireCompartment fireDistrict)
         {
@@ -1479,8 +1391,7 @@ namespace HVAC_CheckEngine
             List<Door> doors = new List<Door>();
             return doors;
         }
-
-
+        
 
         public static List<Pipe> GetPipes(String systemName)
         {
@@ -2331,12 +2242,8 @@ namespace HVAC_CheckEngine
 
             if (reader.Read())
             {
-                smokeCompartment.name = reader["name"].ToString();
-                smokeCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(smokeCompartment.boundaryLoops, smokeCompartment.Id.ToString());
 
-
-
+                AABB aabbSmokeCompartment = GetAABB(reader, dbConnection);    
                 //创建一个连接
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
@@ -2347,11 +2254,9 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
                 {
-                    fireCompartment.name = readerAirTerminals["name"].ToString();
-                    fireCompartment.boundaryLoops = readerAirTerminals["boundaryLoops"].ToString();
-                    Polygon2D polySmokeCompartment = GetSpaceBBox(fireCompartment.boundaryLoops, fireCompartment.Id.ToString());                                                        
 
-                    if ( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, polySmokeCompartment))                       
+                    AABB aabbFireCompartment = GetAABB(reader, dbConnection);                                                                      
+                    if ( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbSmokeCompartment, aabbFireCompartment))                       
                     {
                         return true;
                     }
