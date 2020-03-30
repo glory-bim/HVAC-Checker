@@ -975,41 +975,7 @@ namespace HVAC_CheckEngine
             return floors;
         }
 
-        public static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
-        {
-            string sql = "select * from MepConnectionRelations Where mainElementId = ";
-            sql += strId;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-         
-            while (reader.Read())
-            {
-                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
-                {
-                    sql = "select * from Ducts Where Id = ";
-                    sql += reader["linkElementId"].ToString();
-
-                    SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
-                    SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
-                    if (readerDucts.Read())
-                    {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                        ducts.Add(duct);
-                        
-                        string strLastId = reader["linkElementId"].ToString();
-                        m_listStrLastId.Add(strLastId);
-                        FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
-                    }
-                    else
-                    {
-                        FindDucts(dbConnection, reader["linkElementId"].ToString(), ducts);        
-                    }
-                }
-          
-
-            }
-        }
+   
               
 
         //16获得风机所连接的所有风管集合  支路 干管  风口到末端 
@@ -1030,6 +996,43 @@ namespace HVAC_CheckEngine
             //关闭连接
             dbConnection.Close();
             return ducts;
+        }
+
+        public static void FindDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+                {
+                    sql = "select * from Ducts Where Id = ";
+                    sql += reader["linkElementId"].ToString();
+
+                    SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                    if (readerDucts.Read())
+                    {
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+
+                        ducts.Add(duct);
+
+                        string strLastId = readerDucts["Id"].ToString();
+                        m_listStrLastId.Add(strLastId);
+                        FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+                    }
+                    else
+                    {
+                        string strLastId = reader["linkElementId"].ToString();
+                        m_listStrLastId.Add(strLastId);
+                        FindDucts(dbConnection, reader["linkElementId"].ToString(), ducts);
+                    }
+                }
+                m_listStrLastId.Add(strId);
+            }
         }
         //17判断是否风机所连风系统所有支路都连接了风口  //管堵
         public static bool isAllBranchLinkingAirTerminal(Fan fan)
