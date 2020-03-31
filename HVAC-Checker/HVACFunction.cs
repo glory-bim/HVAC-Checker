@@ -1704,6 +1704,8 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
+                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
+                pipe.systemType = reader["SystemType"].ToString();
                 pipes.Add(pipe);
             }
             return pipes;
