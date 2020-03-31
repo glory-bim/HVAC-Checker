@@ -2258,6 +2258,64 @@ namespace HVAC_CheckEngine
             return ducts;
         }
 
+
+
+        public static List<Duct> GetAllVerticalDuctConnectedToDuct(Duct duct)
+        {
+            List<Duct> ducts = new List<Duct>();
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return ducts;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            m_listStrLastId = new List<string>();
+            m_listStrLastId.Clear();
+            //创建一个连接
+            FindVerticalDucts(dbConnection, duct.Id.ToString(), ducts);
+
+            //关闭连接
+            dbConnection.Close();
+            return ducts;
+        }
+
+        public static void FindVerticalDucts(SQLiteConnection dbConnection, String strId, List<Duct> ducts)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+                {
+                    sql = "select * from Ducts Where Id = ";
+                    sql += reader["linkElementId"].ToString();
+
+                    SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
+                    if (readerDucts.Read())
+                    {
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+
+                        AABB aabbDuct = GetAABB(readerDucts, dbConnection);
+
+
+                        ducts.Add(duct);
+                        m_listStrLastId.Add(strId);
+                        FindVerticalDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+                    }
+                    else
+                    {
+                        m_listStrLastId.Add(strId);
+                        FindVerticalDucts(dbConnection, reader["linkElementId"].ToString(), ducts);
+                    }
+                }
+            }
+        }
+
+
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
