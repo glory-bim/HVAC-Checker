@@ -1510,6 +1510,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AssemblyAHU assemblyAHU = new AssemblyAHU(Convert.ToInt64(reader["Id"].ToString()));
+               // assemblyAHU.type = new AssemblyAHU(Convert.ToInt64(reader["Id"].ToString()));
                 assemblyAHUs.Add(assemblyAHU);
             }
 
@@ -1739,6 +1740,23 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 SmokeCompartment room = new SmokeCompartment(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 smokeCompartments.Add(room);
             }
             //关闭连接
@@ -1770,6 +1788,23 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 FireCompartment room = new FireCompartment(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 smokeCompartments.Add(room);
             }
             //关闭连接
@@ -1885,8 +1920,25 @@ namespace HVAC_CheckEngine
 
             while (reader.Read())
             {
-                fireCompartment.name = reader["name"].ToString();
+            
                 fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
+                fireCompartment.name = reader["name"].ToString();
+                fireCompartment.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                fireCompartment.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                fireCompartment.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                fireCompartment.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    fireCompartment.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
                 //Polygon2D poly = GetSpaceBBox(fireCompartment.boundaryLoops, fireCompartment.Id.ToString());
                 AABB aabbRoom = GetAABB(reader, dbConnection);
                 //创建一个连接
@@ -2035,8 +2087,26 @@ namespace HVAC_CheckEngine
 
                     if ( Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, polySmokeCompartment))
                     {
-                        SmokeCompartment airTerminal = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));                        
-                        smokeCompartments.Add(airTerminal);
+                        SmokeCompartment fireCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                        fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
+                        fireCompartment.name = reader["name"].ToString();
+                        fireCompartment.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                        fireCompartment.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                        fireCompartment.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                        //room.m_dMaxlength
+                        //     room.m_dVolume
+                        //    room.m_eRoomPosition
+                        fireCompartment.type = reader["userLabel"].ToString();
+                        sql = "select * from Storeys where  Id =  ";
+                        sql = sql + reader["storeyId"].ToString();
+                        SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                        if (reader1.Read())
+                        {
+                            fireCompartment.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                        }
+                        smokeCompartments.Add(fireCompartment);
                     }           
                  
                 }
