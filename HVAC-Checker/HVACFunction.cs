@@ -527,6 +527,8 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        inlet.airVelocity = Convert.ToDouble(readerDucts["AirFlowRate"].ToString());
+                        inlet.systemType = readerDucts["SystemType"].ToString();
                         inlets.Add(inlet);
                     }
                     else
