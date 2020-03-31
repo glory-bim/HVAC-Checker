@@ -676,7 +676,7 @@ namespace HVAC_CheckEngine
                     {
 
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                         ducts.Add(duct);
                     }
                 }
@@ -725,7 +725,7 @@ namespace HVAC_CheckEngine
                     {
 
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                         ducts.Add(duct);
                     }
                 }
@@ -1016,6 +1016,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                         ducts.Add(duct);                       
                         m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -1674,6 +1675,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Duct room = new Duct(Convert.ToInt64(reader["Id"].ToString()));
+                room.airVelocity = Convert.ToDouble(reader["Velocity"].ToString());
                 ducts.Add(room);
             }
 
@@ -2257,6 +2259,7 @@ namespace HVAC_CheckEngine
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                         ducts.Add(duct);
                     }               
                 }
@@ -2306,6 +2309,8 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
 
                         AABB aabbDuct = GetAABB(readerDucts, dbConnection);
 
