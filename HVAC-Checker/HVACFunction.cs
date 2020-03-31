@@ -220,6 +220,8 @@ namespace HVAC_CheckEngine
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
                     {
                         Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
+                        window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
+                        window.area = Convert.ToDouble(readerWindows["Area"].ToString());
                         windows.Add(window);
                     }
                     //string sTransformer = readerWindows["transformer"].ToString();
