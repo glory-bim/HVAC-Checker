@@ -623,6 +623,8 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
+                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
+                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
                         inlets.Add(inlet);
                     }
                     else
