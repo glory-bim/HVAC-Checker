@@ -157,13 +157,8 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
 
             if (reader.Read())
-            {
-                //room.name = reader["name"].ToString();
-                //room.boundaryLoops = reader["boundaryLoops"].ToString();
-                //Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+            {            
                 AABB aabbRoom = GetAABB(reader, dbConnection);
-
-
                 //创建一个连接
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
@@ -179,7 +174,44 @@ namespace HVAC_CheckEngine
                         AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
                         airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
                         airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-                        airterminals.Add(airTerminal);
+
+                        string strVector = readerAirTerminals["NormalVector"].ToString();
+
+
+
+                        int index = strVector.IndexOf(":"); 
+                        int index_s = strVector.LastIndexOf(",\"Y"); 
+                        string strX = strVector.Substring(index + 1, index_s - index - 1);
+
+                        double dX = Convert.ToDouble(strX);
+                        index = strVector.IndexOf("Y"); 
+                        index_s = strVector.LastIndexOf(",\"Z");
+                        string strY = strVector.Substring(index + 3, index_s - index-3);
+                        double dY = Convert.ToDouble(strY);
+
+                        index = strVector.IndexOf("Z");
+                      
+                        index_s = strVector.Length;
+                        string strZ = strVector.Substring(index + 3, index_s - index-4);
+                        double dZ = Convert.ToDouble(strY);
+                        List<double> listVector = new List<double>();
+                        listVector.Add(dX);
+                        listVector.Add(dY);
+                        listVector.Add(dZ);
+                     
+                        List<double> listVectorAirterminalToRoom = new List<double>();
+                         dX = aabbRoom.Center().X - aabbAirTerminal.Center().X;
+                         dY = aabbRoom.Center().Y - aabbAirTerminal.Center().Y;
+                         dZ = aabbRoom.Center().Z - aabbAirTerminal.Center().Z;
+                        listVectorAirterminalToRoom.Add(dX);
+                        listVectorAirterminalToRoom.Add(dY);
+                        listVectorAirterminalToRoom.Add(dZ);
+
+                        double dDotProduct =  listVector[0]* listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
+                        if(dDotProduct<0)
+                        {
+                            airterminals.Add(airTerminal);
+                        }                       
                     }
                 }
             }
@@ -188,6 +220,8 @@ namespace HVAC_CheckEngine
 
             return airterminals;
         }
+
+
 
         public static List<Window> GetWindowsInRoom(Room room)
         {

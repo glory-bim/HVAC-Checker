@@ -34,9 +34,9 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetRoomContainAirTerminalTest()
         {
-            Room room = new Room(573789);
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
-            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//机电.GDB";
+            Room room = new Room(362159);
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
             Assert.IsTrue(airTerminals.Count() > 0);
