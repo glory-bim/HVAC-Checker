@@ -168,51 +168,55 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
                 {
-                    AABB aabbAirTerminal =  GetAABB(readerAirTerminals, dbConnectionHVAC);                    
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))                      
+                    AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                    airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                    airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                    AABB aabbAirTerminal =  GetAABB(readerAirTerminals, dbConnectionHVAC);
+                
+
+                  
+                    if (aabbRoom.IsAABBContainsAABB3D(aabbAirTerminal))
                     {
-                        AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                        airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                        airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-
+                        airterminals.Add(airTerminal);
+                    }
+                    else if(Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
+                    {                    
                         string strVector = readerAirTerminals["NormalVector"].ToString();
-
-
-
-                        int index = strVector.IndexOf(":"); 
-                        int index_s = strVector.LastIndexOf(",\"Y"); 
+                        int index = strVector.IndexOf(":");
+                        int index_s = strVector.LastIndexOf(",\"Y");
                         string strX = strVector.Substring(index + 1, index_s - index - 1);
 
                         double dX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y"); 
+                        index = strVector.IndexOf("Y");
                         index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index-3);
+                        string strY = strVector.Substring(index + 3, index_s - index - 3);
                         double dY = Convert.ToDouble(strY);
 
                         index = strVector.IndexOf("Z");
-                      
+
                         index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index-4);
+                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
                         double dZ = Convert.ToDouble(strY);
                         List<double> listVector = new List<double>();
                         listVector.Add(dX);
                         listVector.Add(dY);
                         listVector.Add(dZ);
-                     
+
                         List<double> listVectorAirterminalToRoom = new List<double>();
-                         dX = aabbRoom.Center().X - aabbAirTerminal.Center().X;
-                         dY = aabbRoom.Center().Y - aabbAirTerminal.Center().Y;
-                         dZ = aabbRoom.Center().Z - aabbAirTerminal.Center().Z;
+                        dX = aabbRoom.Center().X - aabbAirTerminal.Center().X;
+                        dY = aabbRoom.Center().Y - aabbAirTerminal.Center().Y;
+                        dZ = aabbRoom.Center().Z - aabbAirTerminal.Center().Z;
                         listVectorAirterminalToRoom.Add(dX);
                         listVectorAirterminalToRoom.Add(dY);
                         listVectorAirterminalToRoom.Add(dZ);
 
-                        double dDotProduct =  listVector[0]* listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                        if(dDotProduct<0)
+                        double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
+                        if (dDotProduct < 0)
                         {
                             airterminals.Add(airTerminal);
-                        }                       
+                        }                        
                     }
+                                                                                                         
                 }
             }
             //关闭连接
