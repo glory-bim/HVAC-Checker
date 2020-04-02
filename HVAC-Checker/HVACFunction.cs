@@ -1494,11 +1494,11 @@ namespace HVAC_CheckEngine
         public static List<Fan> GetAllFans()
         {
             List<Fan> fans = new List<Fan>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fans;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from HVACFans";

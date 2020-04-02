@@ -809,33 +809,7 @@ namespace HVAC_CheckEngine
                 PointInt pt2 = new PointInt(0, 0, 0);
                 string strId = "0";
                 AABB aabbAirterminal  = new AABB(pt1,pt2,strId);
-                HVACFunction.GetAirTerminalAABB(aabbAirterminal, Convert.ToString( airterminal.Id));
-
-
-                //List<Room> rooms = new List<Room>();
-                //rooms = HVACFunction.GetAllRooms();
-
-                //foreach (Room room in rooms)
-                //{
-                //    //创建一个连接
-                //    List<PointIntList> Points = new List<PointIntList>() ;
-                //    string elementId = "";
-
-                //    Polygon2D poly = new Polygon2D(Points, elementId);
-                //    HVACFunction.GetRoomPolygon(poly, room);
-                //    PointInt pt = aabbAirterminal.Center();
-                //    if (!Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Center())
-                //        && !Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirterminal)
-                //        && !Geometry_Utils_BBox.IsPointInBBox2D(aabbAirterminal, poly.Center())
-                //        && !Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Min)
-                //        && !Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirterminal.Max))
-                //    {
-
-                //        AirterminalVelocityResult(airterminal, ref result);
-
-                //    }
-                //}
-                               
+                HVACFunction.GetAirTerminalAABB(aabbAirterminal, Convert.ToString( airterminal.Id));                                      
                 List<Wall> walls = new List<Wall>();
                 walls = HVACFunction.GetOutSideWalls();
                 foreach (Wall wall in walls)
