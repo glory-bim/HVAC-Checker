@@ -1681,11 +1681,11 @@ namespace HVAC_CheckEngine
         public static List<Duct> GetDucts(string strSystemName)
         {
             List<Duct> ducts = new List<Duct>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return ducts;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from Ducts Where CHARINDEX(";
@@ -1714,7 +1714,7 @@ namespace HVAC_CheckEngine
                 return pipes;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();          
             
