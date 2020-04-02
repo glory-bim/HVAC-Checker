@@ -130,5 +130,89 @@ namespace HVAC_CheckEngine.Tests
             // Assert.AreEqual(comment, result.comment);
             Assert.IsFalse(result.isPassCheck);
         }
+
+        [TestMethod()]
+        public void GB51251_2017_4_2_4Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_4_2_4();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_4_4_7Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_4_4_7();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_8_4_2Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_8_4_2();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_8_4_3Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_8_4_3();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_11_1_4Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_11_1_4();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB50490_2009_8_4_17Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50490_2009_8_4_17();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
     }
 }

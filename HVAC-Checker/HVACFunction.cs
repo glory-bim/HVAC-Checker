@@ -1517,11 +1517,11 @@ namespace HVAC_CheckEngine
         public static List<AssemblyAHU> GetAllAssemblyAHUs()
         {
             List<AssemblyAHU> assemblyAHUs = new List<AssemblyAHU>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return assemblyAHUs;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from AssemblyAHUs";
@@ -1752,8 +1752,8 @@ namespace HVAC_CheckEngine
             string csSmokeCompartment = "防烟分区";
             string sql = "select * from Spaces where CHARINDEX(";
             sql = sql + "'" + sName + "'";
-            sql = sql + ",name)> 0 and  userLabel = csSmokeCompartment ";        
-          
+            sql = sql + ",name)> 0 and  userLabel =  ";
+            sql = sql + "'" + csSmokeCompartment + "'"; 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 

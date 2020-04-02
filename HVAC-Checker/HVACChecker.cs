@@ -1578,70 +1578,64 @@ namespace HVAC_CheckEngine
 
         //管道穿越结构变形缝处应设置金属柔性短管(图11．1．4-1、图11．1．4-2)，
         //金属柔性短管长度宜为150mm～300mm，并应满足结构变形的要求，其保温性能应符合管道系统功能要求。
-          public static BimReview GB51251_2017_11_1_4()
+        public static BimReview GB51251_2017_11_1_4()
+        {
+            BimReview result = new BimReview("GB50736_2017", "11.1.4");
+
+            List<Fan> fans = HVACFunction.GetAllFans();
+            foreach (Fan fan in fans)
+            {
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                if (flexiTubes.Count() > 2)
                 {
-                    BimReview result = new BimReview("GB50736_2017", "11.1.4");
-
-                    List<Fan> fans = HVACFunction.GetAllFans();
-                    foreach (Fan fan in fans)
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
                     {
-
-                        List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
-                        if (flexiTubes.Count() > 2)
-                        {
-                            if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
-                            {
-                                result.isPassCheck = true;
-                            }
-                            else
-                            {
-                                result.isPassCheck = false;
-                            }
-                        }
-                        else
-                        {
-                            result.isPassCheck = false;
-                        }
+                        result.isPassCheck = true;
                     }
-
-
-
-                    List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
-                    foreach (AssemblyAHU fan in aHUs)
-                    {
-
-                        List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
-                        if (flexiTubes.Count() > 2)
-                        {
-                            if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
-                            {
-                                result.isPassCheck = true;
-                            }
-                            else
-                            {
-                                result.isPassCheck = false;
-                            }
-                        }
-                        else
-                        {
-                            result.isPassCheck = false;
-                        }
-                    }
-
-                    if (result.isPassCheck)
-                    {
-                        result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
-                    }
-                    //如果审查不通过
-                    //则在审查结果中注明审查不通过的相关内容
                     else
                     {
-                        result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+                        result.isPassCheck = false;
                     }
-                    return result;
-
-
                 }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+            List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
+            foreach (AssemblyAHU fan in aHUs)
+            {
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                if (flexiTubes.Count() > 2)
+                {
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    {
+                        result.isPassCheck = true;
+                    }
+                    else
+                    {
+                        result.isPassCheck = false;
+                    }
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                }
+            }
+
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            }
+            return result;
+        }
 
         //城市轨道交通技术规范GB 50490-2009 
         // 8．4．17 地下车站站厅、站台公共区和设备及管理用房应划分防烟分区，且防烟分区不应跨越防火分区。
@@ -1668,7 +1662,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50490_2009_8_4_17()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50490_2009", "3.3.7");
+            BimReview result = new BimReview("GB50490_2009", "8.4.17");
             string sName = "站厅";
             List<SmokeCompartment> smokeCompartments = HVACFunction.GetSmokeCompartment(sName);
             sName = "站台公共区";
