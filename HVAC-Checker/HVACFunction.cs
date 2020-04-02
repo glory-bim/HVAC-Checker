@@ -1542,11 +1542,11 @@ namespace HVAC_CheckEngine
         public static List<GasMeter> GetGasMeters()
         {
             List<GasMeter> fans = new List<GasMeter>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fans;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from GasMeters";
@@ -1564,11 +1564,11 @@ namespace HVAC_CheckEngine
         public static List<HeatMeter> GetHeatMeters()
         {
             List<HeatMeter> fans = new List<HeatMeter>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fans;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from HeatMeters";
@@ -1586,11 +1586,11 @@ namespace HVAC_CheckEngine
         public static List<WaterMeter> GetWaterMeters()
         {
             List<WaterMeter> fans = new List<WaterMeter>();
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fans;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
             string sql = "select * from WaterMeters";

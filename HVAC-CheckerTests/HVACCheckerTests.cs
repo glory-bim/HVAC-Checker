@@ -46,5 +46,19 @@ namespace HVAC_CheckEngine.Tests
             // Assert.AreEqual(comment, result.comment);
             Assert.IsFalse(result.isPassCheck);
         }
+
+        [TestMethod()]
+        public void GB50736_2012_9_1_5Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50736_2012_9_1_5();
+
+            //assert
+            // Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
     }
 }
