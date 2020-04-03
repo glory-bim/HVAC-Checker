@@ -733,50 +733,15 @@ namespace HVAC_CheckEngine
             return result;
         }
 
-        private static void AirterminalVelocityResult(AirTerminal airterminal, ref BimReview result)
-        {
-            Room room = HVACFunction.GetRoomOfAirterminal(airterminal);
-            if (room.type == "机房" || room.type == "库房")
-            {
-                if (airterminal.airVelocity > 4.5 && airterminal.airVelocity < 5.0)
-                {
-                    result.isPassCheck = true;
-                }
-                else
-                {
-                    result.isPassCheck = false;
-                }
-                if (airterminal.airVelocity > 8 && airterminal.airVelocity < 14)
-                {
-                    result.isPassCheck = true;
-                }
-                else
-                {
-                    result.isPassCheck = false;
-                }
-
-            }
-            else
-            {          
-                if (airterminal.airVelocity > 3.5 && airterminal.airVelocity < 4.5)
-                {
-                    result.isPassCheck = true;
-                }
-                else
-                {
-                    result.isPassCheck = false;
-                }
-                if (airterminal.airVelocity > 5.0 && airterminal.airVelocity < 10.0)
-                {
-                    result.isPassCheck = true;
-                }
-            }
-        }
+       
 
 
         /**
       民用建筑供暖通风与空气调节设计规范 GB50736-2012：6.6.5条文：
-       //机械通风的进排风口风速宜按表6．6．5采用   （加属性//）  
+       //机械通风的进排风口风速宜按表6．6．5采用。   （加属性//）
+            表6.6.5 机械通风系统的进排风口空气流速(m/s)
+            住宅和公共建筑   新风入口 3.5~4.5  风机出口 5.0~10.5
+            机房、库房  新风入口 4.5~5.0  风机出口 8.0~14.0
       */
         //初始化审查结果
         //获取所有风口集合
@@ -817,7 +782,7 @@ namespace HVAC_CheckEngine
                     AABB aabbWall = new AABB(pt1, pt2, strId);
                     HVACFunction.GetWallAABB(aabbWall, Convert.ToString(wall.Id));
 
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbWall, aabbAirterminal))
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbWall, aabbAirterminal)&&(!aabbWall.IsAABBContainsAABB3D(aabbAirterminal)))
                     {
                         AirterminalVelocityResult(airterminal, ref result);
                     }             
@@ -839,7 +804,51 @@ namespace HVAC_CheckEngine
         }
 
 
-        
+        private static void AirterminalVelocityResult(AirTerminal airterminal, ref BimReview result)
+        {
+            Room room = HVACFunction.GetRoomOfAirterminal(airterminal);
+            if (room.type == "机房" || room.type == "库房")
+            {
+                if (airterminal.airVelocity > 4.5 && airterminal.airVelocity < 5.0)
+                {
+                    result.isPassCheck = true;
+                }
+                else
+                {
+                    result.isPassCheck = false;
+
+                    result.AddViolationComponent(airterminal.Id.Value, airterminal.systemType, "");
+                }
+                if (airterminal.airVelocity > 8 && airterminal.airVelocity < 14)
+                {
+                    result.isPassCheck = true;
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                    result.AddViolationComponent(airterminal.Id.Value, airterminal.systemType, "");
+                }
+
+            }
+            else
+            {
+                if (airterminal.airVelocity > 3.5 && airterminal.airVelocity < 4.5)
+                {
+                    result.isPassCheck = true;
+                }
+                else
+                {
+                    result.isPassCheck = false;
+                    result.AddViolationComponent(airterminal.Id.Value, airterminal.systemType, "");
+                }
+                if (airterminal.airVelocity > 5.0 && airterminal.airVelocity < 10.0)
+                {
+                    result.isPassCheck = true;
+                }
+            }
+        }
+
+
         //民用建筑供暖通风与空气调节设计规范 GB50736-2012：6.6.7条文：        
         //667 风管与通风机及空气处理机组等振动设备的连接处，应装设柔性接头，其长度宜为150mm～300mm。 
         //初始化审查结果
