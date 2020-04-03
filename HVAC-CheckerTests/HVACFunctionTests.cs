@@ -128,8 +128,8 @@ namespace HVAC_CheckEngine.Tests
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
             string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
-            AirTerminal airterminal = new AirTerminal(1244249984430243840);
-            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id == 362374);
+            AirTerminal airterminal = new AirTerminal(1245195412197867521);
+            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id == 362156);
         }
 
         [TestMethod()]
