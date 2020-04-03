@@ -881,28 +881,26 @@ namespace HVAC_CheckEngine
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach(Fan fan in fans)
             {
-              List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
-              if(flexiTubes.Count()>2)
+                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                if (flexiTubes.Count() > 2)
                 {
-                 if((flexiTubes[0].m_length >150 && flexiTubes[0].m_length<300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
+                    if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
                     {
                         result.isPassCheck = true;
                     }
-                 else
+                    else
                     {
                         result.isPassCheck = false;
                         result.AddViolationComponent(fan.Id.Value, fan.type, "");
                     }
                 }
-              else
+                else
                 {
                     result.isPassCheck = false;
                     result.AddViolationComponent(fan.Id.Value, fan.type, "");
                 }
             }
-
-
-
+           
             List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
             foreach (AssemblyAHU aHU in aHUs)
             {
@@ -929,9 +927,7 @@ namespace HVAC_CheckEngine
             if (result.isPassCheck)
             {
                 result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
-            }
-            //如果审查不通过
-            //则在审查结果中注明审查不通过的相关内容
+            }  
             else
             {
                 result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
@@ -946,6 +942,8 @@ namespace HVAC_CheckEngine
         //2  应计量耗电量；
         //3  应计量集中供热系统的供热量；
         //4  应计量补水量；
+          // 5 new 应计量集中空调系统冷源的供冷量；
+          //6  new循环水泵耗电量宜单独计量。
 
         //获取燃气表集合
         //获取热表集合
@@ -971,7 +969,18 @@ namespace HVAC_CheckEngine
             else
             {
                 result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。 没有计量燃料的消耗量。";
             }
+            if(globalData.haveSubentryMeasures)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。 没有计量耗电量。";
+            }
+
             List<HeatMeter> heatMeters = HVACFunction.GetHeatMeters();
             if (heatMeters.Count() > 0)
             {
@@ -980,6 +989,7 @@ namespace HVAC_CheckEngine
             else
             {
                 result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。  没有计量集中供热系统的供热量。";
             }
             List<WaterMeter> waterMeters = HVACFunction.GetWaterMeters();
             if (waterMeters.Count() > 0)
@@ -989,6 +999,7 @@ namespace HVAC_CheckEngine
             else
             {
                 result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。  没有计量补水量。";
             }
             if (result.isPassCheck)
             {
@@ -996,15 +1007,15 @@ namespace HVAC_CheckEngine
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
-            else
-            {
-                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
-            }
+            //else
+            //{
+            //    result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            //}
             return result;
         }
 
-
-        // 452   锅炉房、换热机房和制冷机房应进行能量计量，能量计量应包括下列内容：
+        //公共建筑节能设计标准 GB 50189-2015
+        // 4.5.2锅炉房、换热机房和制冷机房应进行能量计量，能量计量应包括下列内容：
         //1 燃料的消耗量；
         //2 制冷机的耗电量； globle
         //3 集中供热系统的供热量；
@@ -1032,6 +1043,16 @@ namespace HVAC_CheckEngine
             else
             {
                 result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。 没有计量燃料的消耗量。";
+            }
+            if (globalData.haveSubentryMeasures)
+            {
+                result.isPassCheck = true;
+            }
+            else
+            {
+                result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。 没有计量耗电量。";
             }
             List<HeatMeter> heatMeters = HVACFunction.GetHeatMeters();
             if (heatMeters.Count() > 0)
@@ -1041,6 +1062,7 @@ namespace HVAC_CheckEngine
             else
             {
                 result.isPassCheck = false;
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。  没有计量集中供热系统的供热量。";
             }
             List<WaterMeter> waterMeters = HVACFunction.GetWaterMeters();
             if (waterMeters.Count() > 0)
@@ -1049,18 +1071,17 @@ namespace HVAC_CheckEngine
             }
             else
             {
-                result.isPassCheck = false;
+                result.isPassCheck = false;                
+                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。没有计量补水量。";
             }
             if (result.isPassCheck)
             {
                 result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
-            }
-            //如果审查不通过
-            //则在审查结果中注明审查不通过的相关内容
-            else
-            {
-                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
-            }
+            }          
+            //else
+            //{
+            //    result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+            //}
             return result;
         }
 
