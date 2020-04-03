@@ -13,6 +13,7 @@ namespace HVAC_CheckEngine
             
         }
         public double? airVelocity { get; set; } = null;
+        public string systemType { get; set; } = null;
        
     }
 }

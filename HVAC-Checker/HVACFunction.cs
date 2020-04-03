@@ -512,7 +512,7 @@ namespace HVAC_CheckEngine
         }
 
         //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花
-        public static List<Room> GetRoomsMoreThan(double dLength)
+        public static List<Room> GetRoomsMoreThan(string roomType,double dLength)
         {
             List<Room> rooms = new List<Room>();
 
@@ -639,85 +639,18 @@ namespace HVAC_CheckEngine
             }
         }
 
+        public struct Point
+        {
+            double x;
+            double y;
+            double z;
+        }
+
 
         //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
         public static List<Duct> GetDuctsCrossSpace(Room room)
         {
             List<Duct> ducts = new List<Duct>();
-            if (!System.IO.File.Exists(m_archXdbPath))
-                return ducts;
-
-            //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            string sql = "select * from Spaces Where Id = ";
-            sql = sql + room.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerSpace = command.ExecuteReader();
-
-            if (readerSpace.Read())
-            {
-                room.name = readerSpace["name"].ToString();
-                room.boundaryLoops = readerSpace["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-
-                connectionstr = @"data source =" + m_hvacXdbPath;
-                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                dbConnectionHVAC.Open();
-                sql = "select * from Ducts";
-                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
-                SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
-                while (readerDucts.Read())
-                {
-                    string sTransformer = readerDucts["transformer"].ToString();
-                    sql = "select * from LODRelations where graphicElementId = ";
-                    sql = sql + readerDucts["Id"].ToString();
-
-                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
-                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                    while (readerHVAC1.Read())
-                    {
-                        sql = "select * from Geometrys where Id = ";
-                        sql = sql + readerHVAC1["geometryId"].ToString();
-                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
-                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                        while (readerHVACGeo.Read())
-                        {
-                            readerHVACGeo["Id"].ToString();
-
-                            Geometry geo = new Geometry();
-                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                            geo.vertices = readerHVACGeo["vertices"].ToString();
-                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                            geo.normals = readerHVACGeo["normals"].ToString();
-                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
-
-                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                                ducts.Add(duct);
-                            }
-                        }
-                    }
-                }
-            }
-            //关闭连接
-            dbConnection.Close();
 
             return ducts;
         }
@@ -725,94 +658,41 @@ namespace HVAC_CheckEngine
         public static List<Duct> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
         {
             List<Duct> ducts = new List<Duct>();
-            //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(m_archXdbPath))
-                return ducts;
-
-            //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            string sql = "select * from Spaces Where Id = ";
-            sql = sql + fireDistrict.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader readerSpace = command.ExecuteReader();
-
-            if (readerSpace.Read())
-            {
-                fireDistrict.name = readerSpace["name"].ToString();
-                fireDistrict.boundaryLoops = readerSpace["boundaryLoops"].ToString();
-                Polygon2D poly = GetSpaceBBox(fireDistrict.boundaryLoops, fireDistrict.Id.ToString());
-
-
-                //创建一个连接
-                connectionstr = @"data source =" + m_hvacXdbPath;
-                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                dbConnectionHVAC.Open();
-                sql = "select * from Ducts";
-                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
-                SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
-                while (readerDucts.Read())
-                {
-                    string sTransformer = readerDucts["transformer"].ToString();
-                    sql = "select * from LODRelations where graphicElementId = ";
-                    sql = sql + readerDucts["Id"].ToString();
-
-                    SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnectionHVAC);
-                    SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
-                    while (readerHVAC1.Read())
-                    {
-                        sql = "select * from Geometrys where Id = ";
-                        sql = sql + readerHVAC1["geometryId"].ToString();
-                        SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnectionHVAC);
-                        SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
-                        while (readerHVACGeo.Read())
-                        {
-                            readerHVACGeo["Id"].ToString();
-
-                            Geometry geo = new Geometry();
-                            geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
-                            geo.vertices = readerHVACGeo["vertices"].ToString();
-                            geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
-                            geo.normals = readerHVACGeo["normals"].ToString();
-                            geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
-                            geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
-                            geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
-                            geo.materialIds = readerHVACGeo["materialIds"].ToString();
-
-                            AABB aabb = GeometryFunction.GetGeometryBBox(geo, sTransformer);
-
-                            PointInt pt = aabb.Center();
-                            if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Center())
-                                || Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabb)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(aabb, poly.Center())
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Min)
-                                || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabb.Max))
-                            {
-
-                                Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                                ducts.Add(duct);
-                            }
-                        }
-                    }
-                }
-            }
-            //关闭连接
-            dbConnection.Close();
-
-
+           
             return ducts;
         }
         //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
-        public static List<Duct> GetDuctsCrossFireSide()
+        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
         {
             List<Duct> ducts = new List<Duct>();
 
             return ducts;
         }
 
+        public static List<FireDamper> getFireDamperOfDuct(Duct duct)
+        {
+            List < FireDamper >fireDampers= new List<FireDamper>();
+            return fireDampers;
+        }
 
+
+        public static List<Duct>getAllVerticalDuctConnectedToDuct(Duct duct)
+        {
+            List<Duct> verticalDuct = new List<Duct>();
+            return verticalDuct;
+        }
+
+        public static List<Duct>getAllDuctsInRoom(Room room)
+        {
+            List<Duct> ducts = new List<Duct>();
+            return ducts;
+        }
+
+        public static List<Room>getAllRoomsHaveFireDoor()
+        {
+            List<Room> room = new List<Room>();
+            return room;
+        }
         //10获得构建所在房间的对象  几何 包含 遍历表都查
 
         public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
@@ -1029,8 +909,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));
-                floor.storeyName = (reader["storeyName"].ToString());
-                floor.FloorNumber = Convert.ToInt32(reader["storeyNo"].ToString());
+                floor.storyNo= Convert.ToInt32(reader["storeyNo"].ToString());
                 floor.elevation = Convert.ToDouble(reader["elevation"].ToString());
                 floor.height = Convert.ToDouble(reader["height"].ToString());
                 floors.Add(floor);
@@ -1754,6 +1633,13 @@ namespace HVAC_CheckEngine
             return fans;
         }
 
+        public static Duct getFirstDuctConnectToFan(Fan fan)
+        {
+            Duct duct = new Duct(1);
+            return duct;
+        }
+
+
 
         public static List<FlexibleShortTubes> GetFlexibleShortTubesOfFan(Fan fan)
         {
@@ -2025,7 +1911,7 @@ namespace HVAC_CheckEngine
                     floors.Add(floor);
                     floors.Sort(new Icp());
                     int imatch= floors.FindIndex(a => a.Id == 0);
-                    iStoryNo = floors[imatch + 1].FloorNumber;
+                    iStoryNo = floors[imatch + 1].storyNo.Value;
                 }                                                    
             }
             //关闭连接
@@ -2033,6 +1919,32 @@ namespace HVAC_CheckEngine
             return iStoryNo;
         }
 
+        public static FireCompartment GetFireCompartmentContainAirTerminal(AirTerminal airTerminal)
+        {
+            FireCompartment fireCompartment = new FireCompartment(1);
+            return fireCompartment;
+        }
+
+        public static bool isAirTerminalInFireCompartment(AirTerminal airTerminal, FireCompartment fireCompartment)
+        {
+            return true;
+        }
+
+        public static bool isOuterAirTerminal(AirTerminal airTerminal)
+        {
+            return true;
+        }
+
+        public static List<SmokeCompartment> GetSmokeCompartmentsInRoom(Room room)
+        {
+            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();
+            return smokeCompartments;
+        }
+
+        public static bool isSmokeCompartmentIntersectFireCompartment(SmokeCompartment smokeCompartment,FireCompartment fireCompartment)
+        {
+            return true;
+        }
     }
 
 

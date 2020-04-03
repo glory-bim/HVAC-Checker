@@ -82,7 +82,7 @@ namespace HVAC_CheckEngine.Tests
         {           
             string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
             HVACFunction.m_archXdbPath = strArchPath;
-            Assert.IsTrue(HVACFunction.GetRoomsMoreThan(10.0).Count() > 0);
+            Assert.IsTrue(HVACFunction.GetRoomsMoreThan("",10.0).Count() > 0);
         }
 
         [TestMethod()]

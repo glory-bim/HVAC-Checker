@@ -627,7 +627,7 @@ namespace UnitTestAssitantFunction
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
                 //arrange
 
 
@@ -659,7 +659,7 @@ namespace UnitTestAssitantFunction
                 stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
 
-                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
                 int lowestStoryNo = stairCase.storyNo.Value;
                 List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
 
@@ -696,7 +696,7 @@ namespace UnitTestAssitantFunction
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
                 //arrange
 
 
@@ -728,7 +728,7 @@ namespace UnitTestAssitantFunction
                 stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
 
-                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
                 int lowestStoryNo = stairCase.storyNo.Value;
                 List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
 

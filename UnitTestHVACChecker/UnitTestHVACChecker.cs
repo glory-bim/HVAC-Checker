@@ -198,7 +198,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -304,12 +304,12 @@ namespace UnitTestHVACChecker
                      return Rooms;
                  };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = (string type,double dLength) =>
                   {
                       List<Room> Rooms = new List<Room>();
                       string roomType = context.DataRow["房间类型"].ToString();
                       double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
-                      if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
+                      if (roomType.Contains(type) && corridorLength > dLength )
                       {
 
 
@@ -380,7 +380,7 @@ namespace UnitTestHVACChecker
                     return new List<Room>();
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = (string type,double dLength) =>
                   {
                       return new List<Room>();
                   };
@@ -396,7 +396,7 @@ namespace UnitTestHVACChecker
                 globalData.buildingHeight = 32;
                 globalData.buildingType = "丙类厂房";
                 string comment = "设计满足规范GB50016_2014中第8.5.2条条文规定。";
-                bool isPassCheck = true;
+
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
 
                 //act
@@ -440,7 +440,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -550,12 +550,12 @@ namespace UnitTestHVACChecker
                     return Rooms;
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = (string type,double dLength) =>
                 {
                     List<Room> Rooms = new List<Room>();
                     string roomType = context.DataRow["房间类型"].ToString();
                     double corridorLength = Convert.ToDouble(context.DataRow["走廊长度"].ToString());
-                    if (roomType.Contains("走廊") && (corridorLength > dLength || Math.Abs(corridorLength - dLength) < error))
+                    if (roomType.Contains(type) && corridorLength > dLength )
                     {
 
 
@@ -629,7 +629,7 @@ namespace UnitTestHVACChecker
                     return new List<Room>();
                 };
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = (double dLength) =>
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = (string type,double dLength) =>
                 {
                     return new List<Room>();
                 };
@@ -689,7 +689,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -753,7 +753,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -819,7 +819,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanDouble = FakeHVACFunction.GetRoomsMoreThan;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal;
 
@@ -880,6 +880,166 @@ namespace UnitTestHVACChecker
         private static string ExcelPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据.xlsx";
 
         private static double error = 0.0001;
+    }
+
+    [TestClass]
+    public class GB50016_2014_9_3_11_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.ductSheetName_new = "风管(通过)";
+
+             
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //arrange
+
+
+
+                string comment = "设计满足规范GB50016_2014中第9.3.11条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB550016_2014_9_3_11.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_ducts = workbook.GetSheet(FakeHVACFunction.ductSheetName_new);
+
+                List<Duct> ducts = new List<Duct>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_ducts.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_ducts.GetRow(index);
+                    if (!row.GetCell(sheet_ducts.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long ductId = Convert.ToInt64(row.GetCell(sheet_ducts.getColNumber("ID")).ToString());
+                       
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = ductId;
+                        componentAnnotation.type = "风管";
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此风管未设置防火阀";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此风管未在穿越点附近设置防火阀";
+                        else if (commentType == 3)
+                            componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50016_2014_9_3_11();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.ductSheetName_new = "风管(不通过)";
+
+                FakeHVACFunction.movementJointName_new = "变形缝(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //arrange
+
+
+
+                string comment = "设计不满足规范GB50016_2014中第9.3.11条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB550016_2014_9_3_11.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_ducts = workbook.GetSheet(FakeHVACFunction.ductSheetName_new);
+
+                List<Duct> ducts = new List<Duct>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_ducts.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_ducts.GetRow(index);
+                    if (!row.GetCell(sheet_ducts.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long ductId = Convert.ToInt64(row.GetCell(sheet_ducts.getColNumber("ID")).ToString());
+
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = ductId;
+                        componentAnnotation.type = "风管";
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此风管未设置防火阀";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50016_2014_9_3_11();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
     }
 
     [TestClass]
@@ -1115,9 +1275,13 @@ namespace UnitTestHVACChecker
 
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
                 FakeHVACFunction.roomSheetName_new = "房间(通过测试)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+               
+
+        HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
 
@@ -1179,6 +1343,7 @@ namespace UnitTestHVACChecker
 
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
                 FakeHVACFunction.roomSheetName_new = "房间(通过测试)";
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
@@ -1236,6 +1401,7 @@ namespace UnitTestHVACChecker
 
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
                 FakeHVACFunction.roomSheetName_new = "房间(通过测试)";
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
@@ -1293,6 +1459,7 @@ namespace UnitTestHVACChecker
 
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
                 FakeHVACFunction.roomSheetName_new = "房间(通过不测试)";
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
@@ -1364,11 +1531,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间（通过≤10m）";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
 
@@ -1422,11 +1591,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间（不通过≤10m）";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
 
@@ -1480,11 +1651,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间（通过＞10m）";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
 
@@ -1538,11 +1711,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间（不通过＞10m）";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
 
@@ -1599,9 +1774,11 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
 
@@ -1661,9 +1838,11 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(不通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
 
@@ -1727,9 +1906,11 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
@@ -1739,7 +1920,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllWallsOfRoomRoom = FakeHVACFunction.GetWallsOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllWallsOfRoomRoom = FakeHVACFunction.GetWallsOfRoom_new;
                 //arrange
 
                 string comment = "设计满足规范GB51251_2017中第3.3.11条条文规定。";
@@ -1789,9 +1970,11 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(不通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
 
@@ -1801,7 +1984,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllWallsOfRoomRoom = FakeHVACFunction.GetWallsOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllWallsOfRoomRoom= FakeHVACFunction.GetWallsOfRoom_new;
                 //arrange
 
                 string comment = "设计不满足规范GB51251_2017中第3.3.11条条文规定。";
@@ -1855,11 +2038,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fireDistrictSheetName_new = "防火分区(通过)";
 
                 FakeHVACFunction.fanSheetName_new = "风机(通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDistrictContainAirTerminalAirTerminal = FakeHVACFunction.getFireDistrictContainAirTerminal_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentContainAirTerminalAirTerminal= FakeHVACFunction.getFireDistrictContainAirTerminal_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
 
@@ -1867,7 +2052,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllFans = FakeHVACFunction.GetAllFans_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireDistrictAirTerminalFireDistrict = FakeHVACFunction.isAirTerminalInFireDistrict_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireCompartmentAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
                 //arrange
 
                 string comment = "设计满足规范GB51251_2017中第4.4.1条条文规定。";
@@ -1916,11 +2101,13 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fireDistrictSheetName_new = "防火分区(不通过)";
 
                 FakeHVACFunction.fanSheetName_new = "风机(不通过)";
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDistrictContainAirTerminalAirTerminal = FakeHVACFunction.getFireDistrictContainAirTerminal_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentContainAirTerminalAirTerminal = FakeHVACFunction.getFireDistrictContainAirTerminal_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
 
@@ -1928,7 +2115,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllFans = FakeHVACFunction.GetAllFans_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireDistrictAirTerminalFireDistrict = FakeHVACFunction.isAirTerminalInFireDistrict_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireCompartmentAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
                 //arrange
 
                 string comment = "设计不满足规范GB51251_2017中第4.4.1条条文规定。";
@@ -1981,6 +2168,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(公共建筑>50通过)";
 
 
@@ -2042,6 +2231,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(公共建筑<=50通过)";
 
 
@@ -2103,6 +2294,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(住宅<=100通过)";
 
 
@@ -2163,6 +2356,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(住宅>100通过)";
 
 
@@ -2227,6 +2422,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(公共建筑>50不通过)";
 
 
@@ -2287,6 +2484,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.fanSheetName_new = "风机(住宅>100不通过)";
 
 
@@ -2353,6 +2552,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(通过)";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
@@ -2423,6 +2624,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(不通过)";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
@@ -2493,6 +2696,8 @@ namespace UnitTestHVACChecker
         {
             using (ShimsContext.Create())
             {
+                FakeHVACFunction.inital();
+
                 FakeHVACFunction.roomSheetName_new = "房间(空房间) ";
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
@@ -2558,6 +2763,1386 @@ namespace UnitTestHVACChecker
             }
         }
     }
+
+    [TestClass]
+    public class GB51251_2017_4_5_2_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetInletsOfFanFan = FakeHVACFunction.GetInputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isOuterAirTerminalAirTerminal = FakeHVACFunction.isOuterAirTerminal_new;
+
+
+                //arrange
+
+                string comment = "设计满足规范GB51251_2017中第4.5.2条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_4_5_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if(commentType==1)
+                            componentAnnotation.remark = "此房间补风系统未从室外引入空气";
+                        else if(commentType==2)
+                            componentAnnotation.remark = "此房间补风量小于排烟量的50%";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_4_5_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetInletsOfFanFan = FakeHVACFunction.GetInputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isOuterAirTerminalAirTerminal = FakeHVACFunction.isOuterAirTerminal_new;
+                //arrange
+
+                string comment = "设计不满足规范GB51251_2017中第4.5.2条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_4_5_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此房间补风系统未从室外引入空气";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此房间补风量小于排烟量的50%";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_4_5_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB50067_2014_8_2_1_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                //arrange
+
+                string comment = "设计满足规范GB50067_2014中第8.2.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库未设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库未设置防烟分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                //arrange
+
+                string comment = "设计不满足规范GB50067_2014中第8.2.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库未设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库未设置防烟分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_emptyRoom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(空房间)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                //arrange
+
+                string comment = "设计满足规范GB50067_2014中第8.2.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库未设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库未设置防烟分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB50067_2014_8_2_2_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                //arrange
+
+                string comment = "设计满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库防烟分区大于2000㎡";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库防烟分区跨越防火分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.isSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                //arrange
+
+                string comment = "设计不满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库防烟分区大于2000㎡";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库防烟分区跨越防火分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_emptyRoom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(空房间)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                //arrange
+
+                string comment = "设计满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50067_2014_8_2_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此车库未设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此车库未设置防烟分区";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50067_2014_8_2_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB50157_2013_28_4_2_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan_new;
+
+                //arrange
+
+                globalData.buildingType = "地铁建筑";
+
+                string comment = "设计满足规范GB50157_2013中第28.4.2条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50157_2013_28_4_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此房间没有设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50157_2013_28_4_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan_new;
+
+                //arrange
+                globalData.buildingType = "地铁建筑";
+
+                string comment = "设计不满足规范GB50157_2013中第28.4.2条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50157_2013_28_4_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此房间没有设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50157_2013_28_4_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_emptyRoom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(空房间)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsMoreThanStringDouble = FakeHVACFunction.GetRoomsMoreThan_new;
+
+                //arrange
+
+                globalData.buildingType = "地铁建筑";
+
+                string comment = "设计满足规范GB50157_2013中第28.4.2条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50157_2013_28_4_2.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "此房间没有设置排烟系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50157_2013_28_4_2();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB50490_2009_8_4_19_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                FakeHVACFunction.fanSheetName_new = "风机(通过)";
+
+                FakeHVACFunction.smokeCompartmentSheetName_new = "防烟分区(通过)";
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+                //arrange
+
+                globalData.buildingType = "城市轨道交通建筑";
+
+                string comment = "设计满足规范GB50490_2009中第8.4.19条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50490_2009_8_4_19.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_smokeCompartments = workbook.GetSheet(FakeHVACFunction.smokeCompartmentSheetName_new);
+
+                ISheet sheet_fans = workbook.GetSheet(FakeHVACFunction.fanSheetName_new);
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_smokeCompartments.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_smokeCompartments.GetRow(index);
+                    if (!row.GetCell(sheet_smokeCompartments.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long smokeCompartmentId = Convert.ToInt64(row.GetCell(sheet_smokeCompartments.getColNumber("ID")).ToString());
+                        String type = "防烟分区";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = smokeCompartmentId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
+                            componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_fans.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_fans.GetRow(index);
+                    if (!row.GetCell(sheet_fans.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long fanId = Convert.ToInt64(row.GetCell(sheet_fans.getColNumber("ID")).ToString());
+                        String type = "风机";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = fanId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
+                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50490_2009_8_4_19();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                FakeHVACFunction.fanSheetName_new = "风机(不通过)";
+
+                FakeHVACFunction.smokeCompartmentSheetName_new = "防烟分区(不通过)";
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+                //arrange
+
+                globalData.buildingType = "城市轨道交通建筑";
+
+                string comment = "设计不满足规范GB50490_2009中第8.4.19条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50490_2009_8_4_19.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_smokeCompartments = workbook.GetSheet(FakeHVACFunction.smokeCompartmentSheetName_new);
+
+                ISheet sheet_fans = workbook.GetSheet(FakeHVACFunction.fanSheetName_new);
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_smokeCompartments.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_smokeCompartments.GetRow(index);
+                    if (!row.GetCell(sheet_smokeCompartments.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long smokeCompartmentId = Convert.ToInt64(row.GetCell(sheet_smokeCompartments.getColNumber("ID")).ToString());
+                        String type = "防烟分区";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = smokeCompartmentId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_fans.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_fans.GetRow(index);
+                    if (!row.GetCell(sheet_fans.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long fanId = Convert.ToInt64(row.GetCell(sheet_fans.getColNumber("ID")).ToString());
+                        String type = "风机";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = fanId;
+                        componentAnnotation.type = type;
+                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50490_2009_8_4_19();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_emptyRoom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(空房间)";
+
+                FakeHVACFunction.fanSheetName_new = "风机(通过)";
+
+                FakeHVACFunction.smokeCompartmentSheetName_new = "防烟分区(通过)";
+
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsStringStringDoubleRoomPosition = FakeHVACFunction.GetRoomsMutiArgu_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+                //arrange
+
+                globalData.buildingType = "城市轨道交通建筑";
+
+                string comment = "设计满足规范GB50490_2009中第8.4.19条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50490_2009_8_4_19.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_smokeCompartments = workbook.GetSheet(FakeHVACFunction.smokeCompartmentSheetName_new);
+
+                ISheet sheet_fans = workbook.GetSheet(FakeHVACFunction.fanSheetName_new);
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_smokeCompartments.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_smokeCompartments.GetRow(index);
+                    if (!row.GetCell(sheet_smokeCompartments.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long smokeCompartmentId = Convert.ToInt64(row.GetCell(sheet_smokeCompartments.getColNumber("ID")).ToString());
+                        String type = "防烟分区";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = smokeCompartmentId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
+                        componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_fans.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_fans.GetRow(index);
+                    if (!row.GetCell(sheet_fans.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long fanId = Convert.ToInt64(row.GetCell(sheet_fans.getColNumber("ID")).ToString());
+                        String type = "风机";
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = fanId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
+                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50490_2009_8_4_19();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+
+    [TestClass]
+    public class GB50736_2012_6_3_6_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString= FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+                //arrange
+
+                string comment = "设计满足规范GB50736_2012中第6.3.6条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50736_2012_6_3_6.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "公共卫生间未保持负压";
+                        else if(commentType==3)
+                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                        else if (commentType == 4)
+                            componentAnnotation.remark = "公共浴室没有设置排风系统";
+                        else if (commentType == 5)
+                            componentAnnotation.remark = "公共浴室未保持负压";
+                        else if (commentType == 6)
+                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50736_2012_6_3_6();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+                //arrange
+
+                string comment = "设计不满足规范GB50736_2012中第6.3.6条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50736_2012_6_3_6.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "公共卫生间未保持负压";
+                        else if (commentType == 3)
+                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                        else if (commentType == 4)
+                            componentAnnotation.remark = "公共浴室没有设置排风系统";
+                        else if (commentType == 5)
+                            componentAnnotation.remark = "公共浴室未保持负压";
+                        else if (commentType == 6)
+                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50736_2012_6_3_6();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_emptyRoom_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(空房间)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetWindowsInRoomRoom = FakeHVACFunction.GetWindowsInRoom_new;
+
+                //arrange
+
+                string comment = "设计满足规范GB50736_2012中第6.3.6条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50490_2009_8_4_19.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
+                        if (commentType == 1)
+                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                        else if (commentType == 2)
+                            componentAnnotation.remark = "公共卫生间未保持负压";
+                        else if (commentType == 3)
+                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                        else if (commentType == 4)
+                            componentAnnotation.remark = "公共浴室没有设置排风系统";
+                        else if (commentType == 5)
+                            componentAnnotation.remark = "公共浴室未保持负压";
+                        else if (commentType == 6)
+                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50736_2012_6_3_6();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB50157_2013_28_4_22_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.ductSheetName_new = "风管(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //arrange
+
+
+
+                string comment = "设计满足规范GB50157_2013中第28.4.22条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50157_2013_28_4_22.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_ducts = workbook.GetSheet(FakeHVACFunction.ductSheetName_new);
+
+                List<Duct> ducts = new List<Duct>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_ducts.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_ducts.GetRow(index);
+                    if (!row.GetCell(sheet_ducts.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long ductId = Convert.ToInt64(row.GetCell(sheet_ducts.getColNumber("ID")).ToString());
+
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = ductId;
+                        componentAnnotation.type = "风管";
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
+                        componentAnnotation.remark = "此风管未设置防火阀";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50157_2013_28_4_22();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.ductSheetName_new = "风管(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //arrange
+
+
+
+                string comment = "设计不满足规范GB50157_2013中第28.4.22条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB50157_2013_28_4_22.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_ducts = workbook.GetSheet(FakeHVACFunction.ductSheetName_new);
+
+                List<Duct> ducts = new List<Duct>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_ducts.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_ducts.GetRow(index);
+                    if (!row.GetCell(sheet_ducts.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long ductId = Convert.ToInt64(row.GetCell(sheet_ducts.getColNumber("ID")).ToString());
+
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = ductId;
+                        componentAnnotation.type = "风管";
+                        int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
+                        componentAnnotation.remark = "此风管未设置防火阀";
+                        componentViolations.Add(componentAnnotation);
+                    }
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50157_2013_28_4_22();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
     public static class FakeHVACFunction
     {
         public static string testDataTableName { get; set; }
@@ -2566,12 +4151,32 @@ namespace UnitTestHVACChecker
 
         public static string ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_new.xlsx";
 
+
         public static string roomSheetName_new = "房间";
+
+        public static string smokeCompartmentSheetName_new = "防烟分区";
 
         public static string fireDistrictSheetName_new = "防火分区";
 
         public static string fanSheetName_new = "风机";
 
+        public static string ductSheetName_new = "风管";
+
+        public static string movementJointName_new = "变形缝";
+        public static void inital()
+        {
+            roomSheetName_new = "房间";
+
+            smokeCompartmentSheetName_new = "防烟分区";
+
+            fireDistrictSheetName_new = "防火分区";
+
+            fanSheetName_new = "风机";
+
+            ductSheetName_new = "风管";
+
+            movementJointName_new = "变形缝";
+        }
         public static string systemType { get; set; }
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
         {
@@ -2611,13 +4216,35 @@ namespace UnitTestHVACChecker
             return storyNo;
         }
 
+        public static int getHighestStoryNoOfSmokeCompartment_new(Room smokeCompartment)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet("防烟分区");
+
+            long roomId = smokeCompartment.Id.Value;
+            IRow row = (IRow)sheet_rooms.GetRow((int)roomId);
+
+            int storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
+            return storyNo;
+        }
         public static List<AirTerminal> GetRoomContainAirTerminal_new(Room room)
         {
             string importExcelPath = ExcelPath_new;
             //打开测试数据文件
             IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
             //读取测试数据表
-            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+            ISheet sheet_rooms = null;
+            if (room is SmokeCompartment)
+            {
+                sheet_rooms = workbook.GetSheet(smokeCompartmentSheetName_new);
+            }
+            else
+            {
+                sheet_rooms = workbook.GetSheet(roomSheetName_new);
+            }
             ISheet sheet_airTerminals = workbook.GetSheet("风口");
             ISheet sheet_fans = workbook.GetSheet(fanSheetName_new);
             List<AirTerminal> airTerminals = new List<AirTerminal>();
@@ -2680,6 +4307,23 @@ namespace UnitTestHVACChecker
                 }
             }
             return fans;
+        }
+        public static bool isSmokeCompartmentIntersectFireCompartment_new(SmokeCompartment smokeCompartment, FireCompartment fireCompartment)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+            List<Fan> fans = new List<Fan>();
+            ISheet sheet_fireCompartments = workbook.GetSheet("防火分区");
+           
+            IRow row = (IRow)sheet_fireCompartments.GetRow((int)fireCompartment.Id.Value);
+            string idStrings = row.GetCell(sheet_fireCompartments.getColNumber("相交的防烟分区")).ToString();
+            List<SmokeCompartment> smokeCompartments = getAllSmokeCompartmentsByIdString(idStrings);
+            if (smokeCompartments.findItem(smokeCompartment)!=null)
+                return true;
+            else
+                return false;
         }
 
         public static List<Window> GetWindowsInRoom(Room room)
@@ -2860,6 +4504,7 @@ namespace UnitTestHVACChecker
                     room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
                     room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
                     room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.height = (int)row.GetCell(sheet_rooms.getColNumber("房间高度")).NumericCellValue;
                     rooms.Add(room);
                 }
 
@@ -2867,7 +4512,41 @@ namespace UnitTestHVACChecker
             return rooms;
         }
 
-        public static FireDistrict getFireDistrictContainAirTerminal_new(AirTerminal airTerminal)
+        public static List<Room> GetRoomsMutiArgu_new(string roomType, string roomName, double roomArea, RoomPosition roomPosition)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+            List<Room> rooms = new List<Room>();
+            //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+            for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_rooms.GetRow(index);
+                string type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                string name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                double area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                RoomPosition position = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+
+                if (type.Contains(roomType)&&name.Contains(roomName)&&area>roomArea&&roomPosition==position)
+                {
+                    long Id = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                    Room room = new Room(Id);
+                    room.type = type;
+                    room.name = name;
+                    room.area = area;
+                    room.roomPosition = position;
+                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    rooms.Add(room);
+                }
+
+            }
+            return rooms;
+        }
+
+        public static FireCompartment getFireDistrictContainAirTerminal_new(AirTerminal airTerminal)
         {
             string importExcelPath = ExcelPath_new;
             //打开测试数据文件
@@ -2881,7 +4560,7 @@ namespace UnitTestHVACChecker
             {
                 IRow row = (IRow)sheet_FireDistricts.GetRow(index);
                 long Id = Convert.ToInt64(row.GetCell(sheet_FireDistricts.getColNumber("ID")).ToString());
-                FireDistrict fireDistrict = new FireDistrict(Id);
+                FireCompartment fireDistrict = new FireCompartment(Id);
                 string idString = row.GetCell(sheet_FireDistricts.getColNumber("包含的风口")).ToString();
 
                 List<AirTerminal> airTerminals = getAllTerminalsByIdString(idString);
@@ -2891,7 +4570,22 @@ namespace UnitTestHVACChecker
             return null;
         }
 
-        public static bool isAirTerminalInFireDistrict_new(AirTerminal airTerminal, FireDistrict fireDistrict)
+        public static bool isOuterAirTerminal_new(AirTerminal airTerminal)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_airTerminals = workbook.GetSheet("风口");
+
+            //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+
+            IRow row = (IRow)sheet_airTerminals.GetRow((int)airTerminal.Id.Value);
+            bool isOuterAirTerminal= row.GetCell(sheet_airTerminals.getColNumber("是否为室外风口")).BooleanCellValue;
+            return isOuterAirTerminal;   
+        }
+
+        public static bool isAirTerminalInFireDistrict_new(AirTerminal airTerminal, FireCompartment fireDistrict)
         {
             string importExcelPath = ExcelPath_new;
             //打开测试数据文件
@@ -3064,6 +4758,20 @@ namespace UnitTestHVACChecker
 
             return floors;
         }
+        public static List<SmokeCompartment> GetSmokeCompartmentsInRoom_new(Room room)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            IRow row = (IRow)sheet_rooms.GetRow((int)room.Id.Value);
+            string IdString = row.GetCell(sheet_rooms.getColNumber("包含的防烟分区")).ToString();
+
+            List<SmokeCompartment> smokeCompartments = getAllSmokeCompartmentsByIdString(IdString);
+            return smokeCompartments;
+        }
 
         public static List<Fan> GetAllFans_new()
         {
@@ -3085,7 +4793,32 @@ namespace UnitTestHVACChecker
             return fans;
         }
 
-        public static List<Room> GetRoomsMoreThan(double dLength)
+        public static List<FireCompartment> GetFireCompartment_new(string sName)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_fireCompartments = workbook.GetSheet("防火分区");
+
+            List<FireCompartment> fireCompartments = new List<FireCompartment>();
+            //依次遍历所有楼层
+            for (int index = 1; index <= sheet_fireCompartments.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_fireCompartments.GetRow(index);
+                string name = row.GetCell(sheet_fireCompartments.getColNumber("名称")).ToString();
+                if(name.Contains(sName))
+                {
+                    FireCompartment fireCompartment = new FireCompartment(index);
+                    fireCompartment.storyNo= (int)row.GetCell(sheet_fireCompartments.getColNumber("楼层编号")).NumericCellValue;
+                    fireCompartments.Add(fireCompartment);
+                }
+            }
+
+            return fireCompartments;
+        }
+
+        public static List<Room> GetRoomsMoreThan(string type,double dLength)
         {
             string importExcelPath = ExcelPath;
             //打开测试数据文件
@@ -3098,10 +4831,10 @@ namespace UnitTestHVACChecker
             {
                 IRow row = (IRow)sheet.GetRow(index);
                 string roomType = row.GetCell(1).StringCellValue;
-                if (roomType.Contains("走廊"))
+                if (roomType.Contains(type))
                 {
                     double corridorLength = double.Parse(row.GetCell(11).ToString());
-                    if (corridorLength >dLength||Math.Abs(corridorLength-dLength)<error)
+                    if (corridorLength >dLength)
                     {
                         long Id = Convert.ToInt64(row.GetCell(0).ToString());
                         Room room = new Room(Id);
@@ -3117,6 +4850,40 @@ namespace UnitTestHVACChecker
             }
             return Rooms;
         }
+
+
+        public static List<Room> GetRoomsMoreThan_new(string type, double dLength)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            List<Room> rooms = new List<Room>();
+            //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+            for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_rooms.GetRow(index);
+                string roomType = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
+                double corridorLength = double.Parse(row.GetCell(sheet_rooms.getColNumber("房间长度")).ToString());
+                if (roomType.Contains(type)&& corridorLength > dLength)
+                {
+                    long Id = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                    Room room = new Room(Id);
+                    room.type = roomType;
+                    room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    rooms.Add(room);
+                }
+            }
+            return rooms;
+        }
+            
+
 
         private static Room getRoomById(long id)
         {
@@ -3144,10 +4911,12 @@ namespace UnitTestHVACChecker
             //打开测试数据文件
             IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
             //读取测试数据表
-            ISheet sheet_rooms = workbook.GetSheet(fanSheetName_new);
-            IRow row = (IRow)sheet_rooms.GetRow((int)id);
+            ISheet sheet_fans = workbook.GetSheet(fanSheetName_new);
+            IRow row = (IRow)sheet_fans.GetRow((int)id);
 
             Fan fan = new Fan(id);
+
+            fan.m_flowRate= row.GetCell(sheet_fans.getColNumber("风量")).NumericCellValue;
 
             return fan;
         }
@@ -3194,6 +4963,7 @@ namespace UnitTestHVACChecker
                 airTerminal.systemType= row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
                 airTerminal.storyNo= (int)row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue;
                 airTerminal.elevation= row.GetCell(sheet_airTerminals.getColNumber("风口标高")).NumericCellValue;
+                airTerminal.airFlowRate = row.GetCell(sheet_airTerminals.getColNumber("风量")).NumericCellValue;
                 airTerminals.Add(airTerminal);
             }
             return airTerminals;
@@ -3210,6 +4980,30 @@ namespace UnitTestHVACChecker
             }
             return fans;
         }
+
+
+        private static List<SmokeCompartment> getAllSmokeCompartmentsByIdString(string IdString)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_smokeCompartments = workbook.GetSheet(smokeCompartmentSheetName_new);
+
+            List<long> idList = getIdList(IdString);
+            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();
+            foreach (long id in idList)
+            {
+                IRow row = (IRow)sheet_smokeCompartments.GetRow((int)id);
+                SmokeCompartment smokeCompartment = new SmokeCompartment(id);
+                smokeCompartment.area= row.GetCell(sheet_smokeCompartments.getColNumber("面积")).NumericCellValue;
+                smokeCompartment.storyNo = (int)row.GetCell(sheet_smokeCompartments.getColNumber("楼层编号")).NumericCellValue;
+
+                smokeCompartments.Add(smokeCompartment);
+            }
+            return smokeCompartments;
+        }
+       
 
 
         private static List<Door> getAllDoorsByIdString(string IdString)
@@ -3296,6 +5090,56 @@ namespace UnitTestHVACChecker
             return floors;
         }
 
+
+        public static Dictionary<Duct, List<HVACFunction.Point>> getAllDuctsByIdString_dictionary(string idString)
+        {
+            List<long> idList = getIdList(idString);
+           
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_ducts = workbook.GetSheet(ductSheetName_new);
+
+            Dictionary<Duct, List<HVACFunction.Point>> ducts = new Dictionary<Duct, List<HVACFunction.Point>>();
+
+            foreach (long id in idList)
+            {
+                Duct duct = new Duct(id);
+                IRow row = (IRow)sheet_ducts.GetRow((int)id);
+                duct.systemType = row.GetCell(sheet_ducts.getColNumber("风管类型")).StringCellValue;
+                List<HVACFunction.Point> points = new List<HVACFunction.Point>();
+                points.Add(new HVACFunction.Point());
+                ducts.Add(duct, points);
+            }
+            return ducts;
+        }
+
+
+        public static List<Duct> getAllDuctsByIdString_List(string idString)
+        {
+            List<long> idList = getIdList(idString);
+
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_ducts = workbook.GetSheet(ductSheetName_new);
+
+            List<Duct> ducts = new List<Duct>();
+
+            foreach (long id in idList)
+            {
+                Duct duct = new Duct(id);
+                IRow row = (IRow)sheet_ducts.GetRow((int)id);
+                duct.systemType = row.GetCell(sheet_ducts.getColNumber("风管类型")).StringCellValue;
+                ducts.Add(duct);
+            }
+            return ducts;
+        }
+
         private static List<long> getIdList(string IdString)
         {
             List<long> idList = new List<long>();
@@ -3338,8 +5182,171 @@ namespace UnitTestHVACChecker
             }
             return -1;
         }
-        
-       
+
+        public static List<Duct> GetDuctsCrossSpace_new(Room room)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            List<Duct> ducts = new List<Duct>();
+
+
+            IRow row = (IRow)sheet_rooms.GetRow((int)room.Id.Value);
+            string idString = row.GetCell(sheet_rooms.getColNumber("穿越的风管"))?.ToString();
+            ducts = getAllDuctsByIdString_List(idString);
+
+
+            return ducts;
+        }
+
+        public static List<Duct> GetDuctsCrossFireDistrict_new(FireCompartment fireDistrict)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_fireCompartments = workbook.GetSheet("防火分区");
+
+            List<Duct> ducts = new List<Duct>();
+
+
+            IRow row = (IRow)sheet_fireCompartments.GetRow((int)fireDistrict.Id.Value);
+            string idString = row.GetCell(sheet_fireCompartments.getColNumber("穿越的风管"))?.ToString();
+            ducts = getAllDuctsByIdString_List(idString);
+
+            return ducts;
+        }
+
+        public static List<Duct> getAllDuctsInRoom_new(Room room)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            List<Duct> ducts = new List<Duct>();
+
+            IRow row = (IRow)sheet_rooms.GetRow((int)room.Id.Value);
+            string idString = row.GetCell(sheet_rooms.getColNumber("包含的风管"))?.ToString();
+            ducts = getAllDuctsByIdString_List(idString);
+            return ducts;
+        }
+
+        public static List<FireDamper> getAllFireDamperByIdString(string idString)
+        {
+            List<long> idList = getIdList(idString);
+
+            string importExcelPath = ExcelPath_new;
+            //打开数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取数据表格
+
+            ISheet sheet_fireDampers = workbook.GetSheet("防火阀");
+
+            List<FireDamper> fireDampers = new List<FireDamper>();
+
+            foreach (long id in idList)
+            {
+                FireDamper firedamper = new FireDamper(id);
+                fireDampers.Add(firedamper);
+            }
+            return fireDampers;
+        }
+
+        public static List<Duct> getAllVerticalDuctConnectedToDuct_new(Duct duct)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_ducts = workbook.GetSheet(ductSheetName_new);
+
+            List<Duct> ducts = new List<Duct>();
+
+            IRow row = (IRow)sheet_ducts.GetRow((int)duct.Id.Value);
+            string idString = row.GetCell(sheet_ducts.getColNumber("所连接的立管"))?.ToString();
+            ducts = getAllDuctsByIdString_List(idString);
+            return ducts;
+        }
+
+        public static List<Duct> GetDuctsCrossMovementJointAndFireSide_new()
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_movementJoint = workbook.GetSheet(movementJointName_new );
+
+            List<Duct> ducts = new List<Duct>();
+
+            for (int index = 1; index <= sheet_movementJoint.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_movementJoint.GetRow(index);
+                string idString = row.GetCell(sheet_movementJoint.getColNumber("穿越的风管"))?.ToString();
+                ducts.addDuctsToList(getAllDuctsByIdString_List(idString));
+            }
+            return ducts;
+        }
+
+        public static List<FireDamper> getFireDamperOfDuct_new(Duct duct)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_ducts = workbook.GetSheet(ductSheetName_new);
+
+            List<FireDamper> fireDampers = new List<FireDamper>();
+
+            IRow row = (IRow)sheet_ducts.GetRow((int)duct.Id.Value);
+            string idString = row.GetCell(sheet_ducts.getColNumber("连接的防火阀"))?.ToString();
+            fireDampers = getAllFireDamperByIdString(idString);
+            return fireDampers;
+        }
+
+        public static bool isElementNearPoint_new(Element element,HVACFunction.Point point)
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_fireDampers = workbook.GetSheet("防火阀");
+
+            IRow row = (IRow)sheet_fireDampers.GetRow((int)element.Id.Value);
+            return row.GetCell(sheet_fireDampers.getColNumber("是否靠近穿越点")).BooleanCellValue;
+        }
+
+        public static List<Room> getAllRoomsHaveFireDoor_new()
+        {
+            string importExcelPath = ExcelPath_new;
+            //打开测试数据文件
+            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+            //读取测试数据表
+            ISheet sheet_rooms = workbook.GetSheet(roomSheetName_new);
+
+            List<Room> rooms = new List<Room>();
+            for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+            {
+                IRow row = (IRow)sheet_rooms.GetRow(index);
+                if(row.GetCell(sheet_rooms.getColNumber("包含防火门")).BooleanCellValue)
+                {
+                    Room room = new Room(index);
+                    room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue; ;
+                    room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
+                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    rooms.Add(room);
+                }
+               
+            }
+            return rooms;
+        }
 
         private static double error = 0.0001;
     }

@@ -173,10 +173,31 @@ namespace HVAC_CheckEngine
             return commonItems;
         }
 
+       
+        
+       
+        public static bool isSmokeCompartmentSpanFireCompartment(SmokeCompartment smokeCompartment)
+        {
+            //获得所有防火分区对象的集合
+            List<FireCompartment> fireCompartments = HVACFunction.GetFireCompartment("");
+            //从防火分区对象集合中筛选出与防烟分区同层的所有防火分区
+            int storyNo = smokeCompartment.storyNo.Value;
+            int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(smokeCompartment);
+            fireCompartments = filtrateElementsBetweenFloor_aAndFloor_b(fireCompartments, storyNo, highestStoryNo);
+            //依次判断防烟分区是否与防火分区相交
+            foreach(FireCompartment fireCompartment in fireCompartments)
+            {
+                //如果相交则返回true
+                if (HVACFunction.isSmokeCompartmentIntersectFireCompartment(smokeCompartment, fireCompartment))
+                    return true;
+            }
+            //如果都不相交则返回false
+            return false;
+        }
 
         public static T findItem<T>(this List<T> items, T aimItem) where T : Element
         {
-            if (items == null)
+            if (items == null|| aimItem == null)
                 throw new ArgumentException();
 
             Element aimElement = aimItem as Element;
@@ -268,6 +289,8 @@ namespace HVAC_CheckEngine
 
         public static List<AirTerminal> filtrateAirTerminalOfSomeSystem(List<AirTerminal> airTerminals, string system)
         {
+            if (airTerminals == null || system == null)
+                throw new ArgumentException();
             List<AirTerminal> aimAirTerminals = new List<AirTerminal>();
             foreach (AirTerminal airTerminal in airTerminals)
             {
@@ -279,6 +302,8 @@ namespace HVAC_CheckEngine
 
         public static Window findWindowNoSmallerThanSomeArea(this List<Window> windows, double area)
         {
+            if (windows == null)
+                throw new ArgumentException();
             foreach (Window window in windows)
             {
                 if (window.area >= area)
@@ -289,6 +314,8 @@ namespace HVAC_CheckEngine
 
         public static List<Fan> getAllFansConnectToAirTerminals(List<AirTerminal> airTerminals)
         {
+            if (airTerminals == null)
+                throw new ArgumentException();
            Dictionary<long,Fan> fans = new Dictionary<long, Fan>();
             foreach (AirTerminal airTerminal in airTerminals)
             {
@@ -305,6 +332,8 @@ namespace HVAC_CheckEngine
 
         public static double calculateTotalAreaOfWindows(List<Window> windows)
         {
+            if (windows == null)
+                throw new ArgumentException();
             double sum = 0;
             foreach (Window window in windows)
             {
@@ -312,6 +341,112 @@ namespace HVAC_CheckEngine
             }
             return sum;
         }
+
+        public static double calculateSmokeExhaustFlowOfSmokeCompartment(SmokeCompartment smokeCompartment)
+        {
+            if (smokeCompartment == null)
+                throw new ArgumentException();
+            List<AirTerminal> smokeExhaustAirTerminals = HVACFunction.GetRoomContainAirTerminal(smokeCompartment);
+            return getTotalAirVolumeOfAirTerminals(smokeExhaustAirTerminals);
+        }
+
+        public static double calculateExhaustFlowOfRoom(Room room)
+        {
+            if (room == null)
+                throw new ArgumentException();
+            List<AirTerminal> exhaustAirTerminals = HVACFunction.GetRoomContainAirTerminal(room);
+            exhaustAirTerminals = filtrateAirTerminalOfSomeSystem(exhaustAirTerminals,"排风");
+            return getTotalAirVolumeOfAirTerminals(exhaustAirTerminals);
+        }
+
+        public static double calculateSupplyFlowOfRoom(Room room)
+        {
+            if (room == null)
+                throw new ArgumentException();
+            List<AirTerminal>airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
+            List<AirTerminal> supplyAirTerminals = filtrateAirTerminalOfSomeSystem(airTerminals, "送风");
+            supplyAirTerminals.AddRange(filtrateAirTerminalOfSomeSystem(airTerminals, "新风"));
+            return getTotalAirVolumeOfAirTerminals(supplyAirTerminals);
+        }
+
+        public static List<Duct> addDuctsToList(this List<Duct> firstList, List<Duct> secondList)
+        {
+            if (firstList == null && secondList == null)
+                throw new ArgumentException();
+
+            foreach(Duct duct in secondList)
+            {
+                if(firstList.findItem(duct) == null)
+                {
+                    firstList.Add(duct);
+                }
+            }
+            return firstList;
+        }
+
+        public static List<Duct> filterSomeSystemTypeDuctsFromList(this List<Duct> list, List<string> systemTypes)
+        {
+            if (list == null || systemTypes == null)
+                throw new ArgumentException();
+
+            List<Duct> aimList = new List<Duct>();
+            foreach (Duct duct in list)
+            {
+                foreach(string systemType in systemTypes)
+                {
+                    if (duct.systemType.Contains(systemType))
+                    {
+                        aimList.Add(duct);
+                        break;
+                    }
+                }
+            }
+            return aimList;
+        }
+
+        public static List<Duct>filterSameDuctsInTwoList(List<Duct>firstList,List<Duct>secondList)
+        {
+            List<Duct> aimDucts = new List<Duct>();
+            foreach(Duct duct in firstList)
+            {
+                if(secondList.findItem(duct)!=null)
+                {
+                    aimDucts.Add(duct);
+                }
+            }
+            return aimDucts;
+        }
+
+        public static List<Duct> removeDuctsFromList(this List<Duct> list,List<Duct>ducts)
+        {
+            if (list == null || ducts == null)
+                throw new ArgumentException();
+            foreach (Duct duct in ducts)
+            {
+                Duct needRemovDuct = list.findItem(duct);
+                if (needRemovDuct != null)
+                {
+                    list.Remove(needRemovDuct);
+                }
+            }
+            return list;
+        }
+
+
+        public static SmokeCompartment getMaxAreaSmokeCompartment(List<SmokeCompartment>smokeCompartments)
+        {
+            if (smokeCompartments == null||smokeCompartments.Count==0)
+                throw new ArgumentException();
+                
+            SmokeCompartment aimSmokeCompartment = smokeCompartments[0];
+            foreach(SmokeCompartment smokeCompartment in smokeCompartments)
+            {
+                if (aimSmokeCompartment.area.Value < smokeCompartment.area.Value)
+                    aimSmokeCompartment = smokeCompartment;
+            }
+            return aimSmokeCompartment;
+        }
+
         private static bool isOvergroundRegion(Region region)
         {
             if (region == null)
@@ -372,9 +507,36 @@ namespace HVAC_CheckEngine
             public enum AreaType{ LargerThan,SmallerThan,LargerAndEqualThan,SmallerAndEqualThan}
         }
 
+        public static List<Room>exceptRoomNoSmallerThanArea(this List<Room>rooms,double area)
+        {
+            List<Room> aimRooms = new List<Room>();
+            aimRooms.AddRange(rooms);
+
+            foreach(Room room in rooms)
+            {
+                if (room.area.Value >= area)
+                    aimRooms.Remove(room);
+            }
+            return aimRooms;
+        }
+
+        public static List<Room> exceptSomeTypeRooms(this List<Room> rooms, string type)
+        {
+            List<Room> aimRooms = new List<Room>();
+            aimRooms.AddRange(rooms);
+
+            foreach (Room room in rooms)
+            {
+                if (room.type.Equals(type))
+                    aimRooms.Remove(room);
+            }
+            return aimRooms;
+        }
 
         public static List<Room>exceptSomeRooms(this List<Room> rooms,List<exceptRoomCondition> conditions)
         {
+            if (rooms == null || conditions == null)
+                throw new ArgumentException();
             List<Room> aimRooms = new List<Room>();
             aimRooms.AddRange(rooms);
             foreach(Room room in rooms)
@@ -517,6 +679,8 @@ namespace HVAC_CheckEngine
 
         static public List<Fan> getFansOfSomeSyetemType(string systemType)
         {
+            if (systemType == null)
+                throw new ArgumentException();
             //获得所有风机
             List<Fan> fans = HVACFunction.GetAllFans();
             List<Fan> aimFans = new List<Fan>();
@@ -540,6 +704,8 @@ namespace HVAC_CheckEngine
 
         static public double getAffordHeightOfSomkeFan(Fan smokeFan)
         {
+            if (smokeFan == null)
+                throw new ArgumentException();
             //获得风机连接的所有排风口
             List<AirTerminal> airTerminals = HVACFunction.GetInletsOfFan(smokeFan);
             double maxHeight = double.MinValue;
@@ -631,7 +797,8 @@ namespace HVAC_CheckEngine
 
         public static Dictionary<AirTerminal, List<Floor>> getFloorDivisionOfAirTerminalsBottomUp(List<Floor> floors, List<AirTerminal> airTerminals)
         {
-
+            if (floors == null || airTerminals == null)
+                throw new ArgumentException();
             //对楼层对象进行排序
             floors.Sort((x, y) => x.storyNo.Value.CompareTo(y.storyNo.Value));
             return getFloorDivisionOfAirTerminals(floors, airTerminals);
@@ -640,7 +807,8 @@ namespace HVAC_CheckEngine
 
         public static Dictionary<AirTerminal, List<Floor>> getFloorDivisionOfAirTerminalsTopToBottom(List<Floor> floors, List<AirTerminal> airTerminals)
         {
-
+            if (floors == null || airTerminals == null)
+                throw new ArgumentException();
             //对楼层对象进行排序
             floors.Sort((x, y) => y.storyNo.Value.CompareTo(x.storyNo.Value));
             return getFloorDivisionOfAirTerminals(floors, airTerminals);
@@ -649,6 +817,8 @@ namespace HVAC_CheckEngine
 
         private static Dictionary<AirTerminal, List<Floor>> getFloorDivisionOfAirTerminals(List<Floor> floors, List<AirTerminal> airTerminals)
         {
+            if (floors == null || airTerminals == null)
+                throw new ArgumentException();
             Dictionary<AirTerminal, List<Floor>> FloorDivisionOfAirTerminals = new Dictionary<AirTerminal, List<Floor>>();
             //从最低楼层开始
             AirTerminal aimAirTerminal = null;
@@ -701,6 +871,8 @@ namespace HVAC_CheckEngine
 
         public static double getAffordHeightOfFanByFloorDivision(Fan fan, Dictionary<AirTerminal, List<Floor>> floorDivision)
         {
+            if (fan == null || floorDivision == null)
+                throw new ArgumentException();
             //找到风机的所有加压送风口
             List<AirTerminal> airTerminalsConnectToFan = HVACFunction.GetOutletsOfFan(fan);
             if (airTerminalsConnectToFan.Count == 0)
@@ -729,9 +901,12 @@ namespace HVAC_CheckEngine
         }
 
 
-        static private T1 findElementFromDictionary<T1, T2>(this Dictionary<T1, List<T2>> dictionary, T1 element) where T1 : Element
-                                                                                              where T2 : Element
+        static public T1 findElementFromDictionary<T1, T2>(this Dictionary<T1, List<T2>> dictionary, T1 element) where T1 : Element
+                                                                                             
         {
+            if (dictionary == null || element == null)
+                throw new ArgumentException();
+
             foreach (KeyValuePair<T1, List<T2>> pair in dictionary)
             {
                 if (pair.Key.Id.Value.Equals(element.Id.Value))
@@ -739,10 +914,12 @@ namespace HVAC_CheckEngine
             }
             return null;
         }
-
-
+       
         private static List<AirTerminal> getAirTerminalsInFloor(Floor floor, List<AirTerminal> airTerminals)
         {
+            if (floor == null || airTerminals == null)
+                throw new ArgumentException();
+
             List<AirTerminal> aimAirTerminals = new List<AirTerminal>();
             int storyNo = floor.storyNo.Value;
             foreach (AirTerminal airTerminal in airTerminals)
@@ -756,6 +933,9 @@ namespace HVAC_CheckEngine
         public static List<T2> getValueAccordingToKey<T1, T2>(this Dictionary<T1, List<T2>> dictionary, T1 key) where T1 : Element
                                                                                                                where T2 : Element
         {
+            if (dictionary == null || key == null)
+                throw new ArgumentException();
+
             foreach (KeyValuePair<T1, List<T2>> pair in dictionary)
             {
                 if (pair.Key.Id == key.Id)
@@ -778,6 +958,8 @@ namespace HVAC_CheckEngine
 
         public static List<Window> getFixOuterWindowsOfRoom(Room room)
         {
+            if (room == null)
+                throw new ArgumentException();
             List<Window> windows = HVACFunction.GetWindowsInRoom(room);
             List<Window> aimWindows = new List<Window>();
             foreach (Window window in windows)
@@ -792,7 +974,9 @@ namespace HVAC_CheckEngine
 
         public static List<Wall>getOuterWallOfRoom(Room room)
         {
-            List<Wall> walls = HVACFunction.getAllWallsOfRoom(room);
+            if (room == null)
+                throw new ArgumentException();
+            List<Wall> walls = HVACFunction.GetAllWallsOfRoom(room);
             List<Wall> outerWalls = new List<Wall>();
             foreach(Wall wall in walls)
             {
@@ -804,8 +988,40 @@ namespace HVAC_CheckEngine
             return outerWalls;
         }
 
+        public static bool isAllFanInletsAreOuterAirTerminals(Fan fan)
+        {
+            if (fan == null)
+                throw new ArgumentException();
+            //获得补风机的取风风口
+            List<AirTerminal> inputAirTerminalOfFan = HVACFunction.GetInletsOfFan(fan);
+            //依次遍历每一个取风口
+            foreach (AirTerminal airTerminal in inputAirTerminalOfFan)
+            {
+                //如果取风风口不为室外风口
+                if (!HVACFunction.isOuterAirTerminal(airTerminal))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static double getTotalAirVolumeOfAirTerminals(List<AirTerminal>airTerminals)
+        {
+            if (airTerminals == null)
+                throw new ArgumentException();
+            double TotalAirVolume = 0;
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                TotalAirVolume += airTerminal.airFlowRate.Value;
+            }
+            return TotalAirVolume;
+        }
+
        public static bool isAllAirTerminalInSameFloor(List<AirTerminal>airTerminals)
         {
+            if (airTerminals == null)
+                throw new ArgumentException();
             int storyNo = 0;
             if (airTerminals.Count > 0)
                 storyNo = airTerminals[0].storyNo.Value;
