@@ -1085,12 +1085,26 @@ namespace HVAC_CheckEngine
             return result;
         }
 
-
-        //    燃油或燃气锅炉房应设置自然通风或机械通风设施。燃气锅炉房应选用防爆型的事故排风机。当采取机械通风时，机械通风设施应设置导除静电的接地装置，通风量应符合下列规定：
+        //建筑设计防火规范GB50016-2014
+        //9.3.16燃油或燃气锅炉房应设置自然通风或机械通风设施。燃气锅炉房应选用防爆型的事故排风机。当采取机械通风时，机械通风设施应设置导除静电的接地装置，通风量应符合下列规定：
         //1 燃油锅炉房的正常通风量应按换气次数不少于3次／h确定，事故排风量应按换气次数不少于6次／h确定；
         //2 燃气锅炉房的正常通风量应按换气次数不少于6次／h确定，事故排风量应按换气次数不少于12次／h确定。  有可开启外窗 机械通风 加高档风量参数
+    
+        public static BimReview GB50016_2014_9_3_16()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50016_2014", "9.3.16");
+            string strOil = "燃油";
+            string strGas = "燃气";
+            List<Room> roomOil = HVACFunction.GetRoomsContainingString(strOil);
+            List<Room> roomGas = HVACFunction.GetRoomsContainingString(strGas);
+            // List<Room> UnionRooms = roomOil.Concat(roomGas).ToList<Room>();
 
+            CheckRoomVentilationRate(roomOil, ref result, 3);
+            CheckRoomVentilationRate(roomGas, ref result, 6);
 
+            return result;
+        }
         private static void CheckRoomVentilationRate(List<Room> rooms, ref BimReview result, int iNum)
         {
             foreach (Room room in rooms)
@@ -1132,26 +1146,11 @@ namespace HVAC_CheckEngine
             }
 
         }
-        public static BimReview GB50016_2014_9_3_16()
-        {
-            //初始化审查结果
-            BimReview result = new BimReview("GB50016_2014", "9.3.16");
-            string strOil = "燃油";
-            string strGas = "燃气";
-            List<Room> roomOil = HVACFunction.GetRoomsContainingString(strOil);
-            List<Room> roomGas = HVACFunction.GetRoomsContainingString(strGas);
-            // List<Room> UnionRooms = roomOil.Concat(roomGas).ToList<Room>();
-
-            CheckRoomVentilationRate(roomOil, ref result, 3);
-            CheckRoomVentilationRate(roomGas, ref result, 6);
-
-            return result;
-        }
 
 
         //前室采用自然通风方式时，独立前室、消防电梯前室可开启外窗或开口的面积不应小于2.0m2，
         //共用前室、合用前室不应小于3．0m2。
-           
+
         //如果审查通过
         //则在审查结果批注中注明审查通过相关内容
         //如果审查不通过
