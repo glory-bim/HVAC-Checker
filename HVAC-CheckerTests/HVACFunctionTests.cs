@@ -129,7 +129,7 @@ namespace HVAC_CheckEngine.Tests
             string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             AirTerminal airterminal = new AirTerminal(1245195412197867521);
-            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id == 362156);
+            Assert.IsTrue(HVACFunction.GetRoomOfAirterminal(airterminal).Id == 362159);
         }
 
         [TestMethod()]
@@ -226,6 +226,12 @@ namespace HVAC_CheckEngine.Tests
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             List<Duct> ducts = HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
             Assert.IsTrue(ducts.Count() > 0);
+        }
+
+        [TestMethod()]
+        public void isBranchHaveDamperTest()
+        {
+            Assert.Fail();
         }
     }
 }

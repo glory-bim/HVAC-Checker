@@ -98,6 +98,12 @@
     <Compile Include="BimReview.cs" />
     <Compile Include="door.cs" />
     <Compile Include="Duct.cs" />
+    <Compile Include="Duct3T.cs" />
+    <Compile Include="Duct4T.cs" />
+    <Compile Include="DuctDamper.cs" />
+    <Compile Include="DuctElbow.cs" />
+    <Compile Include="DuctReducer.cs" />
+    <Compile Include="DuctSoft.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
     <Compile Include="FireCompartment.cs" />

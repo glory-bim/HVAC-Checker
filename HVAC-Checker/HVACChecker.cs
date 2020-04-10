@@ -881,7 +881,7 @@ namespace HVAC_CheckEngine
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach(Fan fan in fans)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
@@ -904,7 +904,7 @@ namespace HVAC_CheckEngine
             List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
             foreach (AssemblyAHU aHU in aHUs)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(aHU);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(aHU);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
@@ -1511,7 +1511,7 @@ namespace HVAC_CheckEngine
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach (Fan fan in fans)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
@@ -1532,7 +1532,7 @@ namespace HVAC_CheckEngine
             List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
             foreach (AssemblyAHU fan in aHUs)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
@@ -1614,7 +1614,7 @@ namespace HVAC_CheckEngine
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach (Fan fan in fans)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfFan(fan);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))
@@ -1635,7 +1635,7 @@ namespace HVAC_CheckEngine
             List<AssemblyAHU> aHUs = HVACFunction.GetAllAssemblyAHUs();
             foreach (AssemblyAHU fan in aHUs)
             {
-                List<FlexibleShortTubes> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
+                List<FlexibleShortTube> flexiTubes = HVACFunction.GetFlexibleShortTubesOfAssemblyAHUs(fan);
                 if (flexiTubes.Count() > 2)
                 {
                     if ((flexiTubes[0].m_length > 150 && flexiTubes[0].m_length < 300) && (flexiTubes[1].m_length > 150 && flexiTubes[1].m_length < 300))

@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class FlexibleShortTube:Element
-    {
+   
 
-        public FlexibleShortTube(long id) : base(id)
+    public class Duct3T : Element
+    {
+        public Duct3T(long id) : base(id)
         {
 
         }
+        public double? airVelocity { get; set; } = null;
 
-        public double? m_length { get; set; } = null;
     }
 }
