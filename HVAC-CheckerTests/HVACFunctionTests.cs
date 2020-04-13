@@ -229,7 +229,7 @@ namespace HVAC_CheckEngine.Tests
         }
 
         [TestMethod()]
-        public void isBranchHaveDamperTest()
+        public void GetBranchDamperDuctsTest()
         {
             Assert.Fail();
         }

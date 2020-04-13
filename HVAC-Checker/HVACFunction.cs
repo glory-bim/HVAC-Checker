@@ -170,13 +170,14 @@ namespace HVAC_CheckEngine
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
         {
             List<AirTerminal> airterminals = new List<AirTerminal>();
-
+            string strDbName = "/建筑.GDB";
+            string path = GetCurrentPath(strDbName);
             //如果不存在，则创建一个空的数据库,
-            if (!System.IO.File.Exists(m_archXdbPath))
+            if (!System.IO.File.Exists(path))
                 return airterminals;
 
             //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            string connectionstr = @"data source =" + path;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces Where Id = ";
@@ -186,9 +187,24 @@ namespace HVAC_CheckEngine
 
             if (reader.Read())
             {
-                AABB aabbRoom = GetAABB(reader, dbConnection);
+                room.name = reader["name"].ToString();
+                room.boundaryLoops = reader["boundaryLoops"].ToString();
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
+
+                strDbName = "/机电.GDB";
+                path = GetCurrentPath(strDbName);
                 //创建一个连接
-                connectionstr = @"data source =" + m_hvacXdbPath;
+                connectionstr = @"data source =" + path;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
                 sql = "select * from AirTerminals";
@@ -196,60 +212,69 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
                 {
-                    AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                    airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                    airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-                    AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
-
-
-
-                    if (aabbRoom.IsAABBContainsAABB3D(aabbAirTerminal))
+                    if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
                     {
-                        airterminals.Add(airTerminal);
-                    }
-                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
-                    {
-                        string strVector = readerAirTerminals["NormalVector"].ToString();
-                        int index = strVector.IndexOf(":");
-                        int index_s = strVector.LastIndexOf(",\"Y");
-                        string strX = strVector.Substring(index + 1, index_s - index - 1);
+                        AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                        airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                        airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                        AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
-                        double dX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double dY = Convert.ToDouble(strY);
 
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double dZ = Convert.ToDouble(strY);
-                        List<double> listVector = new List<double>();
-                        listVector.Add(dX);
-                        listVector.Add(dY);
-                        listVector.Add(dZ);
-
-                        List<double> listVectorAirterminalToRoom = new List<double>();
-                        dX = aabbRoom.Center().X - aabbAirTerminal.Center().X;
-                        dY = aabbRoom.Center().Y - aabbAirTerminal.Center().Y;
-                        dZ = aabbRoom.Center().Z - aabbAirTerminal.Center().Z;
-                        listVectorAirterminalToRoom.Add(dX);
-                        listVectorAirterminalToRoom.Add(dY);
-                        listVectorAirterminalToRoom.Add(dZ);
-
-                        double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                        if (dDotProduct < 0)
+                        PointInt pt = aabbAirTerminal.Center();
+                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
+                         || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
+                         || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
+                         || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
                         {
                             airterminals.Add(airTerminal);
                         }
+                        else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
+                        {
+                            string strVector = readerAirTerminals["NormalVector"].ToString();
+                            int index = strVector.IndexOf(":");
+                            int index_s = strVector.LastIndexOf(",\"Y");
+                            string strX = strVector.Substring(index + 1, index_s - index - 1);
+
+                            double dX = Convert.ToDouble(strX);
+                            index = strVector.IndexOf("Y");
+                            index_s = strVector.LastIndexOf(",\"Z");
+                            string strY = strVector.Substring(index + 3, index_s - index - 3);
+                            double dY = Convert.ToDouble(strY);
+
+                            index = strVector.IndexOf("Z");
+
+                            index_s = strVector.Length;
+                            string strZ = strVector.Substring(index + 3, index_s - index - 4);
+                            double dZ = Convert.ToDouble(strY);
+                            List<double> listVector = new List<double>();
+                            listVector.Add(dX);
+                            listVector.Add(dY);
+                            listVector.Add(dZ);
+
+                            List<double> listVectorAirterminalToRoom = new List<double>();
+                            dX = poly.Center().X - aabbAirTerminal.Center().X;
+                            dY = poly.Center().Y - aabbAirTerminal.Center().Y;
+                            dZ = poly.Center().Z - aabbAirTerminal.Center().Z;
+                            listVectorAirterminalToRoom.Add(dX);
+                            listVectorAirterminalToRoom.Add(dY);
+                            listVectorAirterminalToRoom.Add(dZ);
+
+                            double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
+                            if (dDotProduct < 0)
+                            {
+                                airterminals.Add(airTerminal);
+                            }
+
+
+                        }
+
                     }
-
                 }
-            }
-            //关闭连接
-            dbConnection.Close();
+                //关闭连接
+                dbConnection.Close();
 
+                return airterminals;
+            }
             return airterminals;
         }
 
@@ -2589,142 +2614,146 @@ namespace HVAC_CheckEngine
         public List<Duct> GetBranchDamperDucts()
         {
             List<Duct> ducts = new List<Duct>();
-
             List<AirTerminal> airtermials = GetAirterminals("排烟");
-
-            TreeNode newNode = new TreeNode();
-            newNode.Id = airtermials[0].Id;
-            newNode.iType = 0;
-
-            string strId = Convert.ToString(airtermials[0].Id);
-
-            if (!System.IO.File.Exists(m_hvacXdbPath))
-                return ducts;
-            string connectionstr = @"data source =" + m_hvacXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            //创建一个连接
-
-            string sql = "select * from MepConnectionRelations Where mainElementId = ";
-            sql += strId;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-
-
+            //建立樹結構
             TreeNode lastNode = new TreeNode();
-            while (reader.Read())
+            foreach (AirTerminal airterminal in airtermials)
             {
-                newNode = new TreeNode();
-                //lastNode.addFather(newNode);     
-                if (reader["linkElementId"].ToString() != m_strLastId)
+                //如果這個樹有這個風口節點，下一個風口向上構建樹
+                if (PreOrderFind(lastNode, airterminal)) continue;
+                TreeNode newNode = new TreeNode();
+                newNode.Id = airterminal.Id;
+                newNode.iType = 0;
+
+                string strId = Convert.ToString(airtermials[0].Id);
+
+                if (!System.IO.File.Exists(m_hvacXdbPath))
+                    return ducts;
+                string connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+                dbConnection.Open();
+                //创建一个连接
+
+                string sql = "select * from MepConnectionRelations Where mainElementId = ";
+                sql += strId;
+                SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader = command.ExecuteReader();        
+                while (reader.Read())
                 {
-                    Duct duct = new Duct(-1);
-                    DuctElbow ductElbow = new DuctElbow(-1);
-                    DuctReducer ductReducer = new DuctReducer(-1);
-                    DuctDamper ductDamper = new DuctDamper(-1);
-                    DuctSoft ductSoft = new DuctSoft(-1);
-                    FlexibleShortTube flexibleShortTube = new FlexibleShortTube(-1);
-                    Duct3T duct3t = new Duct3T(-1);
-                    Duct4T duct4t = new Duct4T(-1);
+                    newNode = new TreeNode();
+                    //lastNode.addFather(newNode);     
+                    if (reader["linkElementId"].ToString() != m_strLastId)
+                    {
+                        Duct duct = new Duct(-1);
+                        DuctElbow ductElbow = new DuctElbow(-1);
+                        DuctReducer ductReducer = new DuctReducer(-1);
+                        DuctDamper ductDamper = new DuctDamper(-1);
+                        DuctSoft ductSoft = new DuctSoft(-1);
+                        FlexibleShortTube flexibleShortTube = new FlexibleShortTube(-1);
+                        Duct3T duct3t = new Duct3T(-1);
+                        Duct4T duct4t = new Duct4T(-1);
 
-                    if (GetDuct(reader, dbConnection, duct))
-                    {
-                        newNode.Id = duct.Id;
-                        newNode.DirectNode = lastNode;
-                    }
-                    else if (GetDuctElbow(reader, dbConnection, ductElbow))
-                    {
-                        newNode.DirectNode = lastNode;
-                        newNode.strfireAirea = GetSmokeCompartmentOfDuctElbow(ductElbow).Id;
-                    }
-                    else if (GetDuctReducer(reader, dbConnection, ductReducer))
-                    {
-                        newNode.DirectNode = lastNode;
-                    }
-                    else if (GetDuctDamper(reader, dbConnection, ductDamper))
-                    {
-                        newNode.DirectNode = lastNode;
-                    }
-                    else if (GetDuctSoft(reader, dbConnection, ductSoft))
-                    {
-                        newNode.DirectNode = lastNode;
-                    }
-                    else if (GetFlexibleShortTube(reader, dbConnection, flexibleShortTube))
-                    {
-                        newNode.DirectNode = lastNode;
-                    }
-                    else if (GetDuct3T(reader, dbConnection, duct3t))
-                    {
-                        sql = "select * from MepConnectionRelations Where MainElementId = ";
-                        strId = Convert.ToString(newNode.Id);
-                        sql += strId;
-
-                        sql += "and = linkElementId = ";
-                        strId = Convert.ToString(lastNode.Id);
-                        sql += strId;
-
-                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
-                        string strMain = "";
-                        if (readerUserLabel.Read())
+                        if (GetDuct(reader, dbConnection, duct))
                         {
-                            strMain = readerUserLabel["userLabel"].ToString();
+                            newNode.Id = duct.Id;
+                            newNode.DirectNode = lastNode;
                         }
-                        switch (strMain)
+                        else if (GetDuctElbow(reader, dbConnection, ductElbow))
                         {
-                            case "直管":
-                                newNode.DirectNode = lastNode;
-                                break;
-                            case "主管":
-                                newNode.LeftNode = lastNode;
-                                break;
-                            case "支管":
-                                newNode.RightNode = lastNode;
-                                break;
+                            newNode.DirectNode = lastNode;
+                            newNode.strfireAirea = GetSmokeCompartmentOfDuctElbow(ductElbow).Id;
                         }
-                        GetSmokeCompartmentOfDuct3T(duct3t);
+                        else if (GetDuctReducer(reader, dbConnection, ductReducer))
+                        {
+                            newNode.DirectNode = lastNode;
+                        }
+                        else if (GetDuctDamper(reader, dbConnection, ductDamper))
+                        {
+                            newNode.DirectNode = lastNode;
+                        }
+                        else if (GetDuctSoft(reader, dbConnection, ductSoft))
+                        {
+                            newNode.DirectNode = lastNode;
+                        }
+                        else if (GetFlexibleShortTube(reader, dbConnection, flexibleShortTube))
+                        {
+                            newNode.DirectNode = lastNode;
+                        }
+                        else if (GetDuct3T(reader, dbConnection, duct3t))
+                        {
+                            sql = "select * from MepConnectionRelations Where MainElementId = ";
+                            strId = Convert.ToString(newNode.Id);
+                            sql += strId;
+
+                            sql += "and = linkElementId = ";
+                            strId = Convert.ToString(lastNode.Id);
+                            sql += strId;
+
+                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                            SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
+                            string strMain = "";
+                            if (readerUserLabel.Read())
+                            {
+                                strMain = readerUserLabel["userLabel"].ToString();
+                            }
+                            switch (strMain)
+                            {
+                                case "直管":
+                                    newNode.DirectNode = lastNode;
+                                    break;
+                                case "主管":
+                                    newNode.LeftNode = lastNode;
+                                    break;
+                                case "支管":
+                                    newNode.RightNode = lastNode;
+                                    break;
+                            }
+                            GetSmokeCompartmentOfDuct3T(duct3t);
+                        }
+                        else if (GetDuct4T(reader, dbConnection, duct4t))
+                        {
+                            sql = "select * from MepConnectionRelations Where MainElementId = ";
+                            strId = Convert.ToString(newNode.Id);
+                            sql += strId;
+
+                            sql += "and = linkElementId = ";
+                            strId = Convert.ToString(lastNode.Id);
+                            sql += strId;
+
+                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                            SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
+                            string strMain = "";
+                            if (readerUserLabel.Read())
+                            {
+                                strMain = readerUserLabel["userLabel"].ToString();
+                            }
+                            switch (strMain)
+                            {
+                                case "直管":
+                                    newNode.DirectNode = lastNode;
+                                    break;
+                                case "主管":
+                                    newNode.LeftNode = lastNode;
+                                    break;
+                                case "支管":
+                                    newNode.RightNode = lastNode;
+                                    break;
+                                case "支管1":
+                                    newNode.LeftNode = lastNode;
+                                    break;
+                            }
+                            GetSmokeCompartmentOfDuct4T(duct4t);
+                        }
+
+
+                        lastNode = newNode;
+
+
                     }
-                    else if (GetDuct4T(reader, dbConnection, duct4t))
-                    {
-                        sql = "select * from MepConnectionRelations Where MainElementId = ";
-                        strId = Convert.ToString(newNode.Id);
-                        sql += strId;
-
-                        sql += "and = linkElementId = ";
-                        strId = Convert.ToString(lastNode.Id);
-                        sql += strId;
-
-                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
-                        string strMain = "";
-                        if (readerUserLabel.Read())
-                        {
-                            strMain = readerUserLabel["userLabel"].ToString();
-                        }
-                        switch (strMain)
-                        {
-                            case "直管":
-                                newNode.DirectNode = lastNode;
-                                break;
-                            case "主管":
-                                newNode.LeftNode = lastNode;
-                                break;
-                            case "支管":
-                                newNode.RightNode = lastNode;
-                                break;
-                            case "支管1":
-                                newNode.LeftNode = lastNode;
-                                break;
-                        }
-                        GetSmokeCompartmentOfDuct4T(duct4t);
-                    }
-
-
-                    lastNode = newNode;
-
-
                 }
+
             }
+                            
 
 
 
@@ -2755,63 +2784,6 @@ namespace HVAC_CheckEngine
             }
 
             return ducts;
-
-
-            /*if(lastNode.iType == 3|| lastNode.iType == 4)
-            {
-                if (!PreOrder(lastNode))
-                {
-                    if (lastNode.Parent.iType == 9 || lastNode.Parent.Parent.iType == 9)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-          
-                if (!PreOrder(lastNode.LeftNode))
-                {
-                    if (lastNode.LeftNode.iType == 9 )
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                if (!PreOrder(lastNode.DirectNode))
-                {
-                    if (lastNode.DirectNode.iType == 9 )
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                if (!PreOrder(lastNode.RightNode))
-                {
-                    if (lastNode.RightNode.iType == 9 )
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-
-
-            }*/
-
-
-
-
-
         }
         long lastFireid;
         bool PreOrderAddFireArea(TreeNode node)
@@ -2862,6 +2834,31 @@ namespace HVAC_CheckEngine
                 return false;
             }
             return true;
+
+        }
+
+
+
+        bool PreOrderFind(TreeNode node,AirTerminal airterminal)
+        {
+            if (node.Id < 0) return false;
+            if (node.Id == airterminal.Id)
+            {
+                return true;
+            }
+            if (PreOrder(node.LeftNode))
+            {
+                return true;
+            }
+            if (PreOrder(node.DirectNode))
+            {
+                return true;
+            }
+            if (PreOrder(node.RightNode))
+            {
+                return true;
+            }
+            return false;
 
         }
 
