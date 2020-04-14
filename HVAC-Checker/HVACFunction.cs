@@ -2401,8 +2401,7 @@ namespace HVAC_CheckEngine
 
         public static bool IsSmokeCompartmentIntersectFireCompartment(SmokeCompartment smokeCompartment, FireCompartment fireCompartment)
         {
-            if (!System.IO.File.Exists(m_archXdbPath))
-                return false;
+   
 
             List<PointIntList> PointLists = new List<PointIntList>();
             PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
@@ -2545,29 +2544,30 @@ namespace HVAC_CheckEngine
         public static List<Duct> GetAllDuctsInRoom(Room room)
         {
             List<Duct> ducts = new List<Duct>();
-            if (!System.IO.File.Exists(m_archXdbPath))
-                return ducts;
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
 
-            //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);           
+
+            if (!GetRoomPolygon2D(room, poly))
+            {
+                return ducts;
+            }
+
+           string sql = "select * from Ducts";
+            string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string sql = "select * from Spaces Where Id = ";
-            sql = sql + room.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            if (reader.Read())
-            {
-                AABB aabbRoom = GetAABB(reader, dbConnection);
-
-                sql = "select * from Ducts";
-                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+            SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
                 while (readerDucts.Read())
                 {
+
+                if(room.m_iStoryNo == Convert.ToInt32(readerDucts["storeyNo"].ToString()))
+                {
                     AABB aabbAirTerminal = GetAABB(readerDucts, dbConnection);
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbRoom, aabbAirTerminal))
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                         duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
@@ -2575,6 +2575,8 @@ namespace HVAC_CheckEngine
                     }
                 }
             }
+              
+       
             //关闭连接
             dbConnection.Close();
             return ducts;
