@@ -2404,46 +2404,36 @@ namespace HVAC_CheckEngine
             if (!System.IO.File.Exists(m_archXdbPath))
                 return false;
 
-            //创建一个连接
-            string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            string sql = "select * from Spaces Where Id = ";
-            sql = sql + smokeCompartment.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
 
-            if (reader.Read())
-            {
+            Polygon2D polySmokeCompartment = new Polygon2D(PointLists, sSpaceId);
 
-                AABB aabbSmokeCompartment = GetAABB(reader, dbConnection);
-                //创建一个连接
-                connectionstr = @"data source =" + m_hvacXdbPath;
-                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                dbConnectionHVAC.Open();
-                sql = "select * from Spaces Where Id = ";
-                sql = sql + fireCompartment.Id;
-                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
-                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
-                while (readerAirTerminals.Read())
+            Polygon2D polyfireCompartment = new Polygon2D(PointLists, sSpaceId);
+
+            if (!GetRoomPolygon2D(smokeCompartment, polySmokeCompartment))
                 {
+                    return false;
+                }
 
-                    AABB aabbFireCompartment = GetAABB(reader, dbConnection);
-
-
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbSmokeCompartment, aabbFireCompartment))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
+            if (!GetRoomPolygon2D(fireCompartment, polyfireCompartment))
+            {
+                return false;
+            }
+            //创建一个连接
+            if(smokeCompartment.m_iStoryNo == fireCompartment.m_iStoryNo)
+            {
+                if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(polySmokeCompartment, polyfireCompartment))            
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
-            //关闭连接
-            dbConnection.Close();
+         
             return false;
         }
 
