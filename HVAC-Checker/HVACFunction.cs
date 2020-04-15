@@ -2651,6 +2651,132 @@ namespace HVAC_CheckEngine
 
 
 
+        private static void StructTree(string strId, SQLiteConnection dbConnection, TreeNode newNode, TreeNode lastNode ,List<TreeNode> LastNodes)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                newNode = new TreeNode();
+                //lastNode.addFather(newNode);     
+                //if (reader["linkElementId"].ToString() != m_strLastId)
+                if(!LastNodes.Exists(x => x.Id == Convert.ToInt64( reader["linkElementId"].ToString())))
+                {
+                    Duct duct = new Duct(-1);
+                    DuctElbow ductElbow = new DuctElbow(-1);
+                    DuctReducer ductReducer = new DuctReducer(-1);
+                    DuctDamper ductDamper = new DuctDamper(-1);
+                    DuctSoft ductSoft = new DuctSoft(-1);
+                    FlexibleShortTube flexibleShortTube = new FlexibleShortTube(-1);
+                    Duct3T duct3t = new Duct3T(-1);
+                    Duct4T duct4t = new Duct4T(-1);
+
+                    if (GetDuct(reader, dbConnection, ref duct))
+                    {
+                        newNode.Id = duct.Id;
+                        newNode.DirectNode = lastNode;
+                    }
+                    else if (GetDuctElbow(reader, dbConnection, ref ductElbow))
+                    {
+                        newNode.DirectNode = lastNode;
+                        newNode.strfireAirea = GetSmokeCompartmentOfDuctElbow(ductElbow).Id;
+                    }
+                    else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
+                    {
+                        newNode.DirectNode = lastNode;
+                    }
+                    else if (GetDuctDamper(reader, dbConnection, ref ductDamper))
+                    {
+                        newNode.DirectNode = lastNode;
+                    }
+                    else if (GetDuctSoft(reader, dbConnection, ref ductSoft))
+                    {
+                        newNode.DirectNode = lastNode;
+                    }
+                    else if (GetFlexibleShortTube(reader, dbConnection, ref flexibleShortTube))
+                    {
+                        newNode.DirectNode = lastNode;
+                    }
+                    else if (GetDuct3T(reader, dbConnection, ref duct3t))
+                    {
+                        sql = "select * from MepConnectionRelations Where MainElementId = ";
+                        strId = Convert.ToString(newNode.Id);
+                        sql += strId;
+
+                        sql += "and = linkElementId = ";
+                        strId = Convert.ToString(lastNode.Id);
+                        sql += strId;
+
+                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
+                        string strMain = "";
+                        if (readerUserLabel.Read())
+                        {
+                            strMain = readerUserLabel["userLabel"].ToString();
+                        }
+                        switch (strMain)
+                        {
+                            case "直管":
+                                newNode.DirectNode = lastNode;
+                                break;
+                            case "主管":
+                                newNode.LeftNode = lastNode;
+                                break;
+                            case "支管":
+                                newNode.RightNode = lastNode;
+                                break;
+                        }
+                        GetSmokeCompartmentOfDuct3T(duct3t);
+                    }
+                    else if (GetDuct4T(reader, dbConnection, ref duct4t))
+                    {
+                        sql = "select * from MepConnectionRelations Where MainElementId = ";
+                        strId = Convert.ToString(newNode.Id);
+                        sql += strId;
+
+                        sql += "and = linkElementId = ";
+                        strId = Convert.ToString(lastNode.Id);
+                        sql += strId;
+
+                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
+                        string strMain = "";
+                        if (readerUserLabel.Read())
+                        {
+                            strMain = readerUserLabel["userLabel"].ToString();
+                        }
+                        switch (strMain)
+                        {
+                            case "直管":
+                                newNode.DirectNode = lastNode;
+                                break;
+                            case "主管":
+                                newNode.LeftNode = lastNode;
+                                break;
+                            case "支管":
+                                newNode.RightNode = lastNode;
+                                break;
+                            case "支管1":
+                                newNode.LeftNode = lastNode;
+                                break;
+                        }
+                        GetSmokeCompartmentOfDuct4T(duct4t);
+                    }
+
+                    if(newNode!=null)
+                    {
+                        lastNode = newNode;
+                        LastNodes.Add(newNode);
+                    }               
+
+                    StructTree(Convert.ToString(newNode.Id), dbConnection, newNode, lastNode, LastNodes);
+
+                }
+            }           
+        }
+
         public static List<Duct> GetBranchDamperDucts()
         {
             List<Duct> ducts = new List<Duct>();
@@ -2673,127 +2799,16 @@ namespace HVAC_CheckEngine
                 SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
                 dbConnection.Open();
                 //创建一个连接
-
-                string sql = "select * from MepConnectionRelations Where mainElementId = ";
-                sql += strId;
-                SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader reader = command.ExecuteReader();        
-                while (reader.Read())
-                {
-                    newNode = new TreeNode();
-                    //lastNode.addFather(newNode);     
-                    if (reader["linkElementId"].ToString() != m_strLastId)
-                    {
-                        Duct duct = new Duct(-1);
-                        DuctElbow ductElbow = new DuctElbow(-1);
-                        DuctReducer ductReducer = new DuctReducer(-1);
-                        DuctDamper ductDamper = new DuctDamper(-1);
-                        DuctSoft ductSoft = new DuctSoft(-1);
-                        FlexibleShortTube flexibleShortTube = new FlexibleShortTube(-1);
-                        Duct3T duct3t = new Duct3T(-1);
-                        Duct4T duct4t = new Duct4T(-1);
-
-                        if (GetDuct(reader, dbConnection, duct))
-                        {
-                            newNode.Id = duct.Id;
-                            newNode.DirectNode = lastNode;
-                        }
-                        else if (GetDuctElbow(reader, dbConnection, ductElbow))
-                        {
-                            newNode.DirectNode = lastNode;
-                            newNode.strfireAirea = GetSmokeCompartmentOfDuctElbow(ductElbow).Id;
-                        }
-                        else if (GetDuctReducer(reader, dbConnection, ductReducer))
-                        {
-                            newNode.DirectNode = lastNode;
-                        }
-                        else if (GetDuctDamper(reader, dbConnection, ductDamper))
-                        {
-                            newNode.DirectNode = lastNode;
-                        }
-                        else if (GetDuctSoft(reader, dbConnection, ductSoft))
-                        {
-                            newNode.DirectNode = lastNode;
-                        }
-                        else if (GetFlexibleShortTube(reader, dbConnection, flexibleShortTube))
-                        {
-                            newNode.DirectNode = lastNode;
-                        }
-                        else if (GetDuct3T(reader, dbConnection, duct3t))
-                        {
-                            sql = "select * from MepConnectionRelations Where MainElementId = ";
-                            strId = Convert.ToString(newNode.Id);
-                            sql += strId;
-
-                            sql += "and = linkElementId = ";
-                            strId = Convert.ToString(lastNode.Id);
-                            sql += strId;
-
-                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
-                            SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
-                            string strMain = "";
-                            if (readerUserLabel.Read())
-                            {
-                                strMain = readerUserLabel["userLabel"].ToString();
-                            }
-                            switch (strMain)
-                            {
-                                case "直管":
-                                    newNode.DirectNode = lastNode;
-                                    break;
-                                case "主管":
-                                    newNode.LeftNode = lastNode;
-                                    break;
-                                case "支管":
-                                    newNode.RightNode = lastNode;
-                                    break;
-                            }
-                            GetSmokeCompartmentOfDuct3T(duct3t);
-                        }
-                        else if (GetDuct4T(reader, dbConnection, duct4t))
-                        {
-                            sql = "select * from MepConnectionRelations Where MainElementId = ";
-                            strId = Convert.ToString(newNode.Id);
-                            sql += strId;
-
-                            sql += "and = linkElementId = ";
-                            strId = Convert.ToString(lastNode.Id);
-                            sql += strId;
-
-                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
-                            SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
-                            string strMain = "";
-                            if (readerUserLabel.Read())
-                            {
-                                strMain = readerUserLabel["userLabel"].ToString();
-                            }
-                            switch (strMain)
-                            {
-                                case "直管":
-                                    newNode.DirectNode = lastNode;
-                                    break;
-                                case "主管":
-                                    newNode.LeftNode = lastNode;
-                                    break;
-                                case "支管":
-                                    newNode.RightNode = lastNode;
-                                    break;
-                                case "支管1":
-                                    newNode.LeftNode = lastNode;
-                                    break;
-                            }
-                            GetSmokeCompartmentOfDuct4T(duct4t);
-                        }
+                List<TreeNode> LastNodes = new List<TreeNode>();
+                lastNode = newNode;
+                LastNodes.Add(newNode);
 
 
-                        lastNode = newNode;
+                StructTree(strId, dbConnection, newNode, lastNode, LastNodes);
 
-
-                    }
-                }
 
             }
-                            
+
 
 
 
@@ -2856,7 +2871,8 @@ namespace HVAC_CheckEngine
 
         static bool PreOrder(TreeNode node)
         {
-            if (node.Id < 0) return false;
+            if (node== null) return false;
+            if (node.Id < 0 ) return false;
             if (node.iType == 3 && node.iType == 4)
             {
                 return false;
@@ -3271,7 +3287,7 @@ namespace HVAC_CheckEngine
             return room;
         }
 
-        private static bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct duct)
+        private static bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, ref Duct duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3287,9 +3303,9 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static bool GetDuctReducer(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctReducer duct)
+        private static bool GetDuctReducer(SQLiteDataReader reader, SQLiteConnection dbConnection, ref DuctReducer duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from DuctReducers Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3302,9 +3318,9 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static  bool GetDuctDamper(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctDamper duct)
+        private static  bool GetDuctDamper(SQLiteDataReader reader, SQLiteConnection dbConnection, ref DuctDamper duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from DuctDampers Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3318,9 +3334,9 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static bool GetDuctSoft(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctSoft duct)
+        private static bool GetDuctSoft(SQLiteDataReader reader, SQLiteConnection dbConnection, ref DuctSoft duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from DuctSofts Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3333,9 +3349,9 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static bool GetFlexibleShortTube(SQLiteDataReader reader, SQLiteConnection dbConnection, FlexibleShortTube duct)
+        private static bool GetFlexibleShortTube(SQLiteDataReader reader, SQLiteConnection dbConnection, ref FlexibleShortTube duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from FlexibleShortTubes Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3348,9 +3364,9 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static bool GetDuctElbow(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctElbow duct)
+        private static bool GetDuctElbow(SQLiteDataReader reader, SQLiteConnection dbConnection, ref  DuctElbow duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from DuctElbows Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3363,9 +3379,9 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static bool GetDuct3T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct3T duct)
+        private static bool GetDuct3T(SQLiteDataReader reader, SQLiteConnection dbConnection, ref Duct3T duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from Duct3Ts Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
@@ -3378,9 +3394,9 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private static bool GetDuct4T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct4T duct)
+        private static bool GetDuct4T(SQLiteDataReader reader, SQLiteConnection dbConnection, ref Duct4T duct)
         {
-            string sql = "select * from Ducts Where Id = ";
+            string sql = "select * from Duct4Ts Where Id = ";
             sql += reader["linkElementId"].ToString();
 
             SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
