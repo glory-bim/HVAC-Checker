@@ -51,6 +51,8 @@ namespace HVAC_CheckEngine
         private static string m_strLastId;
         private static List<string> m_listStrLastId;
 
+        static long lastFireid;
+
         public HVACFunction(string Archxdb, string HVACxdb)
         {
             m_archXdbPath = Archxdb;
@@ -2407,8 +2409,7 @@ namespace HVAC_CheckEngine
         }
 
         public static bool IsSmokeCompartmentIntersectFireCompartment(SmokeCompartment smokeCompartment, FireCompartment fireCompartment)
-        {
-   
+        {  
 
             List<PointIntList> PointLists = new List<PointIntList>();
             PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
@@ -2650,7 +2651,7 @@ namespace HVAC_CheckEngine
 
 
 
-        public List<Duct> GetBranchDamperDucts()
+        public static List<Duct> GetBranchDamperDucts()
         {
             List<Duct> ducts = new List<Duct>();
             List<AirTerminal> airtermials = GetAirterminals("排烟");
@@ -2824,8 +2825,8 @@ namespace HVAC_CheckEngine
 
             return ducts;
         }
-        long lastFireid;
-        bool PreOrderAddFireArea(TreeNode node)
+       
+        static bool PreOrderAddFireArea(TreeNode node)
         {
             if (node.Id < 0) return false;
 
@@ -2853,7 +2854,7 @@ namespace HVAC_CheckEngine
 
 
 
-        bool PreOrder(TreeNode node)
+        static bool PreOrder(TreeNode node)
         {
             if (node.Id < 0) return false;
             if (node.iType == 3 && node.iType == 4)
@@ -2878,7 +2879,7 @@ namespace HVAC_CheckEngine
 
 
 
-        bool PreOrderFind(TreeNode node,AirTerminal airterminal)
+        static bool PreOrderFind(TreeNode node,AirTerminal airterminal)
         {
             if (node.Id < 0) return false;
             if (node.Id == airterminal.Id)
@@ -2901,7 +2902,7 @@ namespace HVAC_CheckEngine
 
         }
 
-        List<TreeNode> PreOrderAirterminalNode(TreeNode node)
+        static  List<TreeNode> PreOrderAirterminalNode(TreeNode node)
         {
             List<TreeNode> airTerminalNodes = new List<TreeNode>();
             if (node.Id < 0) return airTerminalNodes;
@@ -2915,7 +2916,7 @@ namespace HVAC_CheckEngine
             return airTerminalNodes;
         }
 
-        TreeNode GetParentEquel3T4T(TreeNode node, List<TreeNode> ducts)
+        static TreeNode GetParentEquel3T4T(TreeNode node, List<TreeNode> ducts)
         {
             if (node.Parent == null)
                 return null;
@@ -3270,7 +3271,7 @@ namespace HVAC_CheckEngine
             return room;
         }
 
-        private bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct duct)
+        private static bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3286,7 +3287,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private bool GetDuctReducer(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctReducer duct)
+        private static bool GetDuctReducer(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctReducer duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3301,7 +3302,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private bool GetDuctDamper(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctDamper duct)
+        private static  bool GetDuctDamper(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctDamper duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3317,7 +3318,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private bool GetDuctSoft(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctSoft duct)
+        private static bool GetDuctSoft(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctSoft duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3332,7 +3333,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private bool GetFlexibleShortTube(SQLiteDataReader reader, SQLiteConnection dbConnection, FlexibleShortTube duct)
+        private static bool GetFlexibleShortTube(SQLiteDataReader reader, SQLiteConnection dbConnection, FlexibleShortTube duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3347,7 +3348,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private bool GetDuctElbow(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctElbow duct)
+        private static bool GetDuctElbow(SQLiteDataReader reader, SQLiteConnection dbConnection, DuctElbow duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3362,7 +3363,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private bool GetDuct3T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct3T duct)
+        private static bool GetDuct3T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct3T duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3377,7 +3378,7 @@ namespace HVAC_CheckEngine
             return false;
         }
 
-        private bool GetDuct4T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct4T duct)
+        private static bool GetDuct4T(SQLiteDataReader reader, SQLiteConnection dbConnection, Duct4T duct)
         {
             string sql = "select * from Ducts Where Id = ";
             sql += reader["linkElementId"].ToString();
@@ -3391,16 +3392,7 @@ namespace HVAC_CheckEngine
             }
             return false;
         }
-     
-      
-
-
-
-
-
-
-
-
+           
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
