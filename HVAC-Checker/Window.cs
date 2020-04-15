@@ -26,6 +26,8 @@ namespace HVAC_CheckEngine
 
         double? openingAngle { get; set; } = null;//开启角度
 
+        public string sFaceOrient { get; set; } = null;
+
         public enum WindowOpenMode{HangWindow,SashWindow,BlindWindow,CasementWindow,PushWindow,FixWindow }//悬窗，推拉窗，百叶窗，平开窗，平推窗，固定窗
     }
 }

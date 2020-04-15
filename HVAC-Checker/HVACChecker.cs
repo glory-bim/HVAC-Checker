@@ -1261,7 +1261,7 @@ namespace HVAC_CheckEngine
             return result;
         }
 
-
+        //建筑防烟排烟系统技术标准
         //323采用自然通风方式的避难层（间）应设有不同朝向的可开启外窗，其有效面积不应小于该避难层（间）地面面积的2％，且每个朝向的面积不应小于2．0m2。加房间TYpe
         public static BimReview GB51251_2017_3_2_3()
         {
@@ -1271,20 +1271,29 @@ namespace HVAC_CheckEngine
 
         foreach (Room room in rooms)
         {
-        List<Window> windows = HVACFunction.GetWindowsInRoom(room);
-        double dAreatotal = 0.0;
-        foreach (Window window in windows)
-        {
-            //  dAreatotal += window.effectiveArea;
-        }
-        if (dAreatotal < room.m_dArea * 0.02)
-        {
-            result.isPassCheck = false;
-        }
+                List<Window> windows = HVACFunction.GetWindowsInRoom(room);
+                double dAreatotal = 0.0;
+                List<string> faceList = new List<string>();
+                foreach (Window window in windows)
+                {
+                    if (!faceList.Exists(x => x == window.sFaceOrient))
+                    {
+                        faceList.Add(window.sFaceOrient);
+                    }
+                    dAreatotal += (double)window.effectiveArea;
+                }
+                if (faceList.Count() < 2)
+                {
+                    result.isPassCheck = false;
+                    result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。没有设置不同朝向的可开启外窗";
+                }
+                if (dAreatotal < room.m_dArea * 0.02)
+                {
+                    result.isPassCheck = false;
+                    result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+                }
+            }
 
-        }
-
-        //如果审查通过
         //则在审查结果批注中注明审查通过相关内容
         if (result.isPassCheck)
             {
@@ -1292,11 +1301,9 @@ namespace HVAC_CheckEngine
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
-            else
-            {
-                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
-            }
-            return result;
+        
+            return result;   //如果审查通过
+     
         }
 
         //机械加压送风系统应采用管道送风，且不应采用土建风道。送风管道应采用不燃材料制作且内壁应光滑。
