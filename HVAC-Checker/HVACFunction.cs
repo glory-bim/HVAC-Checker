@@ -165,7 +165,7 @@ namespace HVAC_CheckEngine
             return aabb;
         }
 
-        private static bool  GetRoomPolygon2D(Room room, Polygon2D poly)
+        private static bool  GetRoomPolygon2D(Room room, ref Polygon2D poly)
         {
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
@@ -207,7 +207,7 @@ namespace HVAC_CheckEngine
             string sSpaceId = "0";
 
             Polygon2D poly = new Polygon2D(PointLists, sSpaceId); 
-            if(!GetRoomPolygon2D(room, poly))
+            if(!GetRoomPolygon2D(room, ref poly))
             {
                 return airterminals;
             }         
@@ -296,7 +296,7 @@ namespace HVAC_CheckEngine
             string sSpaceId = "0";
 
             Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
-            if (!GetRoomPolygon2D(room, poly))
+            if (!GetRoomPolygon2D(room, ref poly))
             {
                 return windows;
             }
@@ -714,7 +714,7 @@ namespace HVAC_CheckEngine
             string sSpaceId = "0";
 
             Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
-            if (!GetRoomPolygon2D(room, poly))
+            if (!GetRoomPolygon2D(room, ref poly))
             {
                 return ducts;
             }
@@ -817,52 +817,59 @@ namespace HVAC_CheckEngine
                 if (!System.IO.File.Exists(m_archXdbPath))
                     return ducts;
 
-                //创建一个连接
-                string connectionstr = @"data source =" + m_archXdbPath;
-                SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-                dbConnection.Open();
-                string sql = "select * from Spaces Where Id = ";
-                sql = sql + fireDistrict.Id;
-                SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader readerSpace = command.ExecuteReader();
 
-                if (readerSpace.Read())
+                List<PointIntList> PointLists = new List<PointIntList>();
+                PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+                string sSpaceId = "0";
+
+                Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+                if (!GetRoomPolygon2D(fireDistrict, ref poly))
                 {
-                    //fireDistrict.name = readerSpace["name"].ToString();
-                    //fireDistrict.boundaryLoops = readerSpace["boundaryLoops"].ToString();
-                    //Polygon2D poly = GetSpaceBBox(fireDistrict.boundaryLoops, fireDistrict.Id.ToString());
-                    AABB aabbFireDistrict = GetAABB(readerSpace, dbConnection);
+                    return ducts;
+                }                   
 
-                    //创建一个连接
-                    connectionstr = @"data source =" + m_hvacXdbPath;
-                    SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                    dbConnectionHVAC.Open();
-                    sql = "select * from Ducts";
-                    SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
-                    SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
-                    while (readerDucts.Read())
+                //创建一个连接
+                string connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+                dbConnectionHVAC.Open();
+                string sql = "select * from Ducts";
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
+                while (readerDucts.Read())
+                {
+                    AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
                     {
-                        AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
-                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbFireDistrict, aabbDuct))
+                    connectionstr = @"data source =" + m_archXdbPath;
+                    SQLiteConnection dbConnectionArch= new SQLiteConnection(connectionstr);
+                    dbConnectionArch.Open();
+                        string strBianxing = "变形缝";
+                        sql = "select * from Proxys Where CHARINDEX(";
+                        sql = sql + "'" + strBianxing + "'";
+                        sql = sql + ",userLabel)> 0";
+                        SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
+                        SQLiteDataReader readerProxys = commandArch.ExecuteReader();
+                    while (readerProxys.Read())
+                    {
+                        AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
+                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbjoint, aabbDuct))
                         {
-
-                            AABB aabbjoint = GetAABB(readerDucts, dbConnectionHVAC);
-                            if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbjoint, aabbDuct))
-                            {
-
-                                Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                                duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                                ducts.Add(duct);
-                            }
-
+                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                            ducts.Add(duct);
                         }
                     }
+                       
+                         
+
+                    }
+                }
                 }
 
-                //关闭连接
-                dbConnection.Close();
+           
+        
 
-            }
+        
 
 
             return ducts;
@@ -893,7 +900,7 @@ namespace HVAC_CheckEngine
                 string sSpaceId = "0";
 
                 Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
-                if (!GetRoomPolygon2D(room, poly))
+                if (!GetRoomPolygon2D(room, ref poly))
                 {
                     return room;
                 }
@@ -2411,12 +2418,12 @@ namespace HVAC_CheckEngine
 
             Polygon2D polyfireCompartment = new Polygon2D(PointLists, sSpaceId);
 
-            if (!GetRoomPolygon2D(smokeCompartment, polySmokeCompartment))
+            if (!GetRoomPolygon2D(smokeCompartment, ref polySmokeCompartment))
                 {
                     return false;
                 }
 
-            if (!GetRoomPolygon2D(fireCompartment, polyfireCompartment))
+            if (!GetRoomPolygon2D(fireCompartment, ref polyfireCompartment))
             {
                 return false;
             }
@@ -2550,7 +2557,7 @@ namespace HVAC_CheckEngine
 
             Polygon2D poly = new Polygon2D(PointLists, sSpaceId);           
 
-            if (!GetRoomPolygon2D(room, poly))
+            if (!GetRoomPolygon2D(room, ref poly))
             {
                 return ducts;
             }
