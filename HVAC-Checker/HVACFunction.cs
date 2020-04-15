@@ -51,7 +51,7 @@ namespace HVAC_CheckEngine
         private static string m_strLastId;
         private static List<string> m_listStrLastId;
 
-        static long lastFireid;
+        static long  lastFireid { set; get; }
 
         public HVACFunction(string Archxdb, string HVACxdb)
         {
@@ -2651,7 +2651,7 @@ namespace HVAC_CheckEngine
 
 
 
-        private static void StructTree(string strId, SQLiteConnection dbConnection, TreeNode newNode, TreeNode lastNode ,List<TreeNode> LastNodes)
+        private static void StructTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, ref TreeNode lastNode ,List<TreeNode> LastNodes)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -2701,11 +2701,12 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct3T(reader, dbConnection, ref duct3t))
                     {
+                        newNode.Id = duct3t.Id;
                         sql = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
                         sql += strId;
 
-                        sql += "and = linkElementId = ";
+                        sql += " and  linkElementId = ";
                         strId = Convert.ToString(lastNode.Id);
                         sql += strId;
 
@@ -2732,11 +2733,12 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
+                        newNode.Id = duct4t.Id;
                         sql = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
                         sql += strId;
 
-                        sql += "and = linkElementId = ";
+                        sql += "and linkElementId = ";
                         strId = Convert.ToString(lastNode.Id);
                         sql += strId;
 
@@ -2765,14 +2767,12 @@ namespace HVAC_CheckEngine
                         GetSmokeCompartmentOfDuct4T(duct4t);
                     }
 
-                    if(newNode!=null)
+                    if(newNode!=null&& newNode.Id != null)
                     {
                         lastNode = newNode;
                         LastNodes.Add(newNode);
-                    }               
-
-                    StructTree(Convert.ToString(newNode.Id), dbConnection, newNode, lastNode, LastNodes);
-
+                        StructTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                    }                
                 }
             }           
         }
@@ -2804,7 +2804,7 @@ namespace HVAC_CheckEngine
                 LastNodes.Add(newNode);
 
 
-                StructTree(strId, dbConnection, newNode, lastNode, LastNodes);
+                StructTree(strId, dbConnection, ref newNode, ref lastNode, LastNodes);
 
 
             }
