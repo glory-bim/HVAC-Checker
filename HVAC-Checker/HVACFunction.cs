@@ -51,7 +51,9 @@ namespace HVAC_CheckEngine
         private static string m_strLastId;
         private static List<string> m_listStrLastId;
 
-        static long  lastFireid { set; get; }
+
+
+        public static long? lastFireid { get; set; } = null;
 
         public HVACFunction(string Archxdb, string HVACxdb)
         {
@@ -2803,20 +2805,13 @@ namespace HVAC_CheckEngine
                 lastNode = newNode;
                 LastNodes.Add(newNode);
 
-
                 StructTree(strId, dbConnection, ref newNode, ref lastNode, LastNodes);
-
-
             }
-
-
-
-
-
-
+                                          
+            //从根节点 标记子节点防火分区
             PreOrderAddFireArea(lastNode);
 
-
+            //从根节点 找到子节点为风口的所有节点
             List<TreeNode> airTerminalNodes = PreOrderAirterminalNode(lastNode);
             foreach (TreeNode airterminal in airTerminalNodes)
             {
@@ -2840,61 +2835,66 @@ namespace HVAC_CheckEngine
 
             return ducts;
         }
-       
+
+        private static void AddArea(TreeNode nodeArea, TreeNode node)
+        {
+            if (!nodeArea.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+            {
+                nodeArea.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
+                AddArea(nodeArea, node.LeftNode.LeftNode);
+                AddArea(nodeArea, node.LeftNode.DirectNode);
+                AddArea(nodeArea, node.LeftNode.RightNode);
+            }
+            if (!nodeArea.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+            {
+                nodeArea.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
+                AddArea(nodeArea, node.DirectNode.LeftNode);
+                AddArea(nodeArea, node.DirectNode.DirectNode);
+                AddArea(nodeArea, node.DirectNode.RightNode);
+            }
+            if (!nodeArea.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+            {
+                nodeArea.StrfireAireas.Add((long)node.RightNode.strfireAirea);
+                AddArea(nodeArea, node.RightNode.LeftNode);
+                AddArea(nodeArea, node.RightNode.DirectNode);
+                AddArea(nodeArea, node.RightNode.RightNode);
+            }
+        }
+
         static bool PreOrderAddFireArea(TreeNode node)
         {
             if (node.Id < 0) return false;
 
-            if (lastFireid != node.strfireAirea)
+            if(!node.StrfireAireas.Exists(x => x == node.strfireAirea))        
             {
-                node.StrfireAireas.Add(lastFireid);
+                node.StrfireAireas.Add((long)lastFireid);
             }
-           // lastFireid = node.strfireAirea;
-            if (!PreOrder(node.LeftNode))
+
+            if (!node.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
             {
-                return false;
+                node.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
+
+                AddArea(node, node.LeftNode);
             }
-            if (!PreOrder(node.DirectNode))
+            if (!node.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
             {
-                return false;
+                node.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
+                AddArea(node, node.DirectNode);
             }
-            if (!PreOrder(node.RightNode))
+            if (!node.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
             {
-                return false;
+                node.StrfireAireas.Add((long)node.RightNode.strfireAirea);
+                AddArea(node, node.RightNode);
             }
+
+
+
+            PreOrderAddFireArea(node.LeftNode);
+            PreOrderAddFireArea(node.DirectNode);
+            PreOrderAddFireArea(node.RightNode);          
             return true;
-
         }
-
-
-
-
-        static bool PreOrder(TreeNode node)
-        {
-            if (node== null) return false;
-            if (node.Id < 0 ) return false;
-            if (node.iType == 3 && node.iType == 4)
-            {
-                return false;
-            }
-            if (!PreOrder(node.LeftNode))
-            {
-                return false;
-            }
-            if (!PreOrder(node.DirectNode))
-            {
-                return false;
-            }
-            if (!PreOrder(node.RightNode))
-            {
-                return false;
-            }
-            return true;
-
-        }
-
-
-
+                         
         static bool PreOrderFind(TreeNode node,AirTerminal airterminal)
         {
             if (node.Id < 0) return false;
@@ -2902,15 +2902,15 @@ namespace HVAC_CheckEngine
             {
                 return true;
             }
-            if (PreOrder(node.LeftNode))
+            if (PreOrderFind(node.LeftNode, airterminal))
             {
                 return true;
             }
-            if (PreOrder(node.DirectNode))
+            if (PreOrderFind(node.DirectNode, airterminal))
             {
                 return true;
             }
-            if (PreOrder(node.RightNode))
+            if (PreOrderFind(node.RightNode, airterminal))
             {
                 return true;
             }
@@ -2921,6 +2921,7 @@ namespace HVAC_CheckEngine
         static  List<TreeNode> PreOrderAirterminalNode(TreeNode node)
         {
             List<TreeNode> airTerminalNodes = new List<TreeNode>();
+            if(node == null) return airTerminalNodes;
             if (node.Id < 0) return airTerminalNodes;
             if (node.iType == 0)
             {
