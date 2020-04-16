@@ -2679,27 +2679,38 @@ namespace HVAC_CheckEngine
                     {
                         newNode.Id = duct.Id;
                         newNode.DirectNode = lastNode;
+                        long longId = (long)duct.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct").Id;
                     }
                     else if (GetDuctElbow(reader, dbConnection, ref ductElbow))
                     {
                         newNode.DirectNode = lastNode;
-                        newNode.strfireAirea = GetSmokeCompartmentOfDuctElbow(ductElbow).Id;
+                        long longId = (long)ductElbow.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctElbows").Id;                       
                     }
                     else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
                     {
                         newNode.DirectNode = lastNode;
+                        long longId = (long)ductReducer.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctReducers").Id;
                     }
                     else if (GetDuctDamper(reader, dbConnection, ref ductDamper))
                     {
                         newNode.DirectNode = lastNode;
+                        long longId = (long)ductDamper.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctDampers").Id;
                     }
                     else if (GetDuctSoft(reader, dbConnection, ref ductSoft))
                     {
                         newNode.DirectNode = lastNode;
+                        long longId = (long)ductSoft.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctSofts").Id;
                     }
                     else if (GetFlexibleShortTube(reader, dbConnection, ref flexibleShortTube))
                     {
                         newNode.DirectNode = lastNode;
+                        long longId = (long)flexibleShortTube.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "FlexibleShortTubes").Id;
                     }
                     else if (GetDuct3T(reader, dbConnection, ref duct3t))
                     {
@@ -2731,7 +2742,9 @@ namespace HVAC_CheckEngine
                                 newNode.RightNode = lastNode;
                                 break;
                         }
-                        GetSmokeCompartmentOfDuct3T(duct3t);
+                    
+                        long longId = (long)duct3t.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct3Ts").Id;
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
@@ -2766,7 +2779,9 @@ namespace HVAC_CheckEngine
                                 newNode.LeftNode = lastNode;
                                 break;
                         }
-                        GetSmokeCompartmentOfDuct4T(duct4t);
+
+                        long longId = (long)duct4t.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct4Ts").Id;
                     }
 
                     if(newNode!=null&& newNode.Id != null)
@@ -2897,6 +2912,7 @@ namespace HVAC_CheckEngine
                          
         static bool PreOrderFind(TreeNode node,AirTerminal airterminal)
         {
+            if(node == null) return false;
             if (node.Id < 0) return false;
             if (node.Id == airterminal.Id)
             {
@@ -2952,7 +2968,7 @@ namespace HVAC_CheckEngine
             }
             return null;
         }
-        public static Room GetSmokeCompartmentOfDuctElbow(DuctElbow airTerminal)
+        public static Room GetSmokeCompartmentOfElement(long Id,string tableName)
         {
             long lid = 0;//id為空的對象
             Room room = new Room(lid);
@@ -2962,8 +2978,10 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string sql = "select * from AirTerminals Where Id = ";
-            sql = sql + airTerminal.Id;
+            string sql = "select * from ";
+            sql += tableName + "Where Id =" ;
+        
+            sql = sql + Id;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             if (reader.Read())
@@ -2981,8 +2999,19 @@ namespace HVAC_CheckEngine
 
                 while (readerRoom.Read())
                 {
-                    AABB aabbRoom = GetAABB(readerRoom, dbConnectionArch);
-                    if (aabbRoom.IsAABBContainsAABB3D(aabbTerminal))
+                    List<PointIntList> PointLists = new List<PointIntList>();
+                    PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+                    string sSpaceId = "0";
+                    Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+                    room.Id = Convert.ToInt64(readerRoom["Id"].ToString());
+                    if (!GetRoomPolygon2D(room, ref poly))
+                    {
+                        return room;
+                    }
+                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
+                  || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
+                  || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
+                  || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
                     {
                         room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
                         room.name = reader["name"].ToString();
@@ -3003,98 +3032,7 @@ namespace HVAC_CheckEngine
                             room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
                         }
                     }
-                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbTerminal, aabbRoom))
-                    {
-                        string strVector = reader["NormalVector"].ToString();
-                        int index = strVector.IndexOf(":");
-                        int index_s = strVector.LastIndexOf(",\"Y");
-                        string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                        double dX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double dY = Convert.ToDouble(strY);
-
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double dZ = Convert.ToDouble(strY);
-                        List<double> listVector = new List<double>();
-                        listVector.Add(dX);
-                        listVector.Add(dY);
-                        listVector.Add(dZ);
-
-                        List<double> listVectorAirterminalToRoom = new List<double>();
-                        dX = aabbRoom.Center().X - aabbTerminal.Center().X;
-                        dY = aabbRoom.Center().Y - aabbTerminal.Center().Y;
-                        dZ = aabbRoom.Center().Z - aabbTerminal.Center().Z;
-                        listVectorAirterminalToRoom.Add(dX);
-                        listVectorAirterminalToRoom.Add(dY);
-                        listVectorAirterminalToRoom.Add(dZ);
-
-                        double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                        if (dDotProduct < 0)
-                        {
-                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                            room.name = readerRoom["name"].ToString();
-                            room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
-                            room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
-                            room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
-                            //room.m_dMaxlength
-                            //     room.m_dVolume
-                            //    room.m_eRoomPosition
-                            room.type = readerRoom["userLabel"].ToString();
-                            sql = "select * from Storeys where  Id =  ";
-                            sql = sql + readerRoom["storeyId"].ToString();
-                            SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                            SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                            if (reader1.Read())
-                            {
-                                room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                            }
-                        }
-
-                    }
-                }
-            }
-            //关闭连接               
-            return room;
-        }
-
-        public static Room GetSmokeCompartmentOfDuct3T(Duct3T airTerminal)
-        {
-            long lid = 0;//id為空的對象
-            Room room = new Room(lid);
-            if (!System.IO.File.Exists(m_hvacXdbPath))
-                return room;
-            //创建一个连接
-            string connectionstr = @"data source =" + m_hvacXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            string sql = "select * from AirTerminals Where Id = ";
-            sql = sql + airTerminal.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                AABB aabbTerminal = GetAABB(reader, dbConnection);
-                if (!System.IO.File.Exists(m_archXdbPath))
-                    return room;
-                //创建一个连接
-                string connectionArchstr = @"data source =" + m_archXdbPath;
-                SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
-                dbConnectionArch.Open();
-                sql = "select * from Spaces";
-                SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
-                SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
-
-                while (readerRoom.Read())
-                {
-                    AABB aabbRoom = GetAABB(readerRoom, dbConnectionArch);
-                    if (aabbRoom.IsAABBContainsAABB3D(aabbTerminal))
+                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
                     {
                         room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
                         room.name = reader["name"].ToString();
@@ -3115,178 +3053,12 @@ namespace HVAC_CheckEngine
                             room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
                         }
                     }
-                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbTerminal, aabbRoom))
-                    {
-                        string strVector = reader["NormalVector"].ToString();
-                        int index = strVector.IndexOf(":");
-                        int index_s = strVector.LastIndexOf(",\"Y");
-                        string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                        double dX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double dY = Convert.ToDouble(strY);
-
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double dZ = Convert.ToDouble(strY);
-                        List<double> listVector = new List<double>();
-                        listVector.Add(dX);
-                        listVector.Add(dY);
-                        listVector.Add(dZ);
-
-                        List<double> listVectorAirterminalToRoom = new List<double>();
-                        dX = aabbRoom.Center().X - aabbTerminal.Center().X;
-                        dY = aabbRoom.Center().Y - aabbTerminal.Center().Y;
-                        dZ = aabbRoom.Center().Z - aabbTerminal.Center().Z;
-                        listVectorAirterminalToRoom.Add(dX);
-                        listVectorAirterminalToRoom.Add(dY);
-                        listVectorAirterminalToRoom.Add(dZ);
-
-                        double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                        if (dDotProduct < 0)
-                        {
-                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                            room.name = readerRoom["name"].ToString();
-                            room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
-                            room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
-                            room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
-                            //room.m_dMaxlength
-                            //     room.m_dVolume
-                            //    room.m_eRoomPosition
-                            room.type = readerRoom["userLabel"].ToString();
-                            sql = "select * from Storeys where  Id =  ";
-                            sql = sql + readerRoom["storeyId"].ToString();
-                            SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                            SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                            if (reader1.Read())
-                            {
-                                room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                            }
-                        }
-
-                    }
                 }
             }
             //关闭连接               
             return room;
         }
-
-        public static Room GetSmokeCompartmentOfDuct4T(Duct4T airTerminal)
-        {
-            long lid = 0;//id為空的對象
-            Room room = new Room(lid);
-            if (!System.IO.File.Exists(m_hvacXdbPath))
-                return room;
-            //创建一个连接
-            string connectionstr = @"data source =" + m_hvacXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
-            string sql = "select * from AirTerminals Where Id = ";
-            sql = sql + airTerminal.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
-            SQLiteDataReader reader = command.ExecuteReader();
-            if (reader.Read())
-            {
-                AABB aabbTerminal = GetAABB(reader, dbConnection);
-                if (!System.IO.File.Exists(m_archXdbPath))
-                    return room;
-                //创建一个连接
-                string connectionArchstr = @"data source =" + m_archXdbPath;
-                SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
-                dbConnectionArch.Open();
-                sql = "select * from Spaces";
-                SQLiteCommand commandRoom = new SQLiteCommand(sql, dbConnectionArch);
-                SQLiteDataReader readerRoom = commandRoom.ExecuteReader();
-
-                while (readerRoom.Read())
-                {
-                    AABB aabbRoom = GetAABB(readerRoom, dbConnectionArch);
-                    if (aabbRoom.IsAABBContainsAABB3D(aabbTerminal))
-                    {
-                        room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                        room.name = reader["name"].ToString();
-                        room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
-                        room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
-                        //room.m_dMaxlength
-                        //     room.m_dVolume
-                        //    room.m_eRoomPosition
-                        room.type = readerRoom["userLabel"].ToString();
-                        sql = "select * from Storeys where  Id =  ";
-                        sql = sql + reader["storeyId"].ToString();
-                        SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                        if (reader1.Read())
-                        {
-                            room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                        }
-                    }
-                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbTerminal, aabbRoom))
-                    {
-                        string strVector = reader["NormalVector"].ToString();
-                        int index = strVector.IndexOf(":");
-                        int index_s = strVector.LastIndexOf(",\"Y");
-                        string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                        double dX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double dY = Convert.ToDouble(strY);
-
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double dZ = Convert.ToDouble(strY);
-                        List<double> listVector = new List<double>();
-                        listVector.Add(dX);
-                        listVector.Add(dY);
-                        listVector.Add(dZ);
-
-                        List<double> listVectorAirterminalToRoom = new List<double>();
-                        dX = aabbRoom.Center().X - aabbTerminal.Center().X;
-                        dY = aabbRoom.Center().Y - aabbTerminal.Center().Y;
-                        dZ = aabbRoom.Center().Z - aabbTerminal.Center().Z;
-                        listVectorAirterminalToRoom.Add(dX);
-                        listVectorAirterminalToRoom.Add(dY);
-                        listVectorAirterminalToRoom.Add(dZ);
-
-                        double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                        if (dDotProduct < 0)
-                        {
-                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                            room.name = readerRoom["name"].ToString();
-                            room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
-                            room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
-                            room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
-                            //room.m_dMaxlength
-                            //     room.m_dVolume
-                            //    room.m_eRoomPosition
-                            room.type = readerRoom["userLabel"].ToString();
-                            sql = "select * from Storeys where  Id =  ";
-                            sql = sql + readerRoom["storeyId"].ToString();
-                            SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                            SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                            if (reader1.Read())
-                            {
-                                room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                            }
-                        }
-
-                    }
-                }
-            }
-            //关闭连接               
-            return room;
-        }
+      
 
         private static bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, ref Duct duct)
         {
