@@ -2851,7 +2851,9 @@ namespace HVAC_CheckEngine
             PreOrderAddFireArea(lastNode);
 
             //从根节点 找到子节点为风口的所有节点
-            List<TreeNode> airTerminalNodes = PreOrderAirterminalNode(lastNode);
+
+            List<TreeNode> airTerminalNodes = new List<TreeNode>();
+            PreOrderAirterminalNode(airTerminalNodes ,lastNode);
             foreach (TreeNode airterminal in airTerminalNodes)
             {
                 List<TreeNode> ductNodes = new List<TreeNode>();
@@ -3018,28 +3020,28 @@ namespace HVAC_CheckEngine
 
         }
 
-        static  List<TreeNode> PreOrderAirterminalNode(TreeNode node)
+        static  void PreOrderAirterminalNode(List<TreeNode> airTerminalNodes ,TreeNode node)
         {
-            List<TreeNode> airTerminalNodes = new List<TreeNode>();
-            if(node == null) return airTerminalNodes;
-            if (node.Id < 0) return airTerminalNodes;
+            
+            if(node == null) return ;
+            if (node.Id < 0) return ;
             if (node.iType == 0)
             {
                 airTerminalNodes.Add(node);
             }
             if(node.LeftNode!=null)
             {
-                PreOrderAirterminalNode(node.LeftNode);
+                PreOrderAirterminalNode(airTerminalNodes,node.LeftNode);
             }
             if (node.DirectNode != null)
             {
-                PreOrderAirterminalNode(node.DirectNode);
+                PreOrderAirterminalNode(airTerminalNodes,node.DirectNode);
             }
             if (node.RightNode != null)
             {
-                PreOrderAirterminalNode(node.RightNode);
+                PreOrderAirterminalNode(airTerminalNodes,node.RightNode);
             }          
-            return airTerminalNodes;
+          
         }
 
         static TreeNode GetParentEquel3T4T(TreeNode node, List<TreeNode> ducts)
