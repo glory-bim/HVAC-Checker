@@ -2682,7 +2682,7 @@ namespace HVAC_CheckEngine
                         newNode.Id = airterminal.Id;
                         newNode.DirectNode = lastNode;
                         newNode.iType = 0;
-                        long longId = (long)duct.Id;
+                        long longId = (long)airterminal.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Ducts").Id;
                     }
                     else if (GetDuct(reader, dbConnection, ref duct))
@@ -3092,60 +3092,79 @@ namespace HVAC_CheckEngine
 
                 while (readerRoom.Read())
                 {
-                    List<PointIntList> PointLists = new List<PointIntList>();
-                    PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
-                    string sSpaceId = "0";
-                    Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
-                    room.Id = Convert.ToInt64(readerRoom["Id"].ToString());
-                    if (!GetRoomPolygon2D(room, ref poly))
-                    {
-                        return room;
-                    }
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                  || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                  || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                  || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
-                    {
-                        room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                        room.name = reader["name"].ToString();
-                        room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
-                        room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
-                        //room.m_dMaxlength
-                        //     room.m_dVolume
-                        //    room.m_eRoomPosition
-                        room.type = readerRoom["userLabel"].ToString();
-                        sql = "select * from Storeys where  Id =  ";
-                        sql = sql + readerRoom["storeyId"].ToString();
-                        SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader reader1 = command1.ExecuteReader();
 
-                        if (reader1.Read())
-                        {
-                            room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                        }
-                    }
-                    else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
-                    {
-                        room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                        room.name = readerRoom["name"].ToString();
-                        room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
-                        room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
-                        //room.m_dMaxlength
-                        //     room.m_dVolume
-                        //    room.m_eRoomPosition
-                        room.type = readerRoom["userLabel"].ToString();
-                        sql = "select * from Storeys where  Id =  ";
-                        sql = sql + readerRoom["storeyId"].ToString();
-                        SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                        SQLiteDataReader reader1 = command1.ExecuteReader();
+                    room.type = readerRoom["userLabel"].ToString();
+                    sql = "select * from Storeys where  Id =  ";
+                    sql = sql + readerRoom["storeyId"].ToString();
+                    SQLiteCommand command1 = new SQLiteCommand(sql, dbConnectionArch);
+                    SQLiteDataReader reader1 = command1.ExecuteReader();
 
-                        if (reader1.Read())
-                        {
-                            room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                        }
+                    if (reader1.Read())
+                    {
+                        room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
                     }
+
+                    if(room.m_iStoryNo == Convert.ToInt32( reader["StoreyNo"].ToString() ))
+                    {
+
+                        List<PointIntList> PointLists = new List<PointIntList>();
+                        PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+                        string sSpaceId = "0";
+                        Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+                        room.Id = Convert.ToInt64(readerRoom["Id"].ToString());
+                        if (!GetRoomPolygon2D(room, ref poly))
+                        {
+                            return room;
+                        }
+                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
+                      || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
+                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
+                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        {
+                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                            room.name = reader["name"].ToString();
+                            room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
+                            room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
+                            room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
+                            //room.m_dMaxlength
+                            //     room.m_dVolume
+                            //    room.m_eRoomPosition
+                            room.type = readerRoom["userLabel"].ToString();
+                            sql = "select * from Storeys where  Id =  ";
+                            sql = sql + readerRoom["storeyId"].ToString();
+                            SQLiteCommand command2 = new SQLiteCommand(sql, dbConnectionArch);
+                            SQLiteDataReader reader2 = command2.ExecuteReader();
+
+                            if (reader2.Read())
+                            {
+                                room.m_iStoryNo = Convert.ToInt32(reader2["storeyNo"].ToString());
+                            }
+                        }
+                        else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
+                        {
+                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                            room.name = readerRoom["name"].ToString();
+                            room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
+                            room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
+                            room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
+                            //room.m_dMaxlength
+                            //     room.m_dVolume
+                            //    room.m_eRoomPosition
+                            room.type = readerRoom["userLabel"].ToString();
+                            sql = "select * from Storeys where  Id =  ";
+                            sql = sql + readerRoom["storeyId"].ToString();
+                            SQLiteCommand command2 = new SQLiteCommand(sql, dbConnectionArch);
+                            SQLiteDataReader reader2 = command2.ExecuteReader();
+
+                            if (reader2.Read())
+                            {
+                                room.m_iStoryNo = Convert.ToInt32(reader2["storeyNo"].ToString());
+                            }
+                        }
+
+                    }
+
+          
                 }
             }
             //关闭连接               
