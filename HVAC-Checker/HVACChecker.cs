@@ -662,8 +662,8 @@ namespace HVAC_CheckEngine
                 if (assistantFunctions.isRoomHaveNatureVentilateSystem(stairCase))
                 {
                     //  获得楼梯间的最低楼层编号及最高楼层编号
-                    int lowestStoryNo = stairCase.storyNo.Value;
-                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
+                    int lowestStoryNo = stairCase.m_iStoryNo.Value;
+                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
                     //  获得楼梯间内的所有窗户的集合
                     List<Window> windows = HVACFunction.GetWindowsInRoom(stairCase);
                     //  从窗户集合中筛选出位于最高楼层的窗户的集合
@@ -801,8 +801,8 @@ namespace HVAC_CheckEngine
                     List<AirTerminal> pressureAirTerminals = assistantFunctions.filtrateAirTerminalOfSomeSystem(airTerminals, "加压送风");
 
                     //获得此楼梯间的最低楼层编号及最高楼层编号
-                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
-                    int lowestStoryNo = stairCase.storyNo.Value;
+                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                    int lowestStoryNo = stairCase.m_iStoryNo.Value;
                     List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
 
                     //自下向上获得每个风口负担的楼层划分
@@ -891,8 +891,8 @@ namespace HVAC_CheckEngine
                 if (assistantFunctions.isRoomHaveSomeMechanicalSystem(stairCase,"加压送风"))
                 {
                     //获得楼梯间的最高楼层编号
-                    int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
-                    int lowestStoryNo = stairCase.storyNo.Value;
+                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                    int lowestStoryNo = stairCase.m_iStoryNo.Value;
                     //获得楼梯间所有固定窗
                     List<Window> fixWindows = assistantFunctions.getFixOuterWindowsOfRoom(stairCase);
                     //筛选出最高楼层的固定窗
@@ -919,7 +919,7 @@ namespace HVAC_CheckEngine
 
                        
                        
-                        for (int currentStoryNo= stairCase.storyNo.Value; currentStoryNo <= storyNoUpperBound; ++currentStoryNo)
+                        for (int currentStoryNo= stairCase.m_iStoryNo.Value; currentStoryNo <= storyNoUpperBound; ++currentStoryNo)
                         {
                             //计算五层以内的固定窗面积
                             int highestStoryNoInCurrentIteration = 0;
@@ -990,10 +990,10 @@ namespace HVAC_CheckEngine
                 {
                     //判断风机的所有排烟口是否都在一个防火分区中
 
-                    FireDistrict fireDistrict = HVACFunction.getFireDistrictContainAirTerminal(airTerminals[0]);
+                    FireCompartment fireDistrict = HVACFunction.GetFireCompartmentContainAirTerminal(airTerminals[0]);
                     foreach(AirTerminal airTerminal in airTerminals)
                     {
-                        if(!HVACFunction.isAirTerminalInFireDistrict(airTerminal,fireDistrict))
+                        if(!HVACFunction.IsAirTermianlInFireDistrict(airTerminal,fireDistrict))
                         {
                             result.isPassCheck = false;
                             string remark = "风机所在的排烟系统跨越了防火分区设置";
