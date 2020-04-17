@@ -2879,7 +2879,7 @@ namespace HVAC_CheckEngine
         {
             if(node.LeftNode!=null)
             {
-                if (!nodeArea.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+                if ((!nodeArea.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea)) && (node.LeftNode.strfireAirea != null))
                 {
                     nodeArea.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
                     AddArea(nodeArea, node.LeftNode.LeftNode);
@@ -2890,7 +2890,7 @@ namespace HVAC_CheckEngine
 
             if (node.DirectNode != null)
             {
-                if (!nodeArea.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+                if ((!nodeArea.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))&& (node.DirectNode.strfireAirea!=null))
                 {
                     nodeArea.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
                     AddArea(nodeArea, node.DirectNode.LeftNode);
@@ -2902,7 +2902,7 @@ namespace HVAC_CheckEngine
 
             if (node.RightNode != null)
             {
-                if (!nodeArea.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+                if ((!nodeArea.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea)) && (node.RightNode.strfireAirea != null))
                 {
                     nodeArea.StrfireAireas.Add((long)node.RightNode.strfireAirea);
                     AddArea(nodeArea, node.RightNode.LeftNode);
@@ -2922,7 +2922,7 @@ namespace HVAC_CheckEngine
                 {
                     node.StrfireAireas.Add((long)node.strfireAirea);
                 }
-                else if (!node.StrfireAireas.Exists(x => x == node.strfireAirea))
+                else if ((!node.StrfireAireas.Exists(x => x == node.strfireAirea)) && node.strfireAirea != null)
                 {
                     node.StrfireAireas.Add((long)node.strfireAirea);
                 }
@@ -2938,7 +2938,7 @@ namespace HVAC_CheckEngine
 
                     AddArea(node, node.LeftNode);
                 }
-                else if (!node.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+                else if ((!node.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea)) && node.LeftNode.strfireAirea != null)
                 {
                     node.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
 
@@ -2955,7 +2955,7 @@ namespace HVAC_CheckEngine
 
                     AddArea(node, node.DirectNode);
                 }
-                else if (!node.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+                else if ((!node.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea)) && node.DirectNode.strfireAirea != null)
                 {
                     node.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
                     AddArea(node, node.DirectNode);
@@ -2970,7 +2970,7 @@ namespace HVAC_CheckEngine
 
                     AddArea(node, node.RightNode);
                 }
-                else if (!node.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+                else if ((!node.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea)) && node.RightNode.strfireAirea != null)
                 {
                     node.StrfireAireas.Add((long)node.RightNode.strfireAirea);
                     AddArea(node, node.RightNode);
@@ -3149,7 +3149,8 @@ namespace HVAC_CheckEngine
           
                 }
             }
-            //关闭连接               
+            //关闭连接  
+            room.Id = null;
             return room;
         }
 
