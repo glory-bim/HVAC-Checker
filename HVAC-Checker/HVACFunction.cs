@@ -2683,7 +2683,7 @@ namespace HVAC_CheckEngine
                         newNode.DirectNode = lastNode;
                         newNode.iType = 0;
                         long longId = (long)airterminal.Id;
-                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Ducts").Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "AirTerminals").Id;
                     }
                     else if (GetDuct(reader, dbConnection, ref duct))
                     {
