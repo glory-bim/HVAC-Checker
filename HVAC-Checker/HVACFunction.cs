@@ -3092,7 +3092,7 @@ namespace HVAC_CheckEngine
 
                 while (readerRoom.Read())
                 {
-
+                    room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
                     room.type = readerRoom["userLabel"].ToString();
                     sql = "select * from Storeys where  Id =  ";
                     sql = sql + readerRoom["storeyId"].ToString();
@@ -3120,8 +3120,7 @@ namespace HVAC_CheckEngine
                       || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
-                        {
-                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                        {                           
                             room.name = reader["name"].ToString();
                             room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
                             room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
@@ -3129,20 +3128,11 @@ namespace HVAC_CheckEngine
                             //room.m_dMaxlength
                             //     room.m_dVolume
                             //    room.m_eRoomPosition
-                            room.type = readerRoom["userLabel"].ToString();
-                            sql = "select * from Storeys where  Id =  ";
-                            sql = sql + readerRoom["storeyId"].ToString();
-                            SQLiteCommand command2 = new SQLiteCommand(sql, dbConnectionArch);
-                            SQLiteDataReader reader2 = command2.ExecuteReader();
-
-                            if (reader2.Read())
-                            {
-                                room.m_iStoryNo = Convert.ToInt32(reader2["storeyNo"].ToString());
-                            }
+                            return room;
+                           
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
-                        {
-                            room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
+                        {                        
                             room.name = readerRoom["name"].ToString();
                             room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
                             room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
@@ -3150,16 +3140,8 @@ namespace HVAC_CheckEngine
                             //room.m_dMaxlength
                             //     room.m_dVolume
                             //    room.m_eRoomPosition
-                            room.type = readerRoom["userLabel"].ToString();
-                            sql = "select * from Storeys where  Id =  ";
-                            sql = sql + readerRoom["storeyId"].ToString();
-                            SQLiteCommand command2 = new SQLiteCommand(sql, dbConnectionArch);
-                            SQLiteDataReader reader2 = command2.ExecuteReader();
+                            return room;
 
-                            if (reader2.Read())
-                            {
-                                room.m_iStoryNo = Convert.ToInt32(reader2["storeyNo"].ToString());
-                            }
                         }
 
                     }
