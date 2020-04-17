@@ -33,6 +33,7 @@ namespace HVAC_CheckEngine
 
         public TreeNode()
         {
+            StrfireAireas = new List<long>();
 
         }
 
@@ -2666,6 +2667,7 @@ namespace HVAC_CheckEngine
                 //if (reader["linkElementId"].ToString() != m_strLastId)
                 if(!LastNodes.Exists(x => x.Id == Convert.ToInt64( reader["linkElementId"].ToString())))
                 {
+                    AirTerminal airterminal = new AirTerminal(-1);
                     Duct duct = new Duct(-1);
                     DuctElbow ductElbow = new DuctElbow(-1);
                     DuctReducer ductReducer = new DuctReducer(-1);
@@ -2675,46 +2677,67 @@ namespace HVAC_CheckEngine
                     Duct3T duct3t = new Duct3T(-1);
                     Duct4T duct4t = new Duct4T(-1);
 
-                    if (GetDuct(reader, dbConnection, ref duct))
+                    if (GetAirterminal(reader, dbConnection, ref airterminal))
+                    {
+                        newNode.Id = airterminal.Id;
+                        newNode.DirectNode = lastNode;
+                        newNode.iType = 0;
+                        long longId = (long)duct.Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Ducts").Id;
+                    }
+                    else if (GetDuct(reader, dbConnection, ref duct))
                     {
                         newNode.Id = duct.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)duct.Id;
-                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct").Id;
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Ducts").Id;
                     }
                     else if (GetDuctElbow(reader, dbConnection, ref ductElbow))
                     {
+                        newNode.Id = ductElbow.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)ductElbow.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctElbows").Id;                       
                     }
                     else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
                     {
+                        newNode.Id = ductReducer.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)ductReducer.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctReducers").Id;
                     }
                     else if (GetDuctDamper(reader, dbConnection, ref ductDamper))
                     {
+                        newNode.Id = ductDamper.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)ductDamper.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctDampers").Id;
                     }
                     else if (GetDuctSoft(reader, dbConnection, ref ductSoft))
                     {
+                        newNode.Id = ductSoft.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)ductSoft.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctSofts").Id;
                     }
                     else if (GetFlexibleShortTube(reader, dbConnection, ref flexibleShortTube))
                     {
+                        newNode.Id = flexibleShortTube.Id;
                         newNode.DirectNode = lastNode;
+                        newNode.iType = 2;
                         long longId = (long)flexibleShortTube.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "FlexibleShortTubes").Id;
                     }
                     else if (GetDuct3T(reader, dbConnection, ref duct3t))
                     {
+                        newNode.iType = 3;
                         newNode.Id = duct3t.Id;
+
                         sql = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
                         sql += strId;
@@ -2748,6 +2771,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
+                        newNode.iType = 4;
                         newNode.Id = duct4t.Id;
                         sql = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
@@ -2853,60 +2877,120 @@ namespace HVAC_CheckEngine
 
         private static void AddArea(TreeNode nodeArea, TreeNode node)
         {
-            if (!nodeArea.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+            if(node.LeftNode!=null)
             {
-                nodeArea.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
-                AddArea(nodeArea, node.LeftNode.LeftNode);
-                AddArea(nodeArea, node.LeftNode.DirectNode);
-                AddArea(nodeArea, node.LeftNode.RightNode);
+                if (!nodeArea.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+                {
+                    nodeArea.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
+                    AddArea(nodeArea, node.LeftNode.LeftNode);
+                    AddArea(nodeArea, node.LeftNode.DirectNode);
+                    AddArea(nodeArea, node.LeftNode.RightNode);
+                }
             }
-            if (!nodeArea.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+
+            if (node.DirectNode != null)
             {
-                nodeArea.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
-                AddArea(nodeArea, node.DirectNode.LeftNode);
-                AddArea(nodeArea, node.DirectNode.DirectNode);
-                AddArea(nodeArea, node.DirectNode.RightNode);
+                if (!nodeArea.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+                {
+                    nodeArea.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
+                    AddArea(nodeArea, node.DirectNode.LeftNode);
+                    AddArea(nodeArea, node.DirectNode.DirectNode);
+                    AddArea(nodeArea, node.DirectNode.RightNode);
+                }
             }
-            if (!nodeArea.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+
+
+            if (node.RightNode != null)
             {
-                nodeArea.StrfireAireas.Add((long)node.RightNode.strfireAirea);
-                AddArea(nodeArea, node.RightNode.LeftNode);
-                AddArea(nodeArea, node.RightNode.DirectNode);
-                AddArea(nodeArea, node.RightNode.RightNode);
+                if (!nodeArea.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+                {
+                    nodeArea.StrfireAireas.Add((long)node.RightNode.strfireAirea);
+                    AddArea(nodeArea, node.RightNode.LeftNode);
+                    AddArea(nodeArea, node.RightNode.DirectNode);
+                    AddArea(nodeArea, node.RightNode.RightNode);
+                }
             }
+         
         }
 
         static bool PreOrderAddFireArea(TreeNode node)
-        {
-            if (node.Id < 0) return false;
-
-            if(!node.StrfireAireas.Exists(x => x == node.strfireAirea))        
+        {        
+            if (node != null)
             {
-                node.StrfireAireas.Add((long)lastFireid);
-            }
-
-            if (!node.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
-            {
-                node.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
-
-                AddArea(node, node.LeftNode);
-            }
-            if (!node.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
-            {
-                node.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
-                AddArea(node, node.DirectNode);
-            }
-            if (!node.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
-            {
-                node.StrfireAireas.Add((long)node.RightNode.strfireAirea);
-                AddArea(node, node.RightNode);
+                if (node.Id < 0) return false;
+                if (node.StrfireAireas == null && node.strfireAirea != null)
+                {
+                    node.StrfireAireas.Add((long)node.strfireAirea);
+                }
+                else if (!node.StrfireAireas.Exists(x => x == node.strfireAirea))
+                {
+                    node.StrfireAireas.Add((long)node.strfireAirea);
+                }
             }
 
 
 
-            PreOrderAddFireArea(node.LeftNode);
-            PreOrderAddFireArea(node.DirectNode);
-            PreOrderAddFireArea(node.RightNode);          
+            if(node.LeftNode!=null)
+            {
+                if (node.StrfireAireas == null && node.LeftNode.strfireAirea != null)
+                {
+                    node.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
+
+                    AddArea(node, node.LeftNode);
+                }
+                else if (!node.StrfireAireas.Exists(x => x == node.LeftNode.strfireAirea))
+                {
+                    node.StrfireAireas.Add((long)node.LeftNode.strfireAirea);
+
+                    AddArea(node, node.LeftNode);
+                }
+            }
+
+
+            if (node.DirectNode != null)
+            {
+                if (node.StrfireAireas == null && node.DirectNode.strfireAirea != null)
+                {
+                    node.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
+
+                    AddArea(node, node.DirectNode);
+                }
+                else if (!node.StrfireAireas.Exists(x => x == node.DirectNode.strfireAirea))
+                {
+                    node.StrfireAireas.Add((long)node.DirectNode.strfireAirea);
+                    AddArea(node, node.DirectNode);
+                }
+            }
+
+            if (node.RightNode != null)
+            {
+                if (node.StrfireAireas == null && node.RightNode.strfireAirea != null)
+                {
+                    node.StrfireAireas.Add((long)node.RightNode.strfireAirea);
+
+                    AddArea(node, node.RightNode);
+                }
+                else if (!node.StrfireAireas.Exists(x => x == node.RightNode.strfireAirea))
+                {
+                    node.StrfireAireas.Add((long)node.RightNode.strfireAirea);
+                    AddArea(node, node.RightNode);
+                }
+            }
+
+
+            if(node.LeftNode!=null)
+            {
+                PreOrderAddFireArea(node.LeftNode);
+            }
+            if (node.LeftNode != null)
+            {
+                PreOrderAddFireArea(node.DirectNode);
+            }
+            if (node.RightNode != null)
+            {
+                PreOrderAddFireArea(node.RightNode);
+            }
+                
             return true;
         }
                          
@@ -2943,9 +3027,18 @@ namespace HVAC_CheckEngine
             {
                 airTerminalNodes.Add(node);
             }
-            PreOrderAirterminalNode(node.LeftNode);
-            PreOrderAirterminalNode(node.DirectNode);
-            PreOrderAirterminalNode(node.RightNode);
+            if(node.LeftNode!=null)
+            {
+                PreOrderAirterminalNode(node.LeftNode);
+            }
+            if (node.DirectNode != null)
+            {
+                PreOrderAirterminalNode(node.DirectNode);
+            }
+            if (node.RightNode != null)
+            {
+                PreOrderAirterminalNode(node.RightNode);
+            }          
             return airTerminalNodes;
         }
 
@@ -2979,7 +3072,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from ";
-            sql += tableName + "Where Id =" ;
+            sql += tableName +" "+"Where Id =" ;
         
             sql = sql + Id;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
@@ -3015,15 +3108,15 @@ namespace HVAC_CheckEngine
                     {
                         room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
                         room.name = reader["name"].ToString();
-                        room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
-                        room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                        room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
+                        room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
                         //room.m_dMaxlength
                         //     room.m_dVolume
                         //    room.m_eRoomPosition
                         room.type = readerRoom["userLabel"].ToString();
                         sql = "select * from Storeys where  Id =  ";
-                        sql = sql + reader["storeyId"].ToString();
+                        sql = sql + readerRoom["storeyId"].ToString();
                         SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
                         SQLiteDataReader reader1 = command1.ExecuteReader();
 
@@ -3035,16 +3128,16 @@ namespace HVAC_CheckEngine
                     else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
                     {
                         room = new Room(Convert.ToInt64(readerRoom["Id"].ToString()));
-                        room.name = reader["name"].ToString();
-                        room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
-                        room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                        room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                        room.name = readerRoom["name"].ToString();
+                        room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
+                        room.m_dArea = Convert.ToDouble(readerRoom["dArea"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(readerRoom["nNumberOfPeople"].ToString());
                         //room.m_dMaxlength
                         //     room.m_dVolume
                         //    room.m_eRoomPosition
                         room.type = readerRoom["userLabel"].ToString();
                         sql = "select * from Storeys where  Id =  ";
-                        sql = sql + reader["storeyId"].ToString();
+                        sql = sql + readerRoom["storeyId"].ToString();
                         SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
                         SQLiteDataReader reader1 = command1.ExecuteReader();
 
@@ -3058,7 +3151,21 @@ namespace HVAC_CheckEngine
             //关闭连接               
             return room;
         }
-      
+
+        private static bool GetAirterminal(SQLiteDataReader reader, SQLiteConnection dbConnection, ref AirTerminal duct)
+        {
+            string sql = "select * from AirTerminals Where Id = ";
+            sql += reader["linkElementId"].ToString();
+
+            SQLiteCommand commandFans = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerFans = commandFans.ExecuteReader();
+            if (readerFans.Read())
+            {
+                duct = new AirTerminal(Convert.ToInt64(readerFans["Id"].ToString()));
+                return true;
+            }
+            return false;
+        }
 
         private static bool GetDuct(SQLiteDataReader reader, SQLiteConnection dbConnection, ref Duct duct)
         {
