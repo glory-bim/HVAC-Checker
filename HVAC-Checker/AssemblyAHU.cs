@@ -12,5 +12,7 @@ namespace HVAC_CheckEngine
         {
 
         }
+
+        public string type { get; set; } = null;
     }
 }

@@ -813,7 +813,7 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //8找到穿越防火分区的风管对象集合  userlable
-        public static List<Duct> GetDuctsCrossFireDistrict(FireDistrict fireDistrict)
+        public static List<Duct> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
         {          
             List<Duct> ducts = new List<Duct>();
             string strDbName = "/建筑.GDB";
@@ -1364,7 +1364,7 @@ namespace HVAC_CheckEngine
             }
         }
         //18获得防烟分区长边长度
-        public static double GetFireDistrictLength(FireDistrict fireDistrict)
+        public static double GetFireDistrictLength(FireCompartment fireDistrict)
         {
             double dLength = 0.0;  
             

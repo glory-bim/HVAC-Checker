@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HVAC_CheckEngine
 {
-    public class FlexibleShortTubes:Element
+    public class FlexibleShortTube:Element
     {
 
-        public FlexibleShortTubes(long id) : base(id)
+        public FlexibleShortTube(long id) : base(id)
         {
 
         }

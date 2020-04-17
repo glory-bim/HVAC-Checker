@@ -101,6 +101,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="HVACCheckerTests.cs" />
     <Compile Include="HVACFunctionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
