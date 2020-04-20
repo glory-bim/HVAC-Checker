@@ -98,9 +98,16 @@
     <Compile Include="BimReview.cs" />
     <Compile Include="door.cs" />
     <Compile Include="Duct.cs" />
+    <Compile Include="Duct3T.cs" />
+    <Compile Include="Duct4T.cs" />
+    <Compile Include="DuctDamper.cs" />
+    <Compile Include="DuctElbow.cs" />
+    <Compile Include="DuctReducer.cs" />
+    <Compile Include="DuctSoft.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Fan.cs" />
     <Compile Include="FireCompartment.cs" />
+    <Compile Include="FireDamper.cs" />
     <Compile Include="FlexibleShortTubes.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="GasMeter.cs" />
@@ -126,6 +133,9 @@
     <None Include="packages.config" />
     <None Include="建筑.GDB" />
     <None Include="机电.GDB" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="question.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -13,10 +13,6 @@ namespace HVAC_CheckEngine
             Id = id;
         }
 
-        public long? Id { get; } = null;
-
-        public int? storyNo { get; set; } = null;
-
-
+        public long? Id { get; set; } = null;
     }
 }

@@ -15,15 +15,14 @@ namespace HVAC_CheckEngine
         public string name { get; set; } = null;
         public string boundaryLoops { get; set; } = null;
 
-        public double? height { get; set; } = null;
-
-        public int? numberOfPeople { get; set; } = null;
+        public int? m_iNumberOfPeople { get; set; } = null;
         
-        public double? area { get; set; } = null;
-        public RoomPosition? roomPosition { get; set; } = null;
-        public double? m_volume { get; set; } = null;
+        public double? m_dArea { get; set; } = null;
+        public RoomPosition? m_eRoomPosition { get; set; } = null;
+        public int ? m_iStoryNo { get; set; } = null;
+        public double? m_dVolume { get; set; } = null;
 
-        public double? m_dheight { get; set; } = null;
+        public double? m_dHeight { get; set; } = null;
         public double? m_dMaxlength { get; set; } = null;
         
     }
