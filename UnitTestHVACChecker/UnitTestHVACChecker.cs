@@ -274,10 +274,10 @@ namespace UnitTestHVACChecker
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
                         room.type = Type;
-                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                         room.name = context.DataRow["房间名称"].ToString();
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -295,10 +295,10 @@ namespace UnitTestHVACChecker
                          long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                          Room room = new Room(Id);
                          room.type = Type;
-                         room.area = area;
+                         room.m_dArea = area;
                          room.name = name;
-                         room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                         room.roomPosition = position;
+                         room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                         room.m_eRoomPosition = position;
                          Rooms.Add(room);
                      }
                      return Rooms;
@@ -317,9 +317,9 @@ namespace UnitTestHVACChecker
                           Room room = new Room(Id);
                           room.type = roomType;
                           room.name = context.DataRow["房间名称"].ToString();
-                          room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                          room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                          room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                          room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                          room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                          room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
                           Rooms.Add(room);
 
                       }
@@ -518,11 +518,11 @@ namespace UnitTestHVACChecker
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
                         room.type = Type;
-                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
                         room.name = context.DataRow["房间名称"].ToString();
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                        room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -540,11 +540,11 @@ namespace UnitTestHVACChecker
                         long Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                         Room room = new Room(Id);
                         room.type = Type;
-                        room.area = area;
+                        room.m_dArea = area;
                         room.name = name;
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.roomPosition = position;
-                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.m_eRoomPosition = position;
+                        room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
                     }
                     return Rooms;
@@ -563,10 +563,10 @@ namespace UnitTestHVACChecker
                         Room room = new Room(Id);
                         room.type = roomType;
                         room.name = context.DataRow["房间名称"].ToString();
-                        room.area = Convert.ToDouble(context.DataRow["房间面积"].ToString());
-                        room.roomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
-                        room.numberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
-                        room.storyNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
+                        room.m_dArea = Convert.ToDouble(context.DataRow["房间面积"].ToString());
+                        room.m_eRoomPosition = (RoomPosition)Convert.ToInt32(context.DataRow["房间位置"].ToString());
+                        room.m_iNumberOfPeople = Convert.ToInt32(context.DataRow["房间人数"].ToString());
+                        room.m_iStoryNo = Convert.ToInt32(context.DataRow["房间楼层编号"].ToString());
                         Rooms.Add(room);
 
                     }
@@ -902,15 +902,15 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetALLRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
@@ -981,15 +981,15 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetALLRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
@@ -1291,7 +1291,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
                 //arrange
@@ -1355,7 +1355,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
                 //arrange
@@ -1413,7 +1413,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
                 //arrange
@@ -1471,7 +1471,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
                 //arrange
@@ -2052,7 +2052,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllFans = FakeHVACFunction.GetAllFans_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireCompartmentAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.IsAirTermianlInFireDistrictAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
                 //arrange
 
                 string comment = "设计满足规范GB51251_2017中第4.4.1条条文规定。";
@@ -2115,7 +2115,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllFans = FakeHVACFunction.GetAllFans_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isAirTerminalInFireCompartmentAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.IsAirTermianlInFireDistrictAirTerminalFireCompartment = FakeHVACFunction.isAirTerminalInFireDistrict_new;
                 //arrange
 
                 string comment = "设计不满足规范GB51251_2017中第4.4.1条条文规定。";
@@ -3128,9 +3128,9 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.IsSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestm_iStoryNoOfSmokeCompartment_new;
                 //arrange
 
                 string comment = "设计满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
@@ -3197,11 +3197,11 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.isSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.IsSmokeCompartmentIntersectFireCompartmentSmokeCompartmentFireCompartment = FakeHVACFunction.isSmokeCompartmentIntersectFireCompartment_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestm_iStoryNoOfSmokeCompartment_new;
                 //arrange
 
                 string comment = "设计不满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
@@ -3268,7 +3268,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetSmokeCompartmentsInRoomRoom = FakeHVACFunction.GetSmokeCompartmentsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfSmokeCompartment_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestm_iStoryNoOfSmokeCompartment_new;
                 //arrange
 
                 string comment = "设计满足规范GB50067_2014中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
@@ -4018,13 +4018,13 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
@@ -4088,13 +4088,13 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
@@ -4212,11 +4212,11 @@ namespace UnitTestHVACChecker
             long roomId = room.Id.Value;
             IRow row = (IRow)sheet_rooms.GetRow((int)roomId);
 
-            int storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
-            return storyNo;
+            int m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
+            return m_iStoryNo;
         }
 
-        public static int getHighestStoryNoOfSmokeCompartment_new(Room smokeCompartment)
+        public static int getHighestm_iStoryNoOfSmokeCompartment_new(Room smokeCompartment)
         {
             string importExcelPath = ExcelPath_new;
             //打开测试数据文件
@@ -4227,8 +4227,8 @@ namespace UnitTestHVACChecker
             long roomId = smokeCompartment.Id.Value;
             IRow row = (IRow)sheet_rooms.GetRow((int)roomId);
 
-            int storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
-            return storyNo;
+            int m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间最高楼层编号")).NumericCellValue;
+            return m_iStoryNo;
         }
         public static List<AirTerminal> GetRoomContainAirTerminal_new(Room room)
         {
@@ -4470,10 +4470,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(Id);
                 room.type = Type;
                 room.name = row.GetCell(13).StringCellValue;
-                room.area = row.GetCell(10).NumericCellValue;
-                room.roomPosition=(RoomPosition)row.GetCell(12).NumericCellValue;
-                room.numberOfPeople= (int)row.GetCell(14).NumericCellValue;
-                room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                room.m_dArea = row.GetCell(10).NumericCellValue;
+                room.m_eRoomPosition=(RoomPosition)row.GetCell(12).NumericCellValue;
+                room.m_iNumberOfPeople= (int)row.GetCell(14).NumericCellValue;
+                room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                 Rooms.Add(room);
              }
 
@@ -4500,11 +4500,11 @@ namespace UnitTestHVACChecker
                     Room room = new Room(Id);
                     room.type = Type;
                     room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
-                    room.height = (int)row.GetCell(sheet_rooms.getColNumber("房间高度")).NumericCellValue;
+                    room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.m_dHeight = (int)row.GetCell(sheet_rooms.getColNumber("房间高度")).NumericCellValue;
                     rooms.Add(room);
                 }
 
@@ -4535,10 +4535,10 @@ namespace UnitTestHVACChecker
                     Room room = new Room(Id);
                     room.type = type;
                     room.name = name;
-                    room.area = area;
-                    room.roomPosition = position;
-                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.m_dArea = area;
+                    room.m_eRoomPosition = position;
+                    room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                     rooms.Add(room);
                 }
 
@@ -4628,10 +4628,10 @@ namespace UnitTestHVACChecker
                             Room room = new Room(Id);
                             room.type = row.GetCell(1).StringCellValue;
                             room.name= row.GetCell(13).StringCellValue;
-                            room.area = area;
-                            room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                            room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                            room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                            room.m_dArea = area;
+                            room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                            room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+                            room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                             Rooms.Add(room);
 
                         }
@@ -4669,10 +4669,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(Id);
                 room.type = row.GetCell(1).StringCellValue;
                 room.name = row.GetCell(13).StringCellValue;
-                room.area = row.GetCell(10).NumericCellValue;
-                room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                room.m_dArea = row.GetCell(10).NumericCellValue;
+                room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+                room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                 region.rooms.Add(room);
             }
             if (region != null)
@@ -4750,7 +4750,7 @@ namespace UnitTestHVACChecker
             {
                 IRow row = (IRow)sheet_floors.GetRow(index);
                 Floor floor = new Floor((long)row.GetCell(sheet_floors.getColNumber("ID")).NumericCellValue);
-                floor.storyNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
+                floor.m_iStoryNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
                 floor.height = row.GetCell(sheet_floors.getColNumber("楼层高度")).NumericCellValue;
                 floor.elevation = row.GetCell(sheet_floors.getColNumber("楼层标高")).NumericCellValue;
                 floors.Add(floor);
@@ -4810,7 +4810,7 @@ namespace UnitTestHVACChecker
                 if(name.Contains(sName))
                 {
                     FireCompartment fireCompartment = new FireCompartment(index);
-                    fireCompartment.storyNo= (int)row.GetCell(sheet_fireCompartments.getColNumber("楼层编号")).NumericCellValue;
+                    fireCompartment.m_iStoryNo= (int)row.GetCell(sheet_fireCompartments.getColNumber("楼层编号")).NumericCellValue;
                     fireCompartments.Add(fireCompartment);
                 }
             }
@@ -4840,10 +4840,10 @@ namespace UnitTestHVACChecker
                         Room room = new Room(Id);
                         room.type = roomType;
                         room.name = row.GetCell(13).StringCellValue;
-                        room.area = row.GetCell(10).NumericCellValue;
-                        room.roomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
-                        room.numberOfPeople = (int)row.GetCell(14).NumericCellValue;
-                        room.storyNo = (int)row.GetCell(15).NumericCellValue;
+                        room.m_dArea = row.GetCell(10).NumericCellValue;
+                        room.m_eRoomPosition = (RoomPosition)row.GetCell(12).NumericCellValue;
+                        room.m_iNumberOfPeople = (int)row.GetCell(14).NumericCellValue;
+                        room.m_iStoryNo = (int)row.GetCell(15).NumericCellValue;
                         Rooms.Add(room);
                     }
                 }
@@ -4873,10 +4873,10 @@ namespace UnitTestHVACChecker
                     Room room = new Room(Id);
                     room.type = roomType;
                     room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                     rooms.Add(room);
                 }
             }
@@ -4897,10 +4897,10 @@ namespace UnitTestHVACChecker
             Room room = new Room(id);
             room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
             room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-            room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-            room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-            room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-            room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+            room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+            room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+            room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+            room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
 
             return room;
         }
@@ -4937,10 +4937,10 @@ namespace UnitTestHVACChecker
                 Room room = new Room(id);
                 room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue; ;
                 room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 rooms.Add(room);
             }
             return rooms;
@@ -4961,7 +4961,7 @@ namespace UnitTestHVACChecker
                 IRow row = (IRow)sheet_airTerminals.GetRow((int)id);
                 AirTerminal airTerminal = new AirTerminal(id);
                 airTerminal.systemType= row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
-                airTerminal.storyNo= (int)row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue;
+                airTerminal.m_iStoryNo= (int)row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue;
                 airTerminal.elevation= row.GetCell(sheet_airTerminals.getColNumber("风口标高")).NumericCellValue;
                 airTerminal.airFlowRate = row.GetCell(sheet_airTerminals.getColNumber("风量")).NumericCellValue;
                 airTerminals.Add(airTerminal);
@@ -4996,8 +4996,8 @@ namespace UnitTestHVACChecker
             {
                 IRow row = (IRow)sheet_smokeCompartments.GetRow((int)id);
                 SmokeCompartment smokeCompartment = new SmokeCompartment(id);
-                smokeCompartment.area= row.GetCell(sheet_smokeCompartments.getColNumber("面积")).NumericCellValue;
-                smokeCompartment.storyNo = (int)row.GetCell(sheet_smokeCompartments.getColNumber("楼层编号")).NumericCellValue;
+                smokeCompartment.m_dArea= row.GetCell(sheet_smokeCompartments.getColNumber("面积")).NumericCellValue;
+                smokeCompartment.m_iStoryNo = (int)row.GetCell(sheet_smokeCompartments.getColNumber("楼层编号")).NumericCellValue;
 
                 smokeCompartments.Add(smokeCompartment);
             }
@@ -5035,7 +5035,8 @@ namespace UnitTestHVACChecker
                 Window window = new Window(id);
                 IRow row = (IRow)sheet_windows.GetRow((int)id);
                 window.area= row.GetCell(sheet_windows.getColNumber("窗户面积")).NumericCellValue;
-                window.storyNo= (int)row.GetCell(sheet_windows.getColNumber("楼层编号")).NumericCellValue;
+                window.effectiveArea=row.GetCell(sheet_windows.getColNumber("窗户有效面积")).NumericCellValue;
+                window.m_iStoryNo= (int)row.GetCell(sheet_windows.getColNumber("楼层编号")).NumericCellValue;
                 window.isExternalWindow= row.GetCell(sheet_windows.getColNumber("是否是外窗")).BooleanCellValue;
                 window.effectiveArea= row.GetCell(sheet_windows.getColNumber("窗户有效面积")).NumericCellValue;
                 window.isSmokeExhaustWindow= row.GetCell(sheet_windows.getColNumber("是否为排烟窗")).BooleanCellValue;
@@ -5082,7 +5083,7 @@ namespace UnitTestHVACChecker
             {
                 Floor floor = new Floor(id);
                 IRow row = (IRow)sheet_floors.GetRow((int)id);
-                floor.storyNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
+                floor.m_iStoryNo = (int)row.GetCell(sheet_floors.getColNumber("楼层编号")).NumericCellValue;
                 floor.height = row.GetCell(sheet_floors.getColNumber("楼层高度")).NumericCellValue;
                 floor.elevation= row.GetCell(sheet_floors.getColNumber("楼层标高")).NumericCellValue;
                 floors.Add(floor);
@@ -5091,30 +5092,6 @@ namespace UnitTestHVACChecker
         }
 
 
-        public static Dictionary<Duct, List<HVACFunction.Point>> getAllDuctsByIdString_dictionary(string idString)
-        {
-            List<long> idList = getIdList(idString);
-           
-            string importExcelPath = ExcelPath_new;
-            //打开数据文件
-            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
-            //读取数据表格
-
-            ISheet sheet_ducts = workbook.GetSheet(ductSheetName_new);
-
-            Dictionary<Duct, List<HVACFunction.Point>> ducts = new Dictionary<Duct, List<HVACFunction.Point>>();
-
-            foreach (long id in idList)
-            {
-                Duct duct = new Duct(id);
-                IRow row = (IRow)sheet_ducts.GetRow((int)id);
-                duct.systemType = row.GetCell(sheet_ducts.getColNumber("风管类型")).StringCellValue;
-                List<HVACFunction.Point> points = new List<HVACFunction.Point>();
-                points.Add(new HVACFunction.Point());
-                ducts.Add(duct, points);
-            }
-            return ducts;
-        }
 
 
         public static List<Duct> getAllDuctsByIdString_List(string idString)
@@ -5308,17 +5285,6 @@ namespace UnitTestHVACChecker
             return fireDampers;
         }
 
-        public static bool isElementNearPoint_new(Element element,HVACFunction.Point point)
-        {
-            string importExcelPath = ExcelPath_new;
-            //打开测试数据文件
-            IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
-            //读取测试数据表
-            ISheet sheet_fireDampers = workbook.GetSheet("防火阀");
-
-            IRow row = (IRow)sheet_fireDampers.GetRow((int)element.Id.Value);
-            return row.GetCell(sheet_fireDampers.getColNumber("是否靠近穿越点")).BooleanCellValue;
-        }
 
         public static List<Room> getAllRoomsHaveFireDoor_new()
         {
@@ -5337,10 +5303,10 @@ namespace UnitTestHVACChecker
                     Room room = new Room(index);
                     room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue; ;
                     room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                    room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                    room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                    room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                    room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                    room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                    room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                    room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                    room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                     rooms.Add(room);
                 }
                

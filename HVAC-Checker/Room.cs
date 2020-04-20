@@ -19,7 +19,7 @@ namespace HVAC_CheckEngine
         
         public double? m_dArea { get; set; } = null;
         public RoomPosition? m_eRoomPosition { get; set; } = null;
-        public int ? m_iStoryNo { get; set; } = null;
+
         public double? m_dVolume { get; set; } = null;
 
         public double? m_dHeight { get; set; } = null;

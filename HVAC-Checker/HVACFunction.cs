@@ -880,6 +880,17 @@ namespace HVAC_CheckEngine
             return ducts;
         }
 
+        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
+        {
+            List<Duct> ducts= new List<Duct>();
+            return ducts; 
+        }
+
+        public static bool isOuterAirTerminal(AirTerminal airTerminal)
+        {
+            return true;
+        }
+
 
         //10获得构建所在房间的对象  几何 包含 遍历表都查
 
@@ -1162,8 +1173,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Floor floor = new Floor(Convert.ToInt64(reader["Id"].ToString()));
-                floor.storeyName = (reader["storeyName"].ToString());
-                floor.FloorNumber = Convert.ToInt32(reader["storeyNo"].ToString());
+                floor.m_iStoryNo = Convert.ToInt32(reader["storeyNo"].ToString());
                 floor.elevation = Convert.ToDouble(reader["elevation"].ToString());
                 floor.height = Convert.ToDouble(reader["height"].ToString());
                 floors.Add(floor);
@@ -2099,9 +2109,9 @@ namespace HVAC_CheckEngine
         public static int GetHighestStoryNoOfRoom(Room room)
         {
             List<Wall> walls = new List<Wall>();
-            int iStoryNo = -18;
+            int im_iStoryNo = -18;
             if (!System.IO.File.Exists(m_archXdbPath))
-                return iStoryNo;
+                return im_iStoryNo;
 
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
@@ -2123,7 +2133,7 @@ namespace HVAC_CheckEngine
 
                 if (reader1.Read())
                 {
-                    iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                    im_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
 
                     double dHighestElevation = Convert.ToDouble(reader1["elevation"].ToString()) + Convert.ToDouble(reader["dHeight"].ToString());
                     Floor floor = new Floor(0);
@@ -2132,12 +2142,12 @@ namespace HVAC_CheckEngine
                     floors.Add(floor);
                     floors.Sort(new Icp());
                     int imatch = floors.FindIndex(a => a.Id == 0);
-                    iStoryNo = floors[imatch + 1].FloorNumber;
+                    im_iStoryNo = floors[imatch + 1].m_iStoryNo.Value;
                 }
             }
             //关闭连接
             dbConnection.Close();
-            return iStoryNo;
+            return im_iStoryNo;
         }
 
 

@@ -515,7 +515,7 @@ namespace HVAC_CheckEngine
             List<Duct> ductsCrossShaft = new List<Duct>();
             foreach (Room shaft in shafts)
             {
-                ductsInShaft.AddRange(HVACFunction.getAllDuctsInRoom(shaft));
+                ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
                 ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有空调、通风管道
@@ -531,7 +531,7 @@ namespace HVAC_CheckEngine
                 ducts=ducts.addDuctsToList(HVACFunction.GetDuctsCrossSpace(room));
             }
             //获得所有重要房间（具有防火门的房间）
-            List<Room> importantRoom = HVACFunction.getAllRoomsHaveFireDoor();
+            List<Room> importantRoom = HVACFunction.GetALLRoomsHaveFireDoor();
             //获得穿越重要房间的风管集合并将风管放于ducts集合中。
             foreach (Room room in importantRoom)
             {
@@ -541,7 +541,7 @@ namespace HVAC_CheckEngine
             foreach(Duct duct in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct>verticalDucts= HVACFunction.getAllVerticalDuctConnectedToDuct(duct);
+                List<Duct>verticalDucts= HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach(Duct verticalDuct in verticalDucts)
                 {
@@ -557,7 +557,7 @@ namespace HVAC_CheckEngine
             foreach(Duct duct in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.getFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if(fireDampers.Count<1)
                 {
@@ -575,7 +575,7 @@ namespace HVAC_CheckEngine
             foreach (Duct duct in ductsCrossMovementJointAndFireSide)
             {
                 //获得风管上的所有风阀
-                List<FireDamper> fireDampers = HVACFunction.getFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
                 //如果风阀少于两个或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if(fireDampers.Count < 2)
                 {
@@ -809,14 +809,14 @@ namespace HVAC_CheckEngine
                 if (assistantFunctions.isRoomHaveNatureVentilateSystem(stairCase))
                 {
                     //  获得楼梯间的最低楼层编号及最高楼层编号
-                    int lowestStoryNo = stairCase.storyNo.Value;
-                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                    int lowestm_iStoryNo = stairCase.m_iStoryNo.Value;
+                    int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
                     //  获得楼梯间内的所有窗户的集合
                     List<Window> windows = HVACFunction.GetWindowsInRoom(stairCase);
                     //  从窗户集合中筛选出位于最高楼层的窗户的集合
-                    List<Window> windowsInHighestStory = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, highestStoryNo, highestStoryNo);
+                    List<Window> windowsInHighestStory = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, highestm_iStoryNo, highestm_iStoryNo);
                     //  查找这些窗户中是否有面积大于等于1㎡的窗户
-                    if(windowsInHighestStory.findWindowNoSmallerThanSomeArea(1)==null)
+                    if(windowsInHighestStory.findWindowNoSmallerThanSomeEffectiveArea(1)==null)
                     {
                         //  如果没有则将审查结果标记为不通过，则把当楼梯间记录进审查结果中，并提示专家审核是否最高部位有不小于1㎡的开口
                         result.isPassCheck = false;
@@ -831,24 +831,24 @@ namespace HVAC_CheckEngine
                         bool isCurrentStairCaseViolate = false;
 
                         //     从最底层起依次计算从当前层起向上五层内的所有窗的总面积（一直到当前楼层编号为【最高楼层编号-4】为止）
-                        int storyNoUpperBound =0;
-                        if ((highestStoryNo - 4) * highestStoryNo <= 0)
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 5);
+                        int m_iStoryNoUpperBound =0;
+                        if ((highestm_iStoryNo - 4) * highestm_iStoryNo <= 0)
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 5);
                         else
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 4);
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 4);
                         
-                        for (int storyNo=lowestStoryNo;storyNo<= storyNoUpperBound;++storyNo)
+                        for (int m_iStoryNo=lowestm_iStoryNo;m_iStoryNo<= m_iStoryNoUpperBound;++m_iStoryNo)
                         {
                             //     如果总面积小于2.0㎡，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足面积要求
-                            int highestStoryNoInCurrentIteration = 0;
-                            if ((storyNo + 4) * storyNo <= 0)
-                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 5);
+                            int highestm_iStoryNoInCurrentIteration = 0;
+                            if ((m_iStoryNo + 4) * m_iStoryNo <= 0)
+                                highestm_iStoryNoInCurrentIteration = Math.Min(highestm_iStoryNo, m_iStoryNo + 5);
                             else
-                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 4);
+                                highestm_iStoryNoInCurrentIteration = Math.Min(highestm_iStoryNo, m_iStoryNo + 4);
 
                           
-                            List<Window> windowsInFiveStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo, highestStoryNoInCurrentIteration);
-                            if (assistantFunctions.calculateTotalAreaOfWindows(windowsInFiveStories) < 2)
+                            List<Window> windowsInFiveStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, m_iStoryNo, highestm_iStoryNoInCurrentIteration);
+                            if (assistantFunctions.calculateTotalEffectiveAreaOfWindows(windowsInFiveStories) < 2)
                             {
                                 result.isPassCheck = false;
                                 string remark = string.Empty;
@@ -863,19 +863,19 @@ namespace HVAC_CheckEngine
                         //     从最低楼层起依次查找从当前楼层向上三层内是否有可开启外窗，（一直到当前楼层编号为【最高楼层编号-2】为止）
 
                         
-                        if ((highestStoryNo - 2) * highestStoryNo <= 0)
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 3);
+                        if ((highestm_iStoryNo - 2) * highestm_iStoryNo <= 0)
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 3);
                         else
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 2);
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 2);
 
                       
-                        for (int storyNo = lowestStoryNo; storyNo <= storyNoUpperBound; ++storyNo)
+                        for (int m_iStoryNo = lowestm_iStoryNo; m_iStoryNo <= m_iStoryNoUpperBound; ++m_iStoryNo)
                         {
                             //     如果没有可开启外窗，则把当楼梯间记录进审查结果中，并提示专家审核是否有其他开口满足设置要求
-                            int highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, storyNo + 2);
-                            if (highestStoryNoInCurrentIteration == 0)
-                                highestStoryNoInCurrentIteration = 1;
-                            List<Window> windowsInThreeStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, storyNo,highestStoryNoInCurrentIteration);
+                            int highestm_iStoryNoInCurrentIteration = Math.Min(highestm_iStoryNo, m_iStoryNo + 2);
+                            if (highestm_iStoryNoInCurrentIteration == 0)
+                                highestm_iStoryNoInCurrentIteration = 1;
+                            List<Window> windowsInThreeStories = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(windows, m_iStoryNo,highestm_iStoryNoInCurrentIteration);
                             if (windowsInThreeStories.Count<=0)
                             {
                                 result.isPassCheck = false;
@@ -948,9 +948,9 @@ namespace HVAC_CheckEngine
                     List<AirTerminal> pressureAirTerminals = assistantFunctions.filtrateAirTerminalOfSomeSystem(airTerminals, "加压送风");
 
                     //获得此楼梯间的最低楼层编号及最高楼层编号
-                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
-                    int lowestStoryNo = stairCase.storyNo.Value;
-                    List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+                    int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                    int lowestm_iStoryNo = stairCase.m_iStoryNo.Value;
+                    List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestm_iStoryNo(lowestm_iStoryNo, highestm_iStoryNo);
 
                     //自下向上获得每个风口负担的楼层划分
                     Dictionary<AirTerminal, List<Floor>> floorDivisionOfAirTerminalBottomUp = assistantFunctions.getFloorDivisionOfAirTerminalsBottomUp(floors, pressureAirTerminals);
@@ -1038,12 +1038,12 @@ namespace HVAC_CheckEngine
                 if (assistantFunctions.isRoomHaveSomeMechanicalSystem(stairCase,"加压送风"))
                 {
                     //获得楼梯间的最高楼层编号
-                    int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
-                    int lowestStoryNo = stairCase.storyNo.Value;
+                    int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                    int lowestm_iStoryNo = stairCase.m_iStoryNo.Value;
                     //获得楼梯间所有固定窗
                     List<Window> fixWindows = assistantFunctions.getFixOuterWindowsOfRoom(stairCase);
                     //筛选出最高楼层的固定窗
-                    List<Window> windowsInHighestStory =assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows,highestStoryNo, highestStoryNo);
+                    List<Window> windowsInHighestStory =assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows,highestm_iStoryNo, highestm_iStoryNo);
                     //如果最高楼层没有固定窗或固定窗面积小于1平米则将审查结果标记为不通过，并把当楼梯间记录进审查结果中
                     if(windowsInHighestStory.Count==0||assistantFunctions.calculateTotalAreaOfWindows(windowsInHighestStory)<1)
                     {
@@ -1058,26 +1058,26 @@ namespace HVAC_CheckEngine
                     if(outerWall.Count>0)
                     {
                         //从最底层开会依次向上进行遍历
-                        int storyNoUpperBound = 0;
-                        if ((highestStoryNo-4)*highestStoryNo<=0)
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 5);
+                        int m_iStoryNoUpperBound = 0;
+                        if ((highestm_iStoryNo-4)*highestm_iStoryNo<=0)
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 5);
                         else
-                            storyNoUpperBound = Math.Max(lowestStoryNo, highestStoryNo - 4);
+                            m_iStoryNoUpperBound = Math.Max(lowestm_iStoryNo, highestm_iStoryNo - 4);
 
                        
                        
-                        for (int currentStoryNo= stairCase.storyNo.Value; currentStoryNo <= storyNoUpperBound; ++currentStoryNo)
+                        for (int currentm_iStoryNo= stairCase.m_iStoryNo.Value; currentm_iStoryNo <= m_iStoryNoUpperBound; ++currentm_iStoryNo)
                         {
                             //计算五层以内的固定窗面积
-                            int highestStoryNoInCurrentIteration = 0;
-                            if ((currentStoryNo + 4) * currentStoryNo <= 0)
-                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, currentStoryNo + 5);
+                            int highestm_iStoryNoInCurrentIteration = 0;
+                            if ((currentm_iStoryNo + 4) * currentm_iStoryNo <= 0)
+                                highestm_iStoryNoInCurrentIteration = Math.Min(highestm_iStoryNo, currentm_iStoryNo + 5);
                             else
-                                highestStoryNoInCurrentIteration = Math.Min(highestStoryNo, currentStoryNo + 4);
+                                highestm_iStoryNoInCurrentIteration = Math.Min(highestm_iStoryNo, currentm_iStoryNo + 4);
 
                            
 
-                            List < Window > windowsInFiveStorys = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows, currentStoryNo, highestStoryNoInCurrentIteration) ;
+                            List < Window > windowsInFiveStorys = assistantFunctions.filtrateElementsBetweenFloor_aAndFloor_b(fixWindows, currentm_iStoryNo, highestm_iStoryNoInCurrentIteration) ;
                             double areaOfFixWindows = assistantFunctions.calculateTotalAreaOfWindows(windowsInFiveStorys);
                             //如果固定窗总面积小于2㎡，则将审查结果标记为不通过，并将当前楼梯间加入到审查结果中
                             if (areaOfFixWindows<2)
@@ -1140,7 +1140,7 @@ namespace HVAC_CheckEngine
                     FireCompartment fireDistrict = HVACFunction.GetFireCompartmentContainAirTerminal(airTerminals[0]);
                     foreach(AirTerminal airTerminal in airTerminals)
                     {
-                        if(!HVACFunction.isAirTerminalInFireCompartment(airTerminal,fireDistrict))
+                        if(!HVACFunction.IsAirTermianlInFireDistrict(airTerminal,fireDistrict))
                         {
                             result.isPassCheck = false;
                             string remark = "风机所在的排烟系统跨越了防火分区设置";
@@ -1400,75 +1400,6 @@ namespace HVAC_CheckEngine
             return result;
         }
 
-      
-
-        public static BimReview GB51251_2017_4_5_2()
-        {
-            //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.5.2");
-            //获得所有房间
-            List<Room> rooms = HVACFunction.GetRooms("");
-            //依次遍历所有房间
-            foreach (Room room in rooms)
-            {
-                bool isRoomViolation = false;
-                //如果房间设置了机械排烟系统且设置了机械补风系统
-                if (assistantFunctions.isRoomHaveSomeMechanicalSystem(room, "排烟") && assistantFunctions.isRoomHaveSomeMechanicalSystem(room, "补风"))
-                {
-                    //获得所有补风系统的补风机
-                    List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(room);
-                    List<AirTerminal> supplementAirTerminals = assistantFunctions.filtrateAirTerminalOfSomeSystem(airTerminals, "补风");
-                    List<Fan> fans = assistantFunctions.getAllFansConnectToAirTerminals(supplementAirTerminals);
-                    //依次遍历每一台补风机
-                    foreach (Fan fan in fans)
-                    {
-                        //如果风机的取风口不全为室外风口
-                        if (!assistantFunctions.isAllFanInletsAreOuterAirTerminals(fan))
-                        {
-                            //则将审查结果标记为不通过，且把当前房间记录进审查结果中。并在批注中记录此房间补风系统未从室外引入空气
-                            result.isPassCheck = false;
-                            string remark = "此房间补风系统未从室外引入空气";
-                            result.AddViolationComponent(room.Id.Value, room.type, remark);
-                            isRoomViolation = true;
-                            break;
-                        }
-                    }
-                    if (isRoomViolation)
-                        continue;
-
-                    //获取房间所有排烟风口
-                    List<AirTerminal> smokeExhaustAirTeriminals = assistantFunctions.filtrateAirTerminalOfSomeSystem(airTerminals, "排烟");
-                    //通过叠加房间内所有排烟口的风量获得房间的排烟量
-                    double totalFlowRateOfSmokeExhaust = assistantFunctions.getTotalAirVolumeOfAirTerminals(smokeExhaustAirTeriminals);
-                    //通过叠加房间内的所有补风口的风量获得房间的补风量
-                    double totalFlowRateOfAirSupplement = assistantFunctions.getTotalAirVolumeOfAirTerminals(supplementAirTerminals);
-                    //如果补风量小于排烟量的50%
-                    if (totalFlowRateOfAirSupplement < 0.5 * totalFlowRateOfSmokeExhaust)
-                    {
-                        //则将审查结果标记为不通过，且把当前房间记录进审查结果中。并在批注中记录此房间补风量小于排烟量的50%
-                        result.isPassCheck = false;
-                        string remark = "此房间补风量小于排烟量的50%";
-                        result.AddViolationComponent(room.Id.Value, room.type, remark);
-                    }
-
-                }
-            }
-            //如果审查通过
-            //则在审查结果批注中注明审查通过相关内容
-            if (result.isPassCheck)
-            {
-                result.comment = "设计满足规范GB51251_2017中第4.5.2条条文规定。";
-            }
-            //如果审查不通过
-            //则在审查结果中注明审查不通过的相关内容
-            else
-            {
-                result.comment = "设计不满足规范GB51251_2017中第4.5.2条条文规定。";
-            }
-
-            return result;
-        }
-
 
         //排烟管道下列部位应设置排烟防火阀：
         //1 垂直风管与每层水平风管交接处的水平管段上；
@@ -1521,7 +1452,7 @@ namespace HVAC_CheckEngine
             List<Duct> ductsCrossShaft = new List<Duct>();
             foreach (Room shaft in shafts)
             {
-                ductsInShaft.AddRange(HVACFunction.getAllDuctsInRoom(shaft));
+                ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
                 ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有排烟风管
@@ -1536,7 +1467,7 @@ namespace HVAC_CheckEngine
             foreach (Duct duct in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct> verticalDucts = HVACFunction.getAllVerticalDuctConnectedToDuct(duct);
+                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach (Duct verticalDuct in verticalDucts)
                 {
@@ -1553,7 +1484,7 @@ namespace HVAC_CheckEngine
             foreach (Duct duct in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.getFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if (fireDampers.Count < 1)
                 {
@@ -1686,7 +1617,7 @@ namespace HVAC_CheckEngine
                 foreach (SmokeCompartment smokeCompartmen in smokeCompartments)
                 {
                     //如果防烟分区的面积大于2000㎡
-                    if(smokeCompartmen.area.Value>2000)
+                    if(smokeCompartmen.m_dArea.Value>2000)
                     {
                         //则将审查结果标记为不通过，且把当前房间记录进审查结果中。并在批注中记录此车库防烟分区大于2000㎡
                         result.isPassCheck = false;
@@ -1853,7 +1784,7 @@ namespace HVAC_CheckEngine
                             //通过叠加防烟分区内排烟口的排烟量计算防烟分区的排烟量
                             double smokeExhaustFlow= assistantFunctions.calculateSmokeExhaustFlowOfSmokeCompartment(smokeCompartment);
                             //如果防烟分区的排烟量小于烟分区的建筑面积乘以1m³/(㎡·min)
-                            if(smokeExhaustFlow<smokeCompartment.area.Value*60)
+                            if(smokeExhaustFlow<smokeCompartment.m_dArea.Value*60)
                             {
                                 //则将审查结果标记为不通过，且把当前防烟分区记录进审查结果中。并在批注中记录此防烟分区排烟量不满足规范要求
                                 result.isPassCheck = false;
@@ -1891,7 +1822,7 @@ namespace HVAC_CheckEngine
                         //获得风机所负担的所有防烟分区。
                         SmokeCompartment maxSmokeCompartment = assistantFunctions.getMaxAreaSmokeCompartment(smokeCompartments);
                         //如果排烟风机的排烟量小于最大防烟分区面积乘以2m³/(㎡·min)
-                        if (fan.m_flowRate < maxSmokeCompartment.area.Value * 2 * 60)
+                        if (fan.m_flowRate < maxSmokeCompartment.m_dArea.Value * 2 * 60)
                         {
                             //则将审查结果标记为不通过，且把当前风机记录进审查结果中。并在批注中记录此风机排烟量不满足规范要求
                             result.isPassCheck = false;
@@ -1904,7 +1835,7 @@ namespace HVAC_CheckEngine
                     else if (smokeCompartments.Count == 1)
                     {
                         //如果排烟风机的排烟量小于防烟分区面积乘以1m³/(㎡·min)
-                        if (fan.m_flowRate < smokeCompartments[0].area.Value * 60)
+                        if (fan.m_flowRate < smokeCompartments[0].m_dArea.Value * 60)
                         {
                             //则将审查结果标记为不通过，且把当前风机记录进审查结果中。并在批注中记录此风机排烟量不满足规范要求
                             result.isPassCheck = false;
@@ -2000,7 +1931,7 @@ namespace HVAC_CheckEngine
                     }
                     //如果房间的换气次数小于5次或大于15次
 
-                    double ventilationRate = exhaustFlow / room.area.Value/room.height.Value;
+                    double ventilationRate = exhaustFlow / room.m_dArea.Value/room.m_dHeight.Value;
                     if (ventilationRate<5||ventilationRate>15)
                     {
                         //则将审查结果标记为不通过，且把当前房间记录进审查结果中。并在批注中记录公共卫生间换气次数不满足规范要求
@@ -2038,7 +1969,7 @@ namespace HVAC_CheckEngine
                             continue;
                         }
                         //如果房间名称为淋浴且换气次数小于5次或者房间名称为浴池且换气次数小于6次或房间为桑拿房且换气次数小于6次
-                        double ventilationRate = exhaustFlow / room.area.Value / room.height.Value;
+                        double ventilationRate = exhaustFlow / room.m_dArea.Value / room.m_dHeight.Value;
                         if(room.name.Contains("淋浴")&&ventilationRate<5||room.name.Contains("浴池")&&ventilationRate<6||room.name.Contains("桑拿房")&&ventilationRate<6)
                         {
                             //则将审查结果标记为不通过，且把当前房间记录进审查结果中。并在批注中记录公共浴室换气次数不满足规范要求
@@ -2127,7 +2058,7 @@ namespace HVAC_CheckEngine
             List<Duct> ductsCrossShaft = new List<Duct>();
             foreach (Room shaft in shafts)
             {
-                ductsInShaft.AddRange(HVACFunction.getAllDuctsInRoom(shaft));
+                ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
                 ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有空调、通风管道
@@ -2141,7 +2072,7 @@ namespace HVAC_CheckEngine
             foreach (Duct duct in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct> verticalDucts = HVACFunction.getAllVerticalDuctConnectedToDuct(duct);
+                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach (Duct verticalDuct in verticalDucts)
                 {
@@ -2158,7 +2089,7 @@ namespace HVAC_CheckEngine
             foreach (Duct duct in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.getFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if (fireDampers.Count < 1)
                 {
@@ -2742,7 +2673,7 @@ namespace HVAC_CheckEngine
             //     
             foreach (Room stairCase in UnionRooms)
             {
-                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveNatureVentilateSystem(stairCase);
 
                 //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
                 if (stairCaseHaveMechanicalPressureSystem)
@@ -2783,7 +2714,7 @@ namespace HVAC_CheckEngine
 
             foreach (Room stairCase in UnionRooms)
             {
-                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeNatureSystem(stairCase, "自然通风");
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveNatureVentilateSystem(stairCase);
 
                 //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
                 if (stairCaseHaveMechanicalPressureSystem)

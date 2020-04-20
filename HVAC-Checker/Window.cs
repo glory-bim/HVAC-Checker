@@ -12,14 +12,13 @@ namespace HVAC_CheckEngine
         {
         }
         public bool? isExternalWindow { get; set; } = null;//是否为外窗
+
+        public bool? isSmokeExhaustWindow { get; set; } = null;//是否为排烟窗
         public double? area { get; set; } = null;
 
         public double? effectiveArea //有效面积在这里计算
-        { 
-            get 
-            {
-                return 0; 
-            } 
+        {
+            get;set;
         }
 
        public WindowOpenMode? openMode { get; set; } = null;

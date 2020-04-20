@@ -138,7 +138,7 @@ namespace HVAC_CheckEngine
             List<T> aimElements = new List<T>();
             foreach (T element in elements)
             {
-                if (element.storyNo >= floor_a && element.storyNo <= floor_b)
+                if (element.m_iStoryNo >= floor_a && element.m_iStoryNo <= floor_b)
                     aimElements.Add(element);
             }
             return aimElements;
@@ -181,14 +181,14 @@ namespace HVAC_CheckEngine
             //获得所有防火分区对象的集合
             List<FireCompartment> fireCompartments = HVACFunction.GetFireCompartment("");
             //从防火分区对象集合中筛选出与防烟分区同层的所有防火分区
-            int storyNo = smokeCompartment.storyNo.Value;
-            int highestStoryNo = HVACFunction.GetHighestStoryNoOfRoom(smokeCompartment);
-            fireCompartments = filtrateElementsBetweenFloor_aAndFloor_b(fireCompartments, storyNo, highestStoryNo);
+            int m_iStoryNo = smokeCompartment.m_iStoryNo.Value;
+            int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(smokeCompartment);
+            fireCompartments = filtrateElementsBetweenFloor_aAndFloor_b(fireCompartments, m_iStoryNo, highestm_iStoryNo);
             //依次判断防烟分区是否与防火分区相交
             foreach(FireCompartment fireCompartment in fireCompartments)
             {
                 //如果相交则返回true
-                if (HVACFunction.isSmokeCompartmentIntersectFireCompartment(smokeCompartment, fireCompartment))
+                if (HVACFunction.IsSmokeCompartmentIntersectFireCompartment(smokeCompartment, fireCompartment))
                     return true;
             }
             //如果都不相交则返回false
@@ -300,13 +300,13 @@ namespace HVAC_CheckEngine
             return aimAirTerminals;
         }
 
-        public static Window findWindowNoSmallerThanSomeArea(this List<Window> windows, double area)
+        public static Window findWindowNoSmallerThanSomeEffectiveArea(this List<Window> windows, double area)
         {
             if (windows == null)
                 throw new ArgumentException();
             foreach (Window window in windows)
             {
-                if (window.area >= area)
+                if (window.effectiveArea >= area)
                     return window;
             }
             return null;
@@ -338,6 +338,19 @@ namespace HVAC_CheckEngine
             foreach (Window window in windows)
             {
                 sum += window.area.Value;
+            }
+            return sum;
+        }
+
+
+        public static double calculateTotalEffectiveAreaOfWindows(List<Window> windows)
+        {
+            if (windows == null)
+                throw new ArgumentException();
+            double sum = 0;
+            foreach (Window window in windows)
+            {
+                sum += window.effectiveArea.Value;
             }
             return sum;
         }
@@ -441,7 +454,7 @@ namespace HVAC_CheckEngine
             SmokeCompartment aimSmokeCompartment = smokeCompartments[0];
             foreach(SmokeCompartment smokeCompartment in smokeCompartments)
             {
-                if (aimSmokeCompartment.area.Value < smokeCompartment.area.Value)
+                if (aimSmokeCompartment.m_dArea.Value < smokeCompartment.m_dArea.Value)
                     aimSmokeCompartment = smokeCompartment;
             }
             return aimSmokeCompartment;
@@ -454,7 +467,7 @@ namespace HVAC_CheckEngine
 
             if (region.rooms.Count == 0)
                 throw new ArgumentException("区域中没有房间");
-            if (region.rooms[0].roomPosition == RoomPosition.overground)
+            if (region.rooms[0].m_eRoomPosition == RoomPosition.overground)
                 return true;
             else
                 return false;
@@ -469,7 +482,7 @@ namespace HVAC_CheckEngine
             foreach (Room room in rooms)
             {
                 if (!isPublicRoom(room))
-                    sum += room.area.Value;
+                    sum += room.m_dArea.Value;
             }
             return sum;
         }
@@ -514,7 +527,7 @@ namespace HVAC_CheckEngine
 
             foreach(Room room in rooms)
             {
-                if (room.area.Value >= area)
+                if (room.m_dArea.Value >= area)
                     aimRooms.Remove(room);
             }
             return aimRooms;
@@ -547,32 +560,32 @@ namespace HVAC_CheckEngine
                     switch (condition.areaType)
                     {
                         case exceptRoomCondition.AreaType.LargerThan:
-                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area > condition.area &&
-                                room.roomPosition == condition.roomPosition)
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.m_dArea > condition.area &&
+                                room.m_eRoomPosition == condition.roomPosition)
                             {
                                 aimRooms.Remove(room);
                                 isRemoveRoom = true;
                             }
                             break;
                         case exceptRoomCondition.AreaType.LargerAndEqualThan:
-                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area >= condition.area &&
-                               room.roomPosition == condition.roomPosition)
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.m_dArea >= condition.area &&
+                               room.m_eRoomPosition == condition.roomPosition)
                             {
                                 aimRooms.Remove(room);
                                 isRemoveRoom = true;
                             }
                             break;
                         case exceptRoomCondition.AreaType.SmallerThan:
-                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area < condition.area &&
-                               room.roomPosition == condition.roomPosition)
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.m_dArea < condition.area &&
+                               room.m_eRoomPosition == condition.roomPosition)
                             {
                                 aimRooms.Remove(room);
                                 isRemoveRoom = true;
                             }
                             break;
                         case exceptRoomCondition.AreaType.SmallerAndEqualThan:
-                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.area <= condition.area &&
-                               room.roomPosition == condition.roomPosition)
+                            if (room.type.Contains(condition.type) && room.name.Contains(condition.name) && room.m_dArea <= condition.area &&
+                               room.m_eRoomPosition == condition.roomPosition)
                             {
                                 aimRooms.Remove(room);
                                 isRemoveRoom = true;
@@ -731,7 +744,7 @@ namespace HVAC_CheckEngine
                 throw new ArgumentException();
 
             //获得前室所有相连房间的集合linkedRooms
-            List<Room> linkedRooms = HVACFunction.getConnectedRooms(atria);
+            List<Room> linkedRooms = HVACFunction.GetConnectedRooms(atria);
             if (linkedRooms.Count <= 0)
                 throw new modelException("前室没有与其他房间相连");
             //从linkedRooms中筛选出非楼梯间房间
@@ -800,7 +813,7 @@ namespace HVAC_CheckEngine
             if (floors == null || airTerminals == null)
                 throw new ArgumentException();
             //对楼层对象进行排序
-            floors.Sort((x, y) => x.storyNo.Value.CompareTo(y.storyNo.Value));
+            floors.Sort((x, y) => x.m_iStoryNo.Value.CompareTo(y.m_iStoryNo.Value));
             return getFloorDivisionOfAirTerminals(floors, airTerminals);
 
         }
@@ -810,7 +823,7 @@ namespace HVAC_CheckEngine
             if (floors == null || airTerminals == null)
                 throw new ArgumentException();
             //对楼层对象进行排序
-            floors.Sort((x, y) => y.storyNo.Value.CompareTo(x.storyNo.Value));
+            floors.Sort((x, y) => y.m_iStoryNo.Value.CompareTo(x.m_iStoryNo.Value));
             return getFloorDivisionOfAirTerminals(floors, airTerminals);
 
         }
@@ -921,10 +934,10 @@ namespace HVAC_CheckEngine
                 throw new ArgumentException();
 
             List<AirTerminal> aimAirTerminals = new List<AirTerminal>();
-            int storyNo = floor.storyNo.Value;
+            int m_iStoryNo = floor.m_iStoryNo.Value;
             foreach (AirTerminal airTerminal in airTerminals)
             {
-                if (airTerminal.storyNo == storyNo)
+                if (airTerminal.m_iStoryNo == m_iStoryNo)
                     aimAirTerminals.Add(airTerminal);
             }
             return aimAirTerminals;
@@ -944,13 +957,13 @@ namespace HVAC_CheckEngine
             return null;
         }
 
-        public static List<Floor> filterFloorsBetweenlowestAndHighestStoryNo(int lowestStoryNo, int HighestStoryNo)
+        public static List<Floor> filterFloorsBetweenlowestAndHighestm_iStoryNo(int lowestm_iStoryNo, int Highestm_iStoryNo)
         {
             List<Floor> allFloors = HVACFunction.GetFloors();
             List<Floor> aimFloors = new List<Floor>();
             foreach (Floor floor in allFloors)
             {
-                if (floor.storyNo >= lowestStoryNo && floor.storyNo <= HighestStoryNo)
+                if (floor.m_iStoryNo >= lowestm_iStoryNo && floor.m_iStoryNo <= Highestm_iStoryNo)
                     aimFloors.Add(floor);
             }
             return aimFloors;
@@ -1022,13 +1035,13 @@ namespace HVAC_CheckEngine
         {
             if (airTerminals == null)
                 throw new ArgumentException();
-            int storyNo = 0;
+            int m_iStoryNo = 0;
             if (airTerminals.Count > 0)
-                storyNo = airTerminals[0].storyNo.Value;
+                m_iStoryNo = airTerminals[0].m_iStoryNo.Value;
 
             foreach(AirTerminal airTerminal in airTerminals)
             {
-                if (!airTerminal.storyNo.Value.Equals(storyNo))
+                if (!airTerminal.m_iStoryNo.Value.Equals(m_iStoryNo))
                     return false;
             }
             return true;
