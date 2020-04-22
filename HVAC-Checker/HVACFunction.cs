@@ -201,6 +201,37 @@ namespace HVAC_CheckEngine
             return false;
         }
 
+        private static bool GetMovementJointPolygon2D(MovementJoint movementJoint, ref Polygon2D poly)
+        {
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionstr);
+            dbConnectionArch.Open();
+            string strBianxing = "变形缝";
+            string sql = "select * from Proxys Where Id =";
+            sql = sql + strBianxing ;         
+            SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
+            SQLiteDataReader readerProxys = commandArch.ExecuteReader();        
+
+            if (readerProxys.Read())
+            {              
+                movementJoint.boundaryLoops = readerProxys["boundaryLoops"].ToString();
+                poly = GetSpaceBBox(movementJoint.boundaryLoops, movementJoint.Id.ToString());
+
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + readerProxys["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnectionArch);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    movementJoint.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }
+                dbConnectionArch.Close();
+                return true;
+            }
+            return false;
+        }
+
         //2 判断房间是否有某种构件并返回构件对象
         //  Room    某种构件  风口
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
@@ -890,17 +921,19 @@ namespace HVAC_CheckEngine
                         SQLiteDataReader readerProxys = commandArch.ExecuteReader();
                     while (readerProxys.Read())
                     {
-                        AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
-                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbjoint, aabbDuct))
+                            MovementJoint moveJoint = new MovementJoint(Convert.ToInt64(readerProxys["Id"].ToString()));
+                            Polygon2D polyJoint = new Polygon2D(PointLists, sSpaceId);
+                            GetMovementJointPolygon2D(moveJoint, ref polyJoint);
+
+                       // AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
+                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(polyJoint, aabbDuct))
                         {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                             duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                             ducts.Add(duct);
                         }
-                    }
-                       
+                    }                     
                          
-
                     }
                 }
                 }

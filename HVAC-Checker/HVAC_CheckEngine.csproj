@@ -117,6 +117,7 @@
     <Compile Include="HVACChecker.cs" />
     <Compile Include="HVACFunction.cs" />
     <Compile Include="HVACFunctionStub.cs" />
+    <Compile Include="MovementJoint.cs" />
     <Compile Include="Pipe.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
