@@ -584,6 +584,8 @@ namespace HVAC_CheckEngine
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
+            sql = sql +  "and userLabel = 风机出口管道";         
+
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -605,7 +607,7 @@ namespace HVAC_CheckEngine
                     else
                     {
                         m_listStrLastId.Add(strId);
-                        FindOutLets(dbConnection, reader["linkElementId"].ToString(), inlets);
+                        FindAirTerminals(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
             }
@@ -680,6 +682,7 @@ namespace HVAC_CheckEngine
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
+            sql = sql + "and userLabel = 风机进口管道";
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -701,11 +704,42 @@ namespace HVAC_CheckEngine
                     else
                     {
                         m_listStrLastId.Add(strId);
-                        FindInlets(dbConnection, reader["linkElementId"].ToString(), inlets);
+                        FindAirTerminals(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
             }
         }
+        public static void FindAirTerminals(SQLiteConnection dbConnection, String strId, List<AirTerminal> inlets)
+        {
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;          
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+                {
+                    sql = "select * from AirTerminals Where Id = ";
+                    sql += reader["linkElementId"].ToString();
+
+                    SQLiteCommand commandAirterminal = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerAirTerminal = commandAirterminal.ExecuteReader();
+                    if (readerAirTerminal.Read())
+                    {
+                        AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
+                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
+                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        inlets.Add(inlet);
+                    }
+                    else
+                    {
+                        m_listStrLastId.Add(strId);
+                        FindAirTerminals(dbConnection, reader["linkElementId"].ToString(), inlets);
+                    }
+                }
+            }
+        }
+
 
         //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
         public static List<Duct> GetDuctsCrossSpace(Room room)
