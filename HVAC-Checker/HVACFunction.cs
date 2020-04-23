@@ -2494,51 +2494,39 @@ namespace HVAC_CheckEngine
         public static List<FireDamper> GetFireDamperOfDuct(Duct duct)
         {
             List<FireDamper> fireDampers = new List<FireDamper>();
-
-
             if (!System.IO.File.Exists(m_hvacXdbPath))
                 return fireDampers;
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             m_listStrLastId = new List<string>();
-            FindFireDampers(dbConnection, duct.Id.ToString(), fireDampers);
+            FindFireDampersDirect(dbConnection, duct.Id.ToString(), fireDampers);
             //关闭连接
             dbConnection.Close();
 
             return fireDampers;
         }
 
-
-        public static void FindFireDampers(SQLiteConnection dbConnection, String strId, List<FireDamper> inlets)
+        public static void FindFireDampersDirect(SQLiteConnection dbConnection, String strId, List<FireDamper> inlets)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
-            {
-                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+            {               
+                sql = "select * from DuctDampers Where Id = ";
+                sql += reader["linkElementId"].ToString();
+
+                SQLiteCommand commandAirterminal = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerAirTerminal = commandAirterminal.ExecuteReader();
+                if (readerAirTerminal.Read())
                 {
-                    sql = "select * from DuctDampers Where Id = ";
-                    sql += reader["linkElementId"].ToString();
-
-                    SQLiteCommand commandAirterminal = new SQLiteCommand(sql, dbConnection);
-                    SQLiteDataReader readerAirTerminal = commandAirterminal.ExecuteReader();
-                    if (readerAirTerminal.Read())
-                    {
-                        FireDamper inlet = new FireDamper(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlets.Add(inlet);
-                    }
-                    else
-                    {
-                        m_listStrLastId.Add(strId);
-                        FindFireDampers(dbConnection, reader["linkElementId"].ToString(), inlets);
-                    }
-                }
+                    FireDamper inlet = new FireDamper(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
+                    inlets.Add(inlet);
+                }                
             }
-        }
-
+        }  
 
         public static List<Room> GetALLRoomsHaveFireDoor()
         {
