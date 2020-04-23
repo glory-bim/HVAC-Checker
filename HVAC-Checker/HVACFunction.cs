@@ -1398,11 +1398,48 @@ namespace HVAC_CheckEngine
             while (readerDoors.Read())
             {
                 Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                SetRoomPara(ref roomConnect);
                 rooms.Add(roomConnect);
             }
             //关闭连接
             dbConnection.Close();
             return rooms;
+        }
+
+
+        public static void SetRoomPara(ref Room room)
+        {           
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return ;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Spaces Where Id =";
+            sql = sql + room.Id;
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {              
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                //room.m_dMaxlength
+                //     room.m_dVolume
+                //    room.m_eRoomPosition
+                room.type = reader["userLabel"].ToString();
+                sql = "select * from Storeys where  Id =  ";
+                sql = sql + reader["storeyId"].ToString();
+                SQLiteCommand command1 = new SQLiteCommand(sql, m_dbConnection);
+                SQLiteDataReader reader1 = command1.ExecuteReader();
+
+                if (reader1.Read())
+                {
+                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                }            
+            }   
         }
 
         public static List<Door> GetDoorsBetweenTwoRooms(Room firstRoom, Room SecondRoom)
@@ -1582,7 +1619,6 @@ namespace HVAC_CheckEngine
             }
         }
 
-
         public static void GetWallAABB(AABB aabb, string Id)
         {
             //创建一个连接
@@ -1628,7 +1664,6 @@ namespace HVAC_CheckEngine
             }
         }
 
-
         public static void GetRoomPolygon(Polygon2D poly, Room room)
         {
             string connectionArchstr = @"data source =" + m_archXdbPath;
@@ -1646,8 +1681,6 @@ namespace HVAC_CheckEngine
                 poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
             }
         }
-
-
 
         public static List<Room> GetAllRooms()
         {
@@ -1710,7 +1743,6 @@ namespace HVAC_CheckEngine
             return fans;
         }
 
-
         public static List<AssemblyAHU> GetAllAssemblyAHUs()
         {
             List<AssemblyAHU> assemblyAHUs = new List<AssemblyAHU>();
@@ -1733,8 +1765,6 @@ namespace HVAC_CheckEngine
 
             return assemblyAHUs;
         }
-
-
 
         public static List<GasMeter> GetGasMeters()
         {
@@ -1801,7 +1831,6 @@ namespace HVAC_CheckEngine
 
             return fans;
         }
-
 
         public static List<FlexibleShortTube> GetFlexibleShortTubesOfFan(Fan fan)
         {
@@ -1902,7 +1931,6 @@ namespace HVAC_CheckEngine
             return ducts;
         }
 
-
         public static List<AirTerminal> GetAirterminals(string strSystemName)
         {
             List<AirTerminal> pipes = new List<AirTerminal>();
@@ -1932,8 +1960,6 @@ namespace HVAC_CheckEngine
             }
             return pipes;
         }
-
-
 
         //获取所有防烟分区
         public static List<SmokeCompartment> GetSmokeCompartment(string sName)
@@ -1982,8 +2008,6 @@ namespace HVAC_CheckEngine
             return smokeCompartments;
         }
 
-
-
         public static List<FireCompartment> GetFireCompartment(string sName)
         {
             List<FireCompartment> smokeCompartments = new List<FireCompartment>();
@@ -2029,7 +2053,6 @@ namespace HVAC_CheckEngine
 
             return smokeCompartments;
         }
-
 
         public static List<FireCompartment> GetALLFireCompartment()
         {
@@ -2077,7 +2100,6 @@ namespace HVAC_CheckEngine
             return smokeCompartments;
         }
 
-
         public static List<Wall> GetAllWallsOfRoom(Room room)
         {
             List<Wall> walls = new List<Wall>();
@@ -2103,9 +2125,7 @@ namespace HVAC_CheckEngine
             dbConnection.Close();
             return walls;
         }
-
-
-
+        
         public class Icp : IComparer<Floor>
         {        //按书名排序  
             public int Compare(Floor x, Floor y)
@@ -2567,9 +2587,7 @@ namespace HVAC_CheckEngine
             }
             return rooms;
         }
-
-
-
+       
         public static List<Duct> GetAllDuctsInRoom(Room room)
         {
             List<Duct> ducts = new List<Duct>();
@@ -2610,9 +2628,7 @@ namespace HVAC_CheckEngine
             dbConnection.Close();
             return ducts;
         }
-
-
-
+               
         public static List<Duct> GetAllVerticalDuctConnectedToDuct(Duct duct)
         {
             List<Duct> ducts = new List<Duct>();
@@ -2669,9 +2685,7 @@ namespace HVAC_CheckEngine
                 }
             }
         }
-
-
-
+       
         private static void StructPareTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, ref TreeNode lastNode ,List<TreeNode> LastNodes)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
@@ -2892,9 +2906,7 @@ namespace HVAC_CheckEngine
                 }
             }           
         }
-
-
-
+               
         private static void StructSonTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, ref TreeNode lastNode, List<TreeNode> LastNodes)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
@@ -3245,7 +3257,7 @@ namespace HVAC_CheckEngine
                 
             return true;
         }
-                         
+                        
         static bool PreOrderFind(TreeNode node,AirTerminal airterminal)
         {
             if(node == null) return false;
@@ -3435,8 +3447,7 @@ namespace HVAC_CheckEngine
             }
             return false;
         }
-
-
+        
         private static bool GetDuctReducer(SQLiteDataReader reader, SQLiteConnection dbConnection, ref DuctReducer duct)
         {
             string sql = "select * from DuctReducers Where Id = ";
@@ -3466,8 +3477,7 @@ namespace HVAC_CheckEngine
             }
             return false;
         }
-
-
+        
         private static bool GetDuctSoft(SQLiteDataReader reader, SQLiteConnection dbConnection, ref DuctSoft duct)
         {
             string sql = "select * from DuctSofts Where Id = ";
