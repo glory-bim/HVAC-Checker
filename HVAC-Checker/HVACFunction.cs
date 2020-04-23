@@ -948,9 +948,9 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static bool IsSameDirect(SQLiteDataReader reader, Polygon2D poly, AABB aabbTerminal )
+        private static bool IsSameDirect(SQLiteDataReader airterminalreader, Polygon2D poly, AABB aabbTerminal )
         {
-            string strVector = reader["NormalVector"].ToString();
+            string strVector = airterminalreader["NormalVector"].ToString();
             int index = strVector.IndexOf(":");
             int index_s = strVector.LastIndexOf(",\"Y");
             string strX = strVector.Substring(index + 1, index_s - index - 1);
@@ -2333,7 +2333,12 @@ namespace HVAC_CheckEngine
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                         {
-                            return true;
+
+                            if (IsSameDirect(readerAirTerminals, poly, aabbAirTerminal))
+                                return true;
+                            else
+                                return false;
+
                         }
                         else
                         {
