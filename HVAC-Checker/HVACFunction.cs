@@ -916,7 +916,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static bool IsSameDirect(SQLiteDataReader airterminalreader, Polygon2D poly, AABB aabbTerminal )
+        private static bool IsSameDirect(SQLiteDataReader airterminalreader, Polygon2D roomPoly, AABB aabbTerminal )
         {
             string strVector = airterminalreader["NormalVector"].ToString();
             int index = strVector.IndexOf(":");
@@ -940,9 +940,9 @@ namespace HVAC_CheckEngine
             listVector.Add(dZ);
 
             List<double> listVectorAirterminalToRoom = new List<double>();
-            dX = poly.Center().X - aabbTerminal.Center().X;
-            dY = poly.Center().Y - aabbTerminal.Center().Y;
-            dZ = poly.Center().Z - aabbTerminal.Center().Z;
+            dX = roomPoly.Center().X - aabbTerminal.Center().X;
+            dY = roomPoly.Center().Y - aabbTerminal.Center().Y;
+            dZ = roomPoly.Center().Z - aabbTerminal.Center().Z;
             listVectorAirterminalToRoom.Add(dX);
             listVectorAirterminalToRoom.Add(dY);
             listVectorAirterminalToRoom.Add(dZ);
@@ -2184,7 +2184,6 @@ namespace HVAC_CheckEngine
 
             while (reader.Read())
             {
-
                 fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
                 fireCompartment.name = reader["name"].ToString();
                 fireCompartment.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
@@ -2229,7 +2228,8 @@ namespace HVAC_CheckEngine
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                         {
-                            return fireCompartment;
+                            if(IsSameDirect(readerAirTerminals,poly, aabbAirTerminal))
+                                return fireCompartment;
                         }
                     }
                 }                        
