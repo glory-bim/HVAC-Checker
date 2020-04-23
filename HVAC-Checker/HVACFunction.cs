@@ -1251,9 +1251,84 @@ namespace HVAC_CheckEngine
         //17判断是否风机所连风系统所有支路都连接了风口  //管堵
         public static bool isAllBranchLinkingAirTerminal(Fan fan)
         {
-            return IfFindAirTerminal(fan.Id.ToString());
-        }
+            return IfFindAirTerminal3t4t(fan.Id.ToString());
+        }        
 
+        public static bool IfFindAirTerminal3t4t(string strId)
+        {
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return false;
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += strId;
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                if (reader["linkElementId"].ToString() != m_strLastId)
+                {
+                    Duct3T duct3t = new Duct3T(-1);
+                    if (GetDuct3T(reader, dbConnection, ref duct3t))
+                    {
+                        sql = "select * from MepConnectionRelations Where mainElementId = ";
+                        sql += strId;
+                        SQLiteCommand command3t = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader reader3t = command3t.ExecuteReader();
+                        bool bReturn = false;
+                        while (reader3t.Read())
+                        {
+                           if( reader3t["linkElementId"].ToString()!= strId)
+                            {
+                                bReturn = IfFindAirTerminal(reader3t["linkElementId"].ToString());
+                            }
+                          
+                        }
+                        return bReturn;
+                    }
+
+                    Duct4T duct4t = new Duct4T(-1);
+                    if (GetDuct4T(reader, dbConnection, ref duct4t))
+                    {
+                        sql = "select * from MepConnectionRelations Where mainElementId = ";
+                        sql += strId;
+                        SQLiteCommand command4t = new SQLiteCommand(sql, dbConnection);
+                        SQLiteDataReader reader4t = command4t.ExecuteReader();
+                        bool bReturn = false;
+                        while (reader4t.Read())
+                        {
+                            if (reader4t["linkElementId"].ToString() != strId)
+                            {
+                                bReturn = IfFindAirTerminal(reader4t["linkElementId"].ToString());
+                            }
+
+                        }
+                        return bReturn;
+
+                    }
+                                       
+
+                    sql = "select * from AirTerminals Where Id = ";
+                    sql += reader["linkElementId"].ToString();
+
+                    SQLiteCommand commandAirTerminals = new SQLiteCommand(sql, dbConnection);
+                    SQLiteDataReader readerAirTerminals = commandAirTerminals.ExecuteReader();
+                    if (readerAirTerminals.Read())
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        m_strLastId = strId;
+                        if (IfFindAirTerminal(reader["linkElementId"].ToString()))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
         public static bool IfFindAirTerminal(string strId)
         {
             //如果不存在，则创建一个空的数据库,
