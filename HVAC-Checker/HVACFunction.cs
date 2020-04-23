@@ -2549,8 +2549,12 @@ namespace HVAC_CheckEngine
 
             string connectionArchstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
-            dbConnectionArch.Open();
-            string sql = "select * from Doors";
+            dbConnectionArch.Open();          
+            string strUserLabel = "防火";
+            string sql = "select * from Doors Where CHARINDEX(";
+            sql = sql + "'" + strUserLabel + "'";
+            sql = sql + ",userLabel)> 0";
+
             SQLiteCommand commandDoor = new SQLiteCommand(sql, dbConnectionArch);
             SQLiteDataReader readerDoor = commandDoor.ExecuteReader();
 
@@ -2584,11 +2588,7 @@ namespace HVAC_CheckEngine
 
                 }
 
-
                 rooms.Add(room);
-
-
-
 
             }
             return rooms;
