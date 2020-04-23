@@ -948,6 +948,48 @@ namespace HVAC_CheckEngine
         }
 
 
+        private static bool IsSameDirect(SQLiteDataReader reader, Polygon2D poly, AABB aabbTerminal )
+        {
+            string strVector = reader["NormalVector"].ToString();
+            int index = strVector.IndexOf(":");
+            int index_s = strVector.LastIndexOf(",\"Y");
+            string strX = strVector.Substring(index + 1, index_s - index - 1);
+
+            double dX = Convert.ToDouble(strX);
+            index = strVector.IndexOf("Y");
+            index_s = strVector.LastIndexOf(",\"Z");
+            string strY = strVector.Substring(index + 3, index_s - index - 3);
+            double dY = Convert.ToDouble(strY);
+
+            index = strVector.IndexOf("Z");
+
+            index_s = strVector.Length;
+            string strZ = strVector.Substring(index + 3, index_s - index - 4);
+            double dZ = Convert.ToDouble(strY);
+            List<double> listVector = new List<double>();
+            listVector.Add(dX);
+            listVector.Add(dY);
+            listVector.Add(dZ);
+
+            List<double> listVectorAirterminalToRoom = new List<double>();
+            dX = poly.Center().X - aabbTerminal.Center().X;
+            dY = poly.Center().Y - aabbTerminal.Center().Y;
+            dZ = poly.Center().Z - aabbTerminal.Center().Z;
+            listVectorAirterminalToRoom.Add(dX);
+            listVectorAirterminalToRoom.Add(dY);
+            listVectorAirterminalToRoom.Add(dZ);
+            //風口方向標註反了所以同向點積為負
+            double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
+            if (dDotProduct < 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }                
+        }
+
         //10获得构建所在房间的对象  几何 包含 遍历表都查
 
         public static Room GetRoomOfAirterminal(AirTerminal airTerminal)
@@ -992,40 +1034,11 @@ namespace HVAC_CheckEngine
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbTerminal))
                         {
-                            string strVector = reader["NormalVector"].ToString();
-                            int index = strVector.IndexOf(":");
-                            int index_s = strVector.LastIndexOf(",\"Y");
-                            string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                            double dX = Convert.ToDouble(strX);
-                            index = strVector.IndexOf("Y");
-                            index_s = strVector.LastIndexOf(",\"Z");
-                            string strY = strVector.Substring(index + 3, index_s - index - 3);
-                            double dY = Convert.ToDouble(strY);
-
-                            index = strVector.IndexOf("Z");
-
-                            index_s = strVector.Length;
-                            string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                            double dZ = Convert.ToDouble(strY);
-                            List<double> listVector = new List<double>();
-                            listVector.Add(dX);
-                            listVector.Add(dY);
-                            listVector.Add(dZ);
-
-                            List<double> listVectorAirterminalToRoom = new List<double>();
-                            dX = poly.Center().X - aabbTerminal.Center().X;
-                            dY = poly.Center().Y - aabbTerminal.Center().Y;
-                            dZ = poly.Center().Z - aabbTerminal.Center().Z;
-                            listVectorAirterminalToRoom.Add(dX);
-                            listVectorAirterminalToRoom.Add(dY);
-                            listVectorAirterminalToRoom.Add(dZ);
-
-                            double dDotProduct = listVector[0] * listVectorAirterminalToRoom[0] + listVector[1] * listVectorAirterminalToRoom[1] + listVector[2] * listVectorAirterminalToRoom[2];
-                            if (dDotProduct < 0)
+                            if(IsSameDirect(reader, poly, aabbTerminal)) 
                             {
                                 return rooms[i];
                             }
+
                         }
                     }                 
 
