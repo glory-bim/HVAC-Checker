@@ -1136,10 +1136,7 @@ namespace HVAC_CheckEngine
             return rooms;
 
         }
-
-
-
-
+              
         // 14判断房间属于地上房间或地下房间  //差参数
         public static bool isOvergroundRoom(Room room)
         {
@@ -3623,7 +3620,69 @@ namespace HVAC_CheckEngine
             }
             return false;
         }
-           
+  
+        
+        public static bool isOuterAirTerminal(AirTerminal airTerminal)
+        {
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from AirTerminals Where Id = ";
+            sql += airTerminal.Id;
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+            PointInt ptMin = new PointInt(0, 0, 0);
+            PointInt ptMax = new PointInt(0, 0, 0);
+            string strId = "";           
+            AABB aabbAirTerminal = new AABB(ptMin, ptMax, strId);
+            if (readerAirTerminals.Read())
+            {               
+                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
+               // if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
+          
+            }
+
+            List<Room> rooms = new List<Room>();
+            rooms = GetAllRooms();
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+            foreach (Room room in rooms)
+            {             
+                if (!GetRoomPolygon2D(room, ref poly))
+                {
+                    return false;
+                }
+
+                PointInt pt = aabbAirTerminal.Center();
+                if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
+                    || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
+                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
+                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                {
+                    return false;
+                }
+                else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
+                {
+                    //if (IsSameDirect(readerAirTerminals, poly, aabbAirTerminal))
+                    // {
+
+                    // }
+                    return false;
+                }
+
+            }             
+            //关闭连接
+            dbConnectionHVAC.Close();       
+            return true;
+        }
+
+
+
     }
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
