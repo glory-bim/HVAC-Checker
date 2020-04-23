@@ -1329,7 +1329,6 @@ namespace HVAC_CheckEngine
             //找出所有走廊
             List<Room> corridors = new List<Room>();
 
-
             if (!System.IO.File.Exists(m_archXdbPath))
                 return regions;
 
@@ -1359,17 +1358,14 @@ namespace HVAC_CheckEngine
 
                 SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
+                Region region = new Region();
                 while (readerDoors.Read())
                 {
                     Room room = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
-                    // room.name = readerDoors["ToRoomId"].ToString();
-                    Region region = new Region();
-                    List<Room> rooms = new List<Room>();
-                    rooms.Add(room);
-                    region.rooms = rooms;
-                    regions.Add(region);
-                    //region.rooms.Add(corridors.ElementAt<Room>(i));
+                    SetRoomPara(ref room);
+                    region.rooms.Add(room);                                 
                 }
+                regions.Add(region);
             }
 
             //关闭连接
