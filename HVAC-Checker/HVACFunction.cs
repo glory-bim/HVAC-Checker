@@ -2734,16 +2734,56 @@ namespace HVAC_CheckEngine
                     SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
                     if (readerDucts.Read())
                     {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        // if(abs(Convert.ToDouble(readerDucts["EndElevation"].ToString())  - Convert.ToDouble(readerDucts["StartElevation"].ToString()))<0.1)
 
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        string strVector = readerDucts["DuctStartPoint"].ToString();
+                        int index = strVector.IndexOf(":");
+                        int index_s = strVector.LastIndexOf(",\"Y");
+                        string strX = strVector.Substring(index + 1, index_s - index - 1);
 
-                        AABB aabbDuct = GetAABB(readerDucts, dbConnection);
+                        double dsX = Convert.ToDouble(strX);
+                        index = strVector.IndexOf("Y");
+                        index_s = strVector.LastIndexOf(",\"Z");
+                        string strY = strVector.Substring(index + 3, index_s - index - 3);
+                        double dsY = Convert.ToDouble(strY);
+
+                        index = strVector.IndexOf("Z");
+
+                        index_s = strVector.Length;
+                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
+                        double dsZ = Convert.ToDouble(strY);
 
 
-                        ducts.Add(duct);
-                        m_listStrLastId.Add(strId);
-                        FindVerticalDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+
+                        strVector = readerDucts["DuctEndPoint"].ToString();
+                        index = strVector.IndexOf(":");
+                        index_s = strVector.LastIndexOf(",\"Y");
+                        strX = strVector.Substring(index + 1, index_s - index - 1);
+
+                        double deX = Convert.ToDouble(strX);
+                        index = strVector.IndexOf("Y");
+                        index_s = strVector.LastIndexOf(",\"Z");
+                         strY = strVector.Substring(index + 3, index_s - index - 3);
+                        double deY = Convert.ToDouble(strY);
+
+                        index = strVector.IndexOf("Z");
+
+                        index_s = strVector.Length;
+                        strZ = strVector.Substring(index + 3, index_s - index - 4);
+                        double deZ = Convert.ToDouble(strY);
+
+                        if((System.Math.Abs(dsX - deX)<0.01)&&(System.Math.Abs(dsY - deY) < 0.01) &&  (System.Math.Abs(dsZ - deZ) >0.01) )
+                        {
+                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+
+                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+
+                            AABB aabbDuct = GetAABB(readerDucts, dbConnection);
+
+                            ducts.Add(duct);
+                            m_listStrLastId.Add(strId);
+                            FindVerticalDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
+                        }                        
                     }
                     else
                     {
@@ -3680,8 +3720,6 @@ namespace HVAC_CheckEngine
             dbConnectionHVAC.Close();       
             return true;
         }
-
-
 
     }
     [Flags]
