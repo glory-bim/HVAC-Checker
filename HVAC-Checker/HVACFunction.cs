@@ -60,7 +60,9 @@ namespace HVAC_CheckEngine
         {
             m_archXdbPath = Archxdb;
             m_hvacXdbPath = HVACxdb;
-        }
+            m_strLastId = "";
+            m_listStrLastId = new List<string>();
+    }
 
         public static string GetCurrentPath(string dbName)
         {
@@ -573,6 +575,8 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
+            m_listStrLastId = new List<string>();
+            m_listStrLastId.Clear();
             //创建一个连接
             FindFansByLinkId(dbConnection, airterminal.Id.ToString(), fans);
             //关闭连接
@@ -589,7 +593,8 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
-                if (reader["linkElementId"].ToString() != m_strLastId)
+
+                if (!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))                  
                 {
                     sql = "select * from HVACFans Where Id = ";
                     sql += reader["linkElementId"].ToString();
@@ -602,8 +607,8 @@ namespace HVAC_CheckEngine
                         inlets.Add(inlet);
                     }
                     else
-                    {
-                        m_strLastId = strId;
+                    {                       
+                        m_listStrLastId.Add(strId);
                         FindFansByLinkId(dbConnection, reader["linkElementId"].ToString(), inlets);
                     }
                 }
