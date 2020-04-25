@@ -170,6 +170,55 @@ namespace HVAC_CheckEngine
             return aabb;
         }
 
+
+
+        private static OBB GetOBB(SQLiteDataReader readerElement, SQLiteConnection dbConnection)
+        {
+            string sTransformer = readerElement["transformer"].ToString();
+
+            string sql = "select * from LODRelations where graphicElementId = ";
+            sql = sql + readerElement["Id"].ToString();
+
+            SQLiteCommand commandHVAC1 = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerHVAC1 = commandHVAC1.ExecuteReader();
+            PointInt pt0 = new PointInt(0, 0, 0);
+            PointInt ptA = new PointInt(0, 0, 0);
+            PointInt ptB = new PointInt(0, 0, 0);
+            PointInt ptC = new PointInt(0, 0, 0);
+            string strId = "";
+            OBB obb = new OBB(pt0,ptA, ptB, ptC,0,0,0, strId);
+            if (readerHVAC1.Read())
+            {
+                sql = "select * from Geometrys where Id = ";
+                sql = sql + readerHVAC1["geometryId"].ToString();
+                SQLiteCommand commandHVACGeo = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerHVACGeo = commandHVACGeo.ExecuteReader();
+
+                if (readerHVACGeo.Read())
+                {
+                    readerHVACGeo["Id"].ToString();
+
+                    Geometry geo = new Geometry();
+                    geo.Id = Convert.ToInt64(readerHVACGeo["Id"].ToString());
+                    geo.vertices = readerHVACGeo["vertices"].ToString();
+                    geo.vertexIndexes = readerHVACGeo["vertexIndexes"].ToString();
+                    geo.normals = readerHVACGeo["normals"].ToString();
+                    geo.normalIndexes = readerHVACGeo["normalIndexes"].ToString();
+                    geo.textrueCoords = readerHVACGeo["textrueCoords"].ToString();
+                    geo.textrueCoordIndexes = readerHVACGeo["textrueCoordIndexes"].ToString();
+                    geo.materialIds = readerHVACGeo["materialIds"].ToString();
+
+                    obb = GeometryFunction.GetGeometryOBB(geo, sTransformer);
+                    return obb;
+
+                }
+            }
+            return obb;
+        }
+
+
+
+
         private static bool  GetRoomPolygon2D(Room room, ref Polygon2D poly)
         {
             string connectionstr = @"data source =" + m_archXdbPath;
@@ -765,10 +814,12 @@ namespace HVAC_CheckEngine
             while (readerDucts.Read())
             {
 
-                AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
+               // AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
+
+                OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
                 if (room.m_iStoryNo == Convert.ToInt32(readerDucts["StoreyNo"].ToString()))
                 {
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
+                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, obbDuct))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                         duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
