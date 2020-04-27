@@ -2873,9 +2873,10 @@ namespace HVAC_CheckEngine
                     Duct3T duct3t = new Duct3T(-1);
                     Duct4T duct4t = new Duct4T(-1);
 
-               
+                    bool bGet = false;
                     if (GetDuct(reader, dbConnection, ref duct))
                     {
+                        bGet = true;
                         newNode.Id = duct.Id;
                   
                         if (lastNode.iType == 3)
@@ -2939,6 +2940,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctElbow(reader, dbConnection, ref ductElbow))
                     {
+                        bGet = true;
                         newNode.Id = ductElbow.Id;
                         newNode.DirectNode = lastNode;
                         lastNode.Parent = newNode;
@@ -2948,6 +2950,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
                     {
+                        bGet = true;
                         newNode.Id = ductReducer.Id;
                         newNode.DirectNode = lastNode;
                         lastNode.Parent = newNode;
@@ -2957,6 +2960,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctDamper(reader, dbConnection, ref ductDamper))
                     {
+                        bGet = true;
                         newNode.Id = ductDamper.Id;
                         newNode.DirectNode = lastNode;
                         lastNode.Parent = newNode;
@@ -2966,6 +2970,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctSoft(reader, dbConnection, ref ductSoft))
                     {
+                        bGet = true;
                         newNode.Id = ductSoft.Id;
                         newNode.DirectNode = lastNode;
                         lastNode.Parent = newNode;
@@ -2975,6 +2980,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetFlexibleShortTube(reader, dbConnection, ref flexibleShortTube))
                     {
+                        bGet = true;
                         newNode.Id = flexibleShortTube.Id;
                         newNode.DirectNode = lastNode;
                         lastNode.Parent = newNode;
@@ -2984,6 +2990,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct3T(reader, dbConnection, ref duct3t))
                     {
+                        bGet = true;
                         newNode.iType = 3;
                         newNode.Id = duct3t.Id;
                         long longId = (long)duct3t.Id;
@@ -3023,6 +3030,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
+                        bGet = true;
                         newNode.iType = 4;
                         newNode.Id = duct4t.Id;
                         lastNode.Parent = newNode;
@@ -3061,12 +3069,20 @@ namespace HVAC_CheckEngine
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct4Ts").Id;
                     }
 
-                    if(newNode!=null&& newNode.Id != null)
+                    if (newNode != null && newNode.Id != null)
                     {
-                        lastNode = newNode;
-                        LastNodes.Add(newNode);
-                        StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
-                    }                
+                        if (bGet)
+                        {
+                            lastNode = newNode;
+                            LastNodes.Add(newNode);
+                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                        }
+                        else
+                        {                                                   
+                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                            LastNodes.Add(newNode);
+                        }
+                    }                                            
                 }
             }           
         }
@@ -3093,9 +3109,10 @@ namespace HVAC_CheckEngine
                     FlexibleShortTube flexibleShortTube = new FlexibleShortTube(-1);
                     Duct3T duct3t = new Duct3T(-1);
                     Duct4T duct4t = new Duct4T(-1);
-
+                    bool bGet = false;
                     if (GetAirterminal(reader, dbConnection, ref airterminal))
                     {
+                        bGet = true;
                         newNode.Id = airterminal.Id;                    
                         newNode.Parent = lastNode;
                         newNode.iType = 0;
@@ -3104,6 +3121,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct(reader, dbConnection, ref duct))
                     {
+                        bGet = true;
                         newNode.Id = duct.Id;                 
                         newNode.Parent = lastNode;
                         if (lastNode.iType == 3)
@@ -3144,6 +3162,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctElbow(reader, dbConnection, ref ductElbow))
                     {
+                        bGet = true;
                         newNode.Id = ductElbow.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 2;
@@ -3152,6 +3171,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
                     {
+                        bGet = true;
                         newNode.Id = ductReducer.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 2;
@@ -3160,6 +3180,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctDamper(reader, dbConnection, ref ductDamper))
                     {
+                        bGet = true;
                         newNode.Id = ductDamper.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 2;
@@ -3168,6 +3189,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuctSoft(reader, dbConnection, ref ductSoft))
                     {
+                        bGet = true;
                         newNode.Id = ductSoft.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 2;
@@ -3176,6 +3198,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetFlexibleShortTube(reader, dbConnection, ref flexibleShortTube))
                     {
+                        bGet = true;
                         newNode.Id = flexibleShortTube.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 2;
@@ -3184,6 +3207,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct3T(reader, dbConnection, ref duct3t))
                     {
+                        bGet = true;
                         newNode.iType = 3;
                         newNode.Id = duct3t.Id;
                         long longId = (long)duct3t.Id;
@@ -3211,6 +3235,7 @@ namespace HVAC_CheckEngine
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
+                        bGet = true;
                         newNode.iType = 4;
                         newNode.Id = duct4t.Id;
                         sql = "select * from MepConnectionRelations Where MainElementId = ";
@@ -3234,11 +3259,21 @@ namespace HVAC_CheckEngine
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct4Ts").Id;
                     }
 
+               
+
                     if (newNode != null && newNode.Id != null)
                     {
-                        lastNode = newNode;
-                        LastNodes.Add(newNode);
-                        StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                        if (bGet)
+                        {
+                            lastNode = newNode;
+                            LastNodes.Add(newNode);
+                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                        }
+                        else
+                        {
+                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                            LastNodes.Add(newNode);
+                        }
                     }
                 }
             }
