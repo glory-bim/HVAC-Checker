@@ -2858,6 +2858,7 @@ namespace HVAC_CheckEngine
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
+
                 newNode = new TreeNode();
                 //lastNode.addFather(newNode);     
                 //if (reader["linkElementId"].ToString() != m_strLastId)
