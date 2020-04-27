@@ -241,8 +241,8 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void IsEquipmentChimneyHasFlexibleShortTubeTest_pass()
         {
-            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\建筑模型.XDB";
-            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\机电模型.XDB";
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50736_2012_6_6_13\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50736_2012_6_6_13\机电模型_Pass.XDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             List<Element> equipments = new List<Element>();
             equipments.AddRange(HVACFunction.GetAllAbsorptionChillers());
@@ -260,6 +260,53 @@ namespace HVAC_CheckEngine.Tests
 
             Assert.IsTrue(isAllEquipmentChimneyHasFlexibleShortTube);
              
+        }
+
+
+        [TestMethod()]
+        public void GetAllRoomsInCertainStory_test()
+        {
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\getRoomInCertainStorey_test\建筑模型.XDB";
+            string strHVACPath = @"";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            //arrange
+            Room room_1 = new Room(726561);
+            Room room_2 = new Room(726564);
+
+
+            //act
+            List<Room>rooms= HVACFunction.GetAllRoomsInCertainStory(1);
+
+            //assert
+            Assert.IsTrue(rooms.Exists(x => x.Id == 726561));
+            Assert.IsTrue(rooms.Exists(x => x.Id == 726564));
+
+        }
+
+        [TestMethod()]
+        public void isOuterAirTerminal_test()
+        {
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\isOuterAirTerminal_test\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\isOuterAirTerminal_test\机电模型.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            //arrange
+            List<AirTerminal> airTerminals = HVACFunction.GetAirterminals();
+
+
+            //act
+            //assert
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if(airTerminal.Id== 1254703607509417984)
+                    Assert.IsFalse(HVACFunction.isOuterAirTerminal(airTerminal));
+                else if (airTerminal.Id == 1254703607538778113)
+                    Assert.IsFalse(HVACFunction.isOuterAirTerminal(airTerminal));
+                else if (airTerminal.Id == 1254703607475863552)
+                    Assert.IsTrue(HVACFunction.isOuterAirTerminal(airTerminal));
+                else if (airTerminal.Id == 1254703607379394560)
+                    Assert.IsTrue(HVACFunction.isOuterAirTerminal(airTerminal));
+            }
+
         }
     }
 }

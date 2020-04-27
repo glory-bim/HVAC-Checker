@@ -899,7 +899,7 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
-        public static List<Duct> GetDuctsCrossFireSide()
+        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
         {
             List<Duct> ducts = new List<Duct>();
 
@@ -971,11 +971,6 @@ namespace HVAC_CheckEngine
             return ducts;
         }
 
-        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
-        {
-            List<Duct> ducts= new List<Duct>();
-            return ducts; 
-        }
 
         private static bool IsSameDirect(SQLiteDataReader airterminalreader, Polygon2D roomPoly, AABB aabbTerminal )
         {
@@ -1838,6 +1833,46 @@ namespace HVAC_CheckEngine
                 {
                     room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
                 }
+                rooms.Add(room);
+            }
+
+            return rooms;
+        }
+
+        public static List<Room> GetAllRoomsInCertainStory(int storeyNo)
+        {
+            List<Room> rooms = new List<Room>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return rooms;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+
+            string sql = "select Id from Storeys where storeyNo=";
+            sql += storeyNo.ToString();
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (!reader.Read())
+                return rooms;
+            int storeyId= Convert.ToInt32(reader["Id"].ToString());
+
+
+            sql = "select * from Spaces where storeyId=";
+            sql += storeyId.ToString();
+
+            command = new SQLiteCommand(sql, m_dbConnection);
+            reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
+                room.name = reader["name"].ToString();
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
+                room.type = reader["userLabel"].ToString();
+                room.m_iStoryNo = storeyNo;
                 rooms.Add(room);
             }
 
@@ -3981,13 +4016,14 @@ namespace HVAC_CheckEngine
             {               
                 airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
                 airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                airTerminal.m_iStoryNo = Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString());
                 aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
-               // if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
+                
           
             }
 
             List<Room> rooms = new List<Room>();
-            rooms = GetAllRooms();
+            rooms = GetAllRoomsInCertainStory(airTerminal.m_iStoryNo.Value);
             List<PointIntList> PointLists = new List<PointIntList>();
             PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
             string sSpaceId = "0";
@@ -3999,20 +4035,19 @@ namespace HVAC_CheckEngine
                     return false;
                 }
 
-                PointInt pt = aabbAirTerminal.Center();
-                if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                    || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+
+                if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                 {
                     return false;
                 }
                 else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                 {
-                    //if (IsSameDirect(readerAirTerminals, poly, aabbAirTerminal))
-                    // {
-
-                    // }
+                    List<AABB> sideWallAABBsOfRoom = GetAllSideWallsAABBOfRoom(room);
+                    foreach(AABB sideWallAABB in sideWallAABBsOfRoom)
+                    {
+                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbAirTerminal, sideWallAABB))
+                            return true;
+                    }
                     return false;
                 }
 
@@ -4022,7 +4057,40 @@ namespace HVAC_CheckEngine
             return true;
         }
 
+
+        private static List<AABB> GetAllSideWallsAABBOfRoom(Room room)
+        {
+            List<AABB> AABBs = new List<AABB>();
+
+            string sql = "select * from WallOfSpaceRelations where spaceId=";
+            sql += room.Id.ToString();
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            List<int> wallIds = new List<int>();
+            while (reader.Read())
+            {
+                wallIds.Add(Convert.ToInt32(reader["wallId"].ToString()));
+            }
+
+            foreach(int Id in wallIds)
+            {
+                sql = "select * from Walls where Id=";
+                sql += Id.ToString();
+                sql += " And isSideWall=1";
+                command = new SQLiteCommand(sql, dbConnection);
+                reader = command.ExecuteReader();
+                if (reader.Read())   
+                    AABBs.Add(GetAABB(reader, dbConnection));
+            }
+            return AABBs;
+        }
+
     }
+
     [Flags]
     public enum RoomPosition { overground = 1, underground = 2, semi_underground = 4 }
 }

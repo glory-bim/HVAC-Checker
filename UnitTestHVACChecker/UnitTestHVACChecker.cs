@@ -4010,8 +4010,8 @@ namespace UnitTestHVACChecker
 
             //arrange
             string comment = "设计满足规范GB50736_2012中第6.6.13条条文规定。";
-            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\建筑模型.XDB";
-            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\机电模型.XDB";
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50736_2012_6_6_13\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50736_2012_6_6_13\机电模型_Pass.XDB";
 
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
