@@ -555,8 +555,12 @@ namespace HVAC_CheckEngine
                     }
                     else
                     {
-                        m_strLastId = strId;
-                        FindFansByLinkId(dbConnection, reader["linkElementId"].ToString(), inlets);
+
+                        if (!reader["userLabel"].ToString().ToString().Equals("支管") && !reader["linkElementId"].ToString().Equals("直管"))
+                        {
+                            m_strLastId = strId;
+                            FindFansByLinkId(dbConnection, reader["linkElementId"].ToString(), inlets);
+                        }
                     }
                 }
             }
@@ -908,10 +912,10 @@ namespace HVAC_CheckEngine
             sql = sql + airTerminal.Id;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
-            if (reader.Read())
+            if (reader.Read())  
             {
                 AABB aabbTerminal = GetAABB(reader, dbConnection);
-                List<PointIntList> PointLists = new List<PointIntList>();
+                List<PointIntList> PointLists = new List<PointIntList>();                               
                 PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
                 string sSpaceId = "0";
 
@@ -1344,17 +1348,18 @@ namespace HVAC_CheckEngine
 
                 SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
                 SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
+                Region region = new Region();
                 while (readerDoors.Read())
                 {
                     Room room = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
                     // room.name = readerDoors["ToRoomId"].ToString();
-                    Region region = new Region();
-                    List<Room> rooms = new List<Room>();
-                    rooms.Add(room);
-                    region.rooms = rooms;
-                    regions.Add(region);
+                   
+                    //为房间属性赋值
+                    region.rooms.Add(room);
+                   
                     //region.rooms.Add(corridors.ElementAt<Room>(i));
                 }
+                regions.Add(region);
             }
 
             //关闭连接
@@ -1383,6 +1388,7 @@ namespace HVAC_CheckEngine
             while (readerDoors.Read())
             {
                 Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                //房间未赋值
                 rooms.Add(roomConnect);
             }
             //关闭连接
@@ -1439,11 +1445,6 @@ namespace HVAC_CheckEngine
         }
 
 
-        public static List<Door> getDoorsBetweenTwoRooms(Room firstRoom, Room secondRoom)
-        {
-            List<Door> doors = new List<Door>();
-            return doors;
-        }
 
 
         public static List<Pipe> GetPipes(String systemName)
@@ -1693,6 +1694,215 @@ namespace HVAC_CheckEngine
             }
 
             return fans;
+        }
+
+        public static List<Boiler> GetAllBoilers()
+        {
+            List<Boiler> boilers = new List<Boiler>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return boilers;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Boilers";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Boiler boiler = new Boiler(Convert.ToInt64(reader["Id"].ToString()));
+                boilers.Add(boiler);
+            }
+
+            return boilers;
+        }
+
+        public static List<AbsorptionChiller> GetAllAbsorptionChillers()
+        {
+            List<AbsorptionChiller> absorptionChillers = new List<AbsorptionChiller>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return absorptionChillers;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from AbsorptionChillers";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                AbsorptionChiller absorptionChiller = new AbsorptionChiller(Convert.ToInt64(reader["Id"].ToString()));
+                absorptionChillers.Add(absorptionChiller);
+            }
+
+            return absorptionChillers;
+        }
+
+        public static List<Chiller> GetAllChillers()
+        {
+            List<Chiller> chillers = new List<Chiller>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return chillers;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from Chillers";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Chiller chiller = new Chiller(Convert.ToInt64(reader["Id"].ToString()));
+                chillers.Add(chiller);
+            }
+
+            return chillers;
+        }
+
+        public static List<RoofTopAHU> GetAllRoofTopAHUs()
+        {
+            List<RoofTopAHU> roofTopAHUs = new List<RoofTopAHU>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return roofTopAHUs;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from RoofTopAHUs";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                RoofTopAHU roofTopAHU  = new RoofTopAHU(Convert.ToInt64(reader["Id"].ToString()));
+                roofTopAHUs.Add(roofTopAHU);
+            }
+
+            return roofTopAHUs;
+        }
+
+        public static List<OutDoorUnit> GetAllOutDoorUnits()
+        {
+            List<OutDoorUnit> outDoorUnits = new List<OutDoorUnit>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return outDoorUnits;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from OutDoorUnits";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                OutDoorUnit outDoorUnit = new OutDoorUnit(Convert.ToInt64(reader["Id"].ToString()));
+                outDoorUnits.Add(outDoorUnit);
+            }
+
+            return outDoorUnits;
+        }
+
+        public static List<OutDoorUnit> GetAllVRVOutDoorUnits()
+        {
+            List<OutDoorUnit> outDoorUnits = new List<OutDoorUnit>();
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                return outDoorUnits;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+            string sql = "select * from OutDoorUnits";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            while (reader.Read()&&reader["userLabel"].Equals("VRV"))
+            {
+                OutDoorUnit outDoorUnit = new OutDoorUnit(Convert.ToInt64(reader["Id"].ToString()));
+                outDoorUnits.Add(outDoorUnit);
+            }
+
+            return outDoorUnits;
+        }
+
+  
+
+        public static bool IsEquipmentChimneyHasFlexibleShortTube(Element equipment)
+        {
+            if (equipment == null)
+                throw new ArgumentException("设备为空");
+
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(m_hvacXdbPath))
+                throw new FileNotFoundException();
+
+            if (!(equipment is Boiler)&&!(equipment is AbsorptionChiller))
+                throw new ArgumentException("设备不为锅炉或直燃机");
+
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+            string sql = "select * from MepConnectionRelations Where mainElementId = ";
+            sql += equipment.Id.ToString();
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            string ChimneyId = string.Empty;
+            while(reader.Read())
+            {
+                sql = "select * from Ducts Where Id = ";
+                sql += reader["linkElementId"].ToString();
+                SQLiteCommand commandDucts = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader readerDucst = commandDucts.ExecuteReader();
+                if(readerDucst.Read()&& readerDucst["SystemType"].ToString().Contains("排风"))
+                {
+                    ChimneyId= reader["linkElementId"].ToString();
+                    break;
+                }
+            }
+
+            if (ChimneyId == string.Empty)
+                return false;
+
+            m_listStrLastId = new List<string>();
+            m_listStrLastId.Add(equipment.Id.ToString());
+
+            if (ChimneyId!=null)
+            {
+                if (FindFlexibleShortTube(dbConnection, ChimneyId) != null)
+                    return true;
+                
+            }
+            return false;
+        }
+
+        private static FlexibleShortTube FindFlexibleShortTube(SQLiteConnection dbConnection, String strId)
+        {
+            string sql = "select * from FlexibleShortTubes Where Id = "+strId.ToString();
+            SQLiteCommand commandShortTubes = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader readerShortTubes = commandShortTubes.ExecuteReader();
+            if (readerShortTubes.Read())
+            {
+                FlexibleShortTube flexibleShortTube = new FlexibleShortTube(Convert.ToInt64(readerShortTubes["Id"].ToString()));
+                return flexibleShortTube;
+            }
+            else
+            {
+                m_listStrLastId.Add(strId);
+                sql = "select * from MepConnectionRelations Where mainElementId = ";
+                sql += strId;
+                SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+                SQLiteDataReader reader = command.ExecuteReader();
+                while (reader.Read() )
+                {
+                    if(!m_listStrLastId.Exists(x => x == reader["linkElementId"].ToString()))
+                        return FindFlexibleShortTube(dbConnection, reader["linkElementId"].ToString());
+                }
+            }
+            return null;
         }
 
 
@@ -2109,9 +2319,9 @@ namespace HVAC_CheckEngine
         public static int GetHighestStoryNoOfRoom(Room room)
         {
             List<Wall> walls = new List<Wall>();
-            int im_iStoryNo = -18;
+            int storyNo = -18;
             if (!System.IO.File.Exists(m_archXdbPath))
-                return im_iStoryNo;
+                return storyNo;
 
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
@@ -2133,7 +2343,7 @@ namespace HVAC_CheckEngine
 
                 if (reader1.Read())
                 {
-                    im_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+                    storyNo = Convert.ToInt32(reader1["storeyNo"].ToString());
 
                     double dHighestElevation = Convert.ToDouble(reader1["elevation"].ToString()) + Convert.ToDouble(reader["dHeight"].ToString());
                     Floor floor = new Floor(0);
@@ -2142,12 +2352,12 @@ namespace HVAC_CheckEngine
                     floors.Add(floor);
                     floors.Sort(new Icp());
                     int imatch = floors.FindIndex(a => a.Id == 0);
-                    im_iStoryNo = floors[imatch + 1].m_iStoryNo.Value;
+                    storyNo = floors[imatch + 1].m_iStoryNo.Value;
                 }
             }
             //关闭连接
             dbConnection.Close();
-            return im_iStoryNo;
+            return storyNo;
         }
 
 

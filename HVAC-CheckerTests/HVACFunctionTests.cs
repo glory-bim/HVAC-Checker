@@ -238,6 +238,28 @@ namespace HVAC_CheckEngine.Tests
             Assert.Fail();
         }
 
-     
+        [TestMethod()]
+        public void IsEquipmentChimneyHasFlexibleShortTubeTest_pass()
+        {
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\机电模型.XDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            List<Element> equipments = new List<Element>();
+            equipments.AddRange(HVACFunction.GetAllAbsorptionChillers());
+            equipments.AddRange(HVACFunction.GetAllBoilers());
+
+            bool isAllEquipmentChimneyHasFlexibleShortTube = true;
+            foreach(Element equipment in equipments)
+            {
+                if(!HVACFunction.IsEquipmentChimneyHasFlexibleShortTube(equipment))
+                {
+                    isAllEquipmentChimneyHasFlexibleShortTube = false;
+                    break;
+                }
+            }
+
+            Assert.IsTrue(isAllEquipmentChimneyHasFlexibleShortTube);
+             
+        }
     }
 }

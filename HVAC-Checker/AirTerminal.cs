@@ -18,5 +18,10 @@ namespace HVAC_CheckEngine
         public double? elevation { get; set; } = null;
 
         public double? airFlowRate { get; set; } = null;
+
+        public double? height { get; set; } = null;
+
+        public double? width { get; set; } = null;
+
     }
 }

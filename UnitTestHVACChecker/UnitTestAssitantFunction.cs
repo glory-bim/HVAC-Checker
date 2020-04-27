@@ -420,7 +420,7 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange
@@ -445,7 +445,7 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange
@@ -467,7 +467,7 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange

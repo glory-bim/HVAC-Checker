@@ -762,7 +762,7 @@ namespace HVAC_CheckEngine
             foreach (Room room in linkedRooms)
             {
                 //获得前室与房间的连通门并放入门的集合中DoorsToCorridor
-                doorsToCorridor.AddRange(HVACFunction.getDoorsBetweenTwoRooms(atria, room));
+                doorsToCorridor.AddRange(HVACFunction.GetDoorsBetweenTwoRooms(atria, room));
             }
             //返回DoorsToCorridor
             return doorsToCorridor;
@@ -1046,6 +1046,328 @@ namespace HVAC_CheckEngine
             }
             return true;
         }
+
+        public static double getBoilerThermalEfficiencyLimit(Boiler boiler)
+        {
+            double[,] thermalEfficiencyLimitTable = new double[,]
+                {
+                    {0.86,0.86,0.88,0.88,0.88,0.88,0 },
+                    {0.88,0.88,0.90,0.90,0.90,0.90,0 },
+                    {0.88,0.88,0.90,0.90,0.90,0.90,0 },
+                    {0.75,0.78,0.80,0.80,0.81,0.82,0 },
+                    {0,0,0,0.82,0.82,0.83,0 },
+                    {0,0,0,0.84,0.84,0.84,0 },
+                    {0,0,0,0,0,0,0 }
+                };
+            int rowIndex = getRowIndexOfBoilerThermalEfficiencyLimitTable(boiler);
+            int colIndex = getColIndexOfBoilerThermalEfficiencyLimitTable(boiler);
+            return thermalEfficiencyLimitTable[rowIndex, colIndex];
+        }
+
+        private static int getRowIndexOfBoilerThermalEfficiencyLimitTable(Boiler boiler)
+        {
+            if (boiler.mediaType.Contains("热水"))
+            {
+                return getRowIndexOfWaterBoilerThermalEfficiencyLimitTable(boiler);
+            }
+            else if (boiler.mediaType.Contains("蒸汽"))
+            {
+                return getRowIndexOfVaporBoilerThermalEfficiencyLimitTable(boiler);
+            }
+            else
+                throw new ArgumentException("锅炉热媒类型有误！");
+        }
+
+        private static int getRowIndexOfWaterBoilerThermalEfficiencyLimitTable(Boiler boiler)
+        {
+            if (boiler.thermalPower < 0.7)
+                return 0;
+            else if (boiler.thermalPower >= 0.7 && boiler.thermalPower <= 1.4)
+                return 1;
+            else if (boiler.thermalPower > 1.4 && boiler.thermalPower < 4.2)
+                return 2;
+            else if (boiler.thermalPower >= 4.2 && boiler.thermalPower <= 5.6)
+                return 3;
+            else if (boiler.thermalPower > 5.6 && boiler.thermalPower <= 14)
+                return 4;
+            else if (boiler.thermalPower > 14)
+                return 5;
+            else
+                return 6;
+        }
+
+
+        private static int getRowIndexOfVaporBoilerThermalEfficiencyLimitTable(Boiler boiler)
+        {
+            if (boiler.evaporationCapacity < 1)
+                return 0;
+            else if (boiler.evaporationCapacity >=1&& boiler.evaporationCapacity <= 2)
+                return 1;
+            else if (boiler.evaporationCapacity > 2 && boiler.thermalPower < 6)
+                return 2;
+            else if (boiler.evaporationCapacity >= 6 && boiler.thermalPower <= 8)
+                return 3;
+            else if (boiler.thermalPower > 8 && boiler.thermalPower <= 20)
+                return 4;
+            else if (boiler.thermalPower > 20)
+                return 5;
+            else
+                return 6;
+        }
+
+        private static int getColIndexOfBoilerThermalEfficiencyLimitTable(Boiler boiler)
+        {
+            if (boiler.type.Equals("燃油燃气锅炉") && boiler.fuelType.Equals("重油"))
+                return 0;
+            else if (boiler.type.Equals("燃油燃气锅炉") && boiler.fuelType.Equals("轻油"))
+                return 1;
+            else if (boiler.type.Equals("燃油燃气锅炉") && boiler.fuelType.Equals("燃气"))
+                return 2;
+            else if (boiler.type.Equals("层状燃烧锅炉") && boiler.fuelType.Equals("III类烟煤"))
+                return 3;
+            else if (boiler.type.Equals("抛煤机链条炉排锅炉") && boiler.fuelType.Equals("III类烟煤"))
+                return 4;
+            else if (boiler.type.Equals("硫化床燃烧锅炉") && boiler.fuelType.Equals("III类烟煤"))
+                return 5;
+            else
+                throw new ArgumentException("锅炉类型或燃料类型有误！");
+
+        }
+
+        public static double getChillerCopLimit(Chiller chiller)
+        {
+            double[,] COPLimitTable = new double[,]
+                {
+                    {4.1,4.1,4.1,4.1,4.2,4.4 },
+                    {0,0,0,0,0,0 },
+                    {4.6,4.7,4.7,4.7,4.8,4.9},
+                    {5.0,5.0,5.0,5.1,5.2,5.3},
+                    {5.2,5.3,5.4,5.5,5.6,5.6},
+                    {5.0,5.0,5.1,5.2,5.3,5.4},
+                    {5.3,5.4,5.4,5.5,5.6,5.7},
+                    {5.7,5.7,5.7,5.8,5.9,5.9},
+                    {2.6,2.6,2.6,2.6,2.7,2.8},
+                    {2.8,2.8,2.8,2.8,2.9,2.9},
+                    {2.7,2.7,2.7,2.8,2.9,2.9},
+                    {2.9,2.9,2.9,3.0,3.0,3.0}
+                };
+            int rowIndex = getRowIndexOfChillerCOPLimitTable(chiller);
+            int colIndex = getColIndexOfChillerCOPLimitTable(chiller);
+            return COPLimitTable[rowIndex, colIndex];
+        }
+
+        private static int getRowIndexOfChillerCOPLimitTable(Chiller chiller)
+        {
+            if (globalData.climateZone.Equals("严寒A区") || globalData.climateZone.Equals("严寒B区"))
+                return 0;
+            else if (globalData.climateZone.Equals("严寒C区"))
+                return 1;
+            else if (globalData.climateZone.Equals("温和地区"))
+                return 2;
+            else if (globalData.climateZone.Equals("寒冷地区"))
+                return 3;
+            else if (globalData.climateZone.Equals("夏热冬冷地区"))
+                return 4;
+            else if (globalData.climateZone.Equals("夏热冬暖地区"))
+                return 5;
+            else
+                throw new Exception("气候分区有误！");
+        }
+
+        private static int getColIndexOfChillerCOPLimitTable(Chiller chiller)
+        {
+            if (chiller.coolingType.Contains("水冷"))
+            {
+                if (chiller.type.Equals("活塞式") || chiller.type.Equals("涡旋式"))
+                    if (chiller.capacity <= 528)
+                        return 0;
+                    else
+                        return 1;
+                else if (chiller.type.Equals("螺杆式"))
+                    if (chiller.capacity <= 528)
+                        return 2;
+                    else if (chiller.capacity > 528 && chiller.capacity <= 1163)
+                        return 3;
+                    else
+                        return 4;
+                else if (chiller.type.Equals("离心式"))
+                    if (chiller.capacity <= 1163)
+                        return 5;
+                    else if (chiller.capacity > 1163 && chiller.capacity <= 2110)
+                        return 6;
+                    else
+                        return 7;
+                else
+                    throw new Exception("冷水机组类型有误！");
+            }
+            else if (chiller.coolingType.Contains("风冷") || chiller.coolingType.Contains("蒸发"))
+            {
+                if (chiller.type.Equals("活塞式") || chiller.type.Equals("涡旋式"))
+                    if (chiller.capacity <= 50)
+                        return 8;
+                    else
+                        return 9;
+                else if (chiller.type.Equals("螺杆式"))
+                    if (chiller.capacity <= 50)
+                        return 10;
+                    else
+                        return 11;
+                else
+                    throw new Exception("冷水机组类型有误！");
+            }
+            else
+                throw new Exception("冷却类型有误");
+          
+        }
+
+
+
+        public static double getEquipmentEERLimit(Element equipment)
+        {
+            double[,] EERLimitTable = new double[,]
+                {
+                    {2.7,2.7,2.7,2.75,2.8,2.85 },
+                    {2.65,2.65,2.65,2.7,2.75,2.75 },
+                    {2.5,2.5,2.5,2.55,2.6,2.6},
+                    {2.45,2.45,2.45,2.5,2.55,2.55},
+                    {3.4,3.45,3.45,3.5,3.55,3.55},
+                    {3.25,3.3,3.3,3.35,3.4,3.45},
+                    {3.1,3.1,3.15,3.2,3.25,3.25},
+                    {3,3,3.05,3.1,3.15,3.2},
+                    {0,0,0,0,0,0}
+                    
+                };
+            int rowIndex = getRowIndexOfEquipmentEERLimitTable(equipment);
+            int colIndex = getColIndexOfEquipmentEERLimitTable(equipment);
+            return EERLimitTable[rowIndex, colIndex];
+        }
+
+        private static int getRowIndexOfEquipmentEERLimitTable(Element equipment)
+        {
+            if (globalData.climateZone.Equals("严寒A区") || globalData.climateZone.Equals("严寒B区"))
+                return 0;
+            else if (globalData.climateZone.Equals("严寒C区"))
+                return 1;
+            else if (globalData.climateZone.Equals("温和地区"))
+                return 2;
+            else if (globalData.climateZone.Equals("寒冷地区"))
+                return 3;
+            else if (globalData.climateZone.Equals("夏热冬冷地区"))
+                return 4;
+            else if (globalData.climateZone.Equals("夏热冬暖地区"))
+                return 5;
+            else
+                throw new Exception("气候分区有误！");
+        }
+
+        private static int getColIndexOfEquipmentEERLimitTable(Element equipment)
+        {
+            OutDoorUnit outDoorUnit = equipment as OutDoorUnit;
+            RoofTopAHU roofTopAHU = equipment as RoofTopAHU;
+
+            if (outDoorUnit != null && outDoorUnit.coolingType.Contains("风冷"))
+            {
+                if (outDoorUnit.capacity > 7.1 && outDoorUnit.capacity <= 14)
+                    return 0;
+                else if (outDoorUnit.capacity > 14)
+                    return 1;
+                else
+                    return 8;
+            }
+            else if (roofTopAHU != null && roofTopAHU.coolingType.Contains("风冷"))
+            {
+                if (roofTopAHU.capacity > 7.1 && roofTopAHU.capacity <= 14)
+                    return 2;
+                else if (roofTopAHU.capacity > 14)
+                    return 3;
+                else
+                    return 8;
+            }
+            else if (outDoorUnit != null && outDoorUnit.coolingType.Contains("水冷"))
+            {
+                if (outDoorUnit.capacity > 7.1 && outDoorUnit.capacity <= 14)
+                    return 4;
+                else if (outDoorUnit.capacity > 14)
+                    return 5;
+                else
+                    return 8;
+            }
+            else if (roofTopAHU != null && roofTopAHU.coolingType.Contains("水冷"))
+            {
+                if (roofTopAHU.capacity > 7.1 && roofTopAHU.capacity <= 14)
+                    return 6;
+                else if (roofTopAHU.capacity > 14)
+                    return 7;
+                else
+                    return 8;
+            }
+            else
+                throw new Exception("设备参数有误！");
+
+        }
+
+        public static double getShutterSpeed(AirTerminal shutter)
+        {
+            return shutter.airFlowRate.Value / shutter.height.Value / shutter.width.Value / 3600;
+        }
+
+
+        public static double getVRVOutDoorUnitIPLVLimit(OutDoorUnit outDoorUnit)
+        {
+            double[,] IPLVLimitTable = new double[,]
+            {
+                    {3.8,3.85,3.85,3.9,4.0,4.0},
+                    {3.75,3.8,3.8,3.85,3.95,3.95},
+                    {3.65,3.7,3.7,3.75,3.8,3.8}
+            };
+            int rowIndex = getRowIndexOfOutDoorUnitIPLVLimitTable(outDoorUnit);
+            int colIndex = getColIndexOfOutDoorUnitIPLVLimitTable(outDoorUnit);
+            return IPLVLimitTable[rowIndex, colIndex];
+        }
+
+        private static int getRowIndexOfOutDoorUnitIPLVLimitTable(OutDoorUnit outDoorUnit)
+        {
+            if (globalData.climateZone.Equals("严寒A区") || globalData.climateZone.Equals("严寒B区"))
+                return 0;
+            else if (globalData.climateZone.Equals("严寒C区"))
+                return 1;
+            else if (globalData.climateZone.Equals("温和地区"))
+                return 2;
+            else if (globalData.climateZone.Equals("寒冷地区"))
+                return 3;
+            else if (globalData.climateZone.Equals("夏热冬冷地区"))
+                return 4;
+            else if (globalData.climateZone.Equals("夏热冬暖地区"))
+                return 5;
+            else
+                throw new Exception("气候分区有误！");
+        }
+
+        private static int getColIndexOfOutDoorUnitIPLVLimitTable(OutDoorUnit outDoorUnit)
+        {
+
+            if (outDoorUnit.capacity <= 28)
+                return 0;
+            else if (outDoorUnit.capacity > 28 && outDoorUnit.capacity <= 84)
+                return 1;
+            else
+                return 2;
+
+        }
+
+        public static Dictionary<int,List<AirTerminal>> sortAirTerminalByStoryNo(List<AirTerminal>airTerminals)
+        {
+            Dictionary<int, List<AirTerminal>> airTerminalsByStoryNo = new Dictionary<int, List<AirTerminal>>();
+            foreach(AirTerminal airTerminal in airTerminals)
+            {
+                if (!airTerminalsByStoryNo.ContainsKey(airTerminal.m_iStoryNo.Value))
+                    airTerminalsByStoryNo.Add(airTerminal.m_iStoryNo.Value,new List<AirTerminal>());
+
+                airTerminalsByStoryNo[airTerminal.m_iStoryNo.Value].Add(airTerminal);
+            }
+            return airTerminalsByStoryNo;
+        }
+
 
         private static string[] CommonOfenStayRoomTypes = { "办公室", "会议室", "报告厅", "商场" };
         private static string[] PublicRooms = { "走廊", "走道", "楼梯间", "前室", "避难间" };
