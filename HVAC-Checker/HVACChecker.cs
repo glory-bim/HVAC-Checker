@@ -3108,6 +3108,17 @@ namespace HVAC_CheckEngine
         //1 燃油锅炉房的正常通风量应按换气次数不少于3次／h确定，事故排风量应按换气次数不少于6次／h确定；
         //2 燃气锅炉房的正常通风量应按换气次数不少于6次／h确定，事故排风量应按换气次数不少于12次／h确定。  有可开启外窗 机械通风 加高档风量参数
 
+        //获取燃气房间集合
+        //获取燃油房间集合
+
+        //如果房间是采用了机械通风时，找到房间里的所有风口
+        //遍历所有找到的风口，找到与风口相连的风机
+        //找到与风机相连的排风口
+        // 如果排风口没在这个房间里风口集合，则不通过，说明机械通风没有单独设置
+        // 比较这个风机流量和房间体积与换气次数的乘积
+        //燃油锅炉房大于3与房间体积的乘积则标记为不通过，不通过房间记入结果中
+        //燃气锅炉房大于6与房间体积的乘积则条文不通过，不通过房间记入结果中                     
+                       
         public static BimReview GB50016_2014_9_3_16()
         {
             //初始化审查结果
@@ -3127,7 +3138,7 @@ namespace HVAC_CheckEngine
         {
             foreach (Room room in rooms)
             {
-                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveNatureVentilateSystem(room);
+                bool stairCaseHaveMechanicalPressureSystem = assistantFunctions.isRoomHaveSomeMechanicalSystem(room, "机械通风");
 
                 //  如果楼梯间采用了机械加压送风系统且机械加压送风系统未设置独立
                 if (stairCaseHaveMechanicalPressureSystem)
@@ -3145,8 +3156,6 @@ namespace HVAC_CheckEngine
                                 {
                                     result.isPassCheck = false;
                                 }
-
-
                             }
                             if (fan.m_flowRate > iNum * room.m_dVolume)
                             {
@@ -3155,6 +3164,7 @@ namespace HVAC_CheckEngine
                             else
                             {
                                 result.isPassCheck = false;
+                                result.AddViolationComponent((long)room.Id, "", "");
                             }
                         }
                     }
@@ -3281,6 +3291,14 @@ namespace HVAC_CheckEngine
 
         //建筑防烟排烟系统技术标准
         //323采用自然通风方式的避难层（间）应设有不同朝向的可开启外窗，其有效面积不应小于该避难层（间）地面面积的2％，且每个朝向的面积不应小于2．0m2。加房间TYpe
+
+        //获取所有避难层房间
+        //遍历所有房间，找到每个房间的所有窗户
+        //遍历每个房间的所有窗户累加个个窗户的有效面积
+        //累加不同的窗户朝向
+        //窗户朝向小于2说明没有设置不同朝向的可开启外窗，不通过并标注不通过房间
+        //每个朝向窗户面积累加小于该避难层（间）地面面积的2％，则不通过并标注不通过房间
+
         public static BimReview GB51251_2017_3_2_3()
         {
             //将审查结果初始化
@@ -3290,26 +3308,38 @@ namespace HVAC_CheckEngine
         foreach (Room room in rooms)
         {
                 List<Window> windows = HVACFunction.GetWindowsInRoom(room);
-                double dAreatotal = 0.0;
+               
                 List<string> faceList = new List<string>();
+
+                List<double> dAreatotalList = new List<double>();
                 foreach (Window window in windows)
                 {
                     if (!faceList.Exists(x => x == window.sFaceOrient))
                     {
                         faceList.Add(window.sFaceOrient);
+                        double dAreatotal = 0.0;
+                        dAreatotal += (double)window.effectiveArea;
+                        dAreatotalList.Add(dAreatotal);
                     }
-                    dAreatotal += (double)window.effectiveArea;
+                   
                 }
                 if (faceList.Count() < 2)
                 {
                     result.isPassCheck = false;
                     result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。没有设置不同朝向的可开启外窗";
+                    result.AddViolationComponent((long)room.Id, "", "");
                 }
-                if (dAreatotal < room.m_dArea * 0.02)
+
+                foreach(double dArea in dAreatotalList)
                 {
-                    result.isPassCheck = false;
-                    result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+                    if (dArea < room.m_dArea * 0.02)
+                    {
+                        result.isPassCheck = false;
+                        result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。";
+                        result.AddViolationComponent((long)room.Id, "", "");
+                    }
                 }
+              
             }
 
         //则在审查结果批注中注明审查通过相关内容
