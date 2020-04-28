@@ -2964,12 +2964,12 @@ namespace HVAC_CheckEngine
            if( FindRoot(LastNodes, ref root))
             {
                 //从根节点 标记子节点防火分区
-                PreOrderAddFireArea(lastNode);
+                PreOrderAddFireArea(root);
 
                 //从根节点 找到子节点为风口的所有节点
 
                 List<TreeNode> airTerminalNodes = new List<TreeNode>();
-                PreOrderAirterminalNode(airTerminalNodes, lastNode);
+                PreOrderAirterminalNode(airTerminalNodes, root);
                 foreach (TreeNode airterminal in airTerminalNodes)
                 {
                     List<TreeNode> ductNodes = new List<TreeNode>();
