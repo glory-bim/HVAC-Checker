@@ -2937,6 +2937,7 @@ namespace HVAC_CheckEngine
             List<AirTerminal> airtermials = GetAirterminals("排烟");
             //建立樹結構
             TreeNode lastNode = new TreeNode();
+            List<TreeNode> LastNodes = new List<TreeNode>();
             foreach (AirTerminal airterminal in airtermials)
             {
                 //如果這個樹有這個風口節點，下一個風口向上構建樹
@@ -2953,36 +2954,42 @@ namespace HVAC_CheckEngine
                 SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
                 dbConnection.Open();
                 //创建一个连接
-                List<TreeNode> LastNodes = new List<TreeNode>();                
+                         
                 LastNodes.Add(newNode);               
 
                 StructPareTree(strId, dbConnection, ref newNode, LastNodes);
             }
-                                          
-            //从根节点 标记子节点防火分区
-            PreOrderAddFireArea(lastNode);
-
-            //从根节点 找到子节点为风口的所有节点
-
-            List<TreeNode> airTerminalNodes = new List<TreeNode>();
-            PreOrderAirterminalNode(airTerminalNodes ,lastNode);
-            foreach (TreeNode airterminal in airTerminalNodes)
+            //找到根節點
+            TreeNode root = new TreeNode();
+           if( FindRoot(LastNodes, ref root))
             {
-                List<TreeNode> ductNodes = new List<TreeNode>();
-                TreeNode node3T4T = GetParentEquel3T4T(airterminal, ductNodes);
+                //从根节点 标记子节点防火分区
+                PreOrderAddFireArea(lastNode);
 
-                if (node3T4T != null)
+                //从根节点 找到子节点为风口的所有节点
+
+                List<TreeNode> airTerminalNodes = new List<TreeNode>();
+                PreOrderAirterminalNode(airTerminalNodes, lastNode);
+                foreach (TreeNode airterminal in airTerminalNodes)
                 {
-                    if (node3T4T.StrfireAireas.Count() > node3T4T.StrfireAireas.Count())
+                    List<TreeNode> ductNodes = new List<TreeNode>();
+                    TreeNode node3T4T = GetParentEquel3T4T(airterminal, ductNodes);
+
+                    if (node3T4T != null)
                     {
-                        foreach (TreeNode ductnode in ductNodes)
+                        if (node3T4T.StrfireAireas.Count() > node3T4T.StrfireAireas.Count())
                         {
-                            Duct duct = new Duct((long)ductnode.Id);
-                            ducts.Add(duct);
+                            foreach (TreeNode ductnode in ductNodes)
+                            {
+                                Duct duct = new Duct((long)ductnode.Id);
+                                ducts.Add(duct);
+                            }
                         }
                     }
                 }
             }
+
+         
 
             return ducts;
         }
@@ -3267,15 +3274,15 @@ namespace HVAC_CheckEngine
                         newNode.Parent = lastNode;
                         if (lastNode.iType == 3)
                         {
-                            sql = "select * from MepConnectionRelations Where MainElementId = ";
+                            string sqlduct = "select * from MepConnectionRelations Where MainElementId = ";
                             strId = Convert.ToString(lastNode.Id);
-                            sql += strId;
+                            sqlduct += strId;
 
-                            sql += " and  linkElementId = ";
+                            sqlduct += " and  linkElementId = ";
                             strId = Convert.ToString(newNode.Id);
-                            sql += strId;
+                            sqlduct += strId;
 
-                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                            SQLiteCommand commandUserLabel = new SQLiteCommand(sqlduct, dbConnection);
                             SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
                             string strMain = "";
                             if (readerUserLabel.Read())
@@ -3354,15 +3361,15 @@ namespace HVAC_CheckEngine
                         long longId = (long)duct3t.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct3Ts").Id;
 
-                        sql = "select * from MepConnectionRelations Where MainElementId = ";
+                        string sqlduct3t = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
-                        sql += strId;
+                        sqlduct3t += strId;
 
-                        sql += " and  linkElementId = ";
+                        sqlduct3t += " and  linkElementId = ";
                         strId = Convert.ToString(lastNode.Id);
-                        sql += strId;
+                        sqlduct3t += strId;
 
-                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                        SQLiteCommand commandUserLabel = new SQLiteCommand(sqlduct3t, dbConnection);
                         SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
                         string strMain = "";
                         if (readerUserLabel.Read())
@@ -3379,15 +3386,15 @@ namespace HVAC_CheckEngine
                         bGet = true;
                         newNode.iType = 4;
                         newNode.Id = duct4t.Id;
-                        sql = "select * from MepConnectionRelations Where MainElementId = ";
+                        string sql4t = "select * from MepConnectionRelations Where MainElementId = ";
                         strId = Convert.ToString(newNode.Id);
-                        sql += strId;
+                        sql4t += strId;
 
-                        sql += "and linkElementId = ";
+                        sql4t += "and linkElementId = ";
                         strId = Convert.ToString(lastNode.Id);
-                        sql += strId;
+                        sql4t += strId;
 
-                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                        SQLiteCommand commandUserLabel = new SQLiteCommand(sql4t, dbConnection);
                         SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
                         string strMain = "";
                         if (readerUserLabel.Read())
@@ -3554,6 +3561,24 @@ namespace HVAC_CheckEngine
             {
                 return true;
             }
+            return false;
+
+        }
+
+
+        static bool  FindRoot(List<TreeNode> LastNodes,ref TreeNode root)
+        {
+
+            foreach(TreeNode node in LastNodes)
+            {
+                if (node.LeftNode == null && node.RightNode == null && node.DirectNode == null && node.Parent == null)
+                {
+                    root = node;
+                    return true;
+                }
+                  
+            }
+
             return false;
 
         }
