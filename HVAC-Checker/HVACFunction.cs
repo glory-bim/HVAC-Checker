@@ -930,6 +930,9 @@ namespace HVAC_CheckEngine
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
                 {
+                  
+
+
                     AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
                     {
@@ -950,8 +953,10 @@ namespace HVAC_CheckEngine
 
                        // AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
                         if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(polyJoint, aabbDuct))
-                        {
+                            {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                            GetDuctStartPointEndPoint(readerDucts, ref duct);
+                             
                             duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
                             ducts.Add(duct);
                         }
@@ -963,6 +968,55 @@ namespace HVAC_CheckEngine
             return ducts;
         }
 
+
+        private static void GetDuctStartPointEndPoint(SQLiteDataReader ductReader,ref Duct duct)
+        {
+            string strVector = ductReader["DuctStartPoint"].ToString();
+            int index = strVector.IndexOf(":");
+            int index_s = strVector.LastIndexOf(",\"Y");
+            string strX = strVector.Substring(index + 1, index_s - index - 1);
+
+            double dX = Convert.ToDouble(strX);
+            index = strVector.IndexOf("Y");
+            index_s = strVector.LastIndexOf(",\"Z");
+            string strY = strVector.Substring(index + 3, index_s - index - 3);
+            double dY = Convert.ToDouble(strY);
+
+            index = strVector.IndexOf("Z");
+
+            index_s = strVector.Length;
+            string strZ = strVector.Substring(index + 3, index_s - index - 4);
+            double dZ = Convert.ToDouble(strY);
+
+
+            duct.ptStart.X = Convert.ToInt32(dX);
+            duct.ptStart.Y = Convert.ToInt32(dY);
+            duct.ptStart.Z = Convert.ToInt32(dZ);
+
+
+            strVector = ductReader["DuctEndPoint"].ToString();
+            index = strVector.IndexOf(":");
+            index_s = strVector.LastIndexOf(",\"Y");
+            strX = strVector.Substring(index + 1, index_s - index - 1);
+
+            dX = Convert.ToDouble(strX);
+            index = strVector.IndexOf("Y");
+            index_s = strVector.LastIndexOf(",\"Z");
+            strY = strVector.Substring(index + 3, index_s - index - 3);
+            dY = Convert.ToDouble(strY);
+
+            index = strVector.IndexOf("Z");
+
+            index_s = strVector.Length;
+            strZ = strVector.Substring(index + 3, index_s - index - 4);
+            dZ = Convert.ToDouble(strY);
+
+
+            duct.ptStart.X = Convert.ToInt32(dX);
+            duct.ptStart.Y = Convert.ToInt32(dY);
+            duct.ptStart.Z = Convert.ToInt32(dZ);
+
+        }
 
         List<PointInt> GetIntersect(Polygon2D polygon,Duct duct)
         {
@@ -1039,54 +1093,7 @@ namespace HVAC_CheckEngine
 
 
 
-        private static void GetDuctStartPointEndPoint(SQLiteDataReader ductReader, Duct duct)
-        {
-            string strVector = ductReader["DuctStartPoint"].ToString();
-            int index = strVector.IndexOf(":");
-            int index_s = strVector.LastIndexOf(",\"Y");
-            string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-            double dX = Convert.ToDouble(strX);
-            index = strVector.IndexOf("Y");
-            index_s = strVector.LastIndexOf(",\"Z");
-            string strY = strVector.Substring(index + 3, index_s - index - 3);
-            double dY = Convert.ToDouble(strY);
-
-            index = strVector.IndexOf("Z");
-
-            index_s = strVector.Length;
-            string strZ = strVector.Substring(index + 3, index_s - index - 4);
-            double dZ = Convert.ToDouble(strY);
-
-
-            duct.ptStart.X = Convert.ToInt32(dX);
-            duct.ptStart.Y = Convert.ToInt32(dY);
-            duct.ptStart.Z = Convert.ToInt32(dZ);
-
-
-            strVector = ductReader["DuctEndPoint"].ToString();
-            index = strVector.IndexOf(":");
-            index_s = strVector.LastIndexOf(",\"Y");
-            strX = strVector.Substring(index + 1, index_s - index - 1);
-
-            dX = Convert.ToDouble(strX);
-            index = strVector.IndexOf("Y");
-            index_s = strVector.LastIndexOf(",\"Z");
-            strY = strVector.Substring(index + 3, index_s - index - 3);
-            dY = Convert.ToDouble(strY);
-
-            index = strVector.IndexOf("Z");
-
-            index_s = strVector.Length;
-            strZ = strVector.Substring(index + 3, index_s - index - 4);
-            dZ = Convert.ToDouble(strY);
-
-
-            duct.ptStart.X = Convert.ToInt32(dX);
-            duct.ptStart.Y = Convert.ToInt32(dY);
-            duct.ptStart.Z = Convert.ToInt32(dZ);
-
-        }
+    
 
         //10获得构建所在房间的对象  几何 包含 遍历表都查
 
