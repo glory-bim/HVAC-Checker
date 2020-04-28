@@ -2953,8 +2953,7 @@ namespace HVAC_CheckEngine
                 string connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
                 dbConnection.Open();
-                //创建一个连接
-                         
+                //创建一个连接                         
                 LastNodes.Add(newNode);               
 
                 StructPareTree(strId, dbConnection, ref newNode, LastNodes);
