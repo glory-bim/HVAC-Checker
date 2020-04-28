@@ -899,7 +899,7 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
-        public static List<Duct> GetDuctsCrossFireSide()
+        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
         {
             List<Duct> ducts = new List<Duct>();
 
@@ -910,7 +910,6 @@ namespace HVAC_CheckEngine
                 //如果不存在，则创建一个空的数据库,
                 if (!System.IO.File.Exists(m_archXdbPath))
                     return ducts;
-
 
                 List<PointIntList> PointLists = new List<PointIntList>();
                 PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
@@ -960,16 +959,40 @@ namespace HVAC_CheckEngine
                          
                     }
                 }
-                }
-
-           
-        
-
-        
-
-
+                }                     
             return ducts;
         }
+
+
+        List<PointInt> GetIntersect(Polygon2D polygon,Duct duct)
+        {
+            List<PointInt> ptList = new List<PointInt>();
+            foreach ( PointIntList list in polygon.Points)
+            {
+                if(list.Count()>2)
+                {
+                   
+                    for (int i = 0;i<list.Count();i++)
+                    {
+                       PointInt ptInter = new PointInt(0,0,0);
+                        if (PointInt.IsLineIntersectsLine2D(duct.ptStart, duct.ptEnd, list[i], list[i + 1]))
+                        {
+                            ptInter = PointInt.GetLinesIntersectionPoint_2D(duct.ptStart, duct.ptEnd, list[i], list[i + 1]);
+                            ptList.Add(ptInter);
+                        }
+                        
+                    }
+                   
+                }
+               
+            }
+
+            return ptList;
+
+
+        }
+
+
 
 
         private static bool IsSameDirect(SQLiteDataReader airterminalreader, Polygon2D roomPoly, AABB aabbTerminal )
@@ -3812,6 +3835,10 @@ namespace HVAC_CheckEngine
             dbConnectionHVAC.Close();       
             return true;
         }
+
+
+
+
 
     }
     [Flags]
