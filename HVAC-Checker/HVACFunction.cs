@@ -2931,20 +2931,78 @@ namespace HVAC_CheckEngine
             }
         }
        
-        private static void StructPareTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, ref TreeNode lastNode ,List<TreeNode> LastNodes)
+        public static List<Duct> GetBranchDamperDucts()
         {
+            List<Duct> ducts = new List<Duct>();
+            List<AirTerminal> airtermials = GetAirterminals("排烟");
+            //建立樹結構
+            TreeNode lastNode = new TreeNode();
+            foreach (AirTerminal airterminal in airtermials)
+            {
+                //如果這個樹有這個風口節點，下一個風口向上構建樹
+                if (PreOrderFind(lastNode, airterminal)) continue;
+                TreeNode newNode = new TreeNode();
+                newNode.Id = airterminal.Id;
+                newNode.iType = 0;
+
+                string strId = Convert.ToString(airtermials[0].Id);
+
+                if (!System.IO.File.Exists(m_hvacXdbPath))
+                    return ducts;
+                string connectionstr = @"data source =" + m_hvacXdbPath;
+                SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+                dbConnection.Open();
+                //创建一个连接
+                List<TreeNode> LastNodes = new List<TreeNode>();                
+                LastNodes.Add(newNode);               
+
+                StructPareTree(strId, dbConnection, ref newNode, LastNodes);
+            }
+                                          
+            //从根节点 标记子节点防火分区
+            PreOrderAddFireArea(lastNode);
+
+            //从根节点 找到子节点为风口的所有节点
+
+            List<TreeNode> airTerminalNodes = new List<TreeNode>();
+            PreOrderAirterminalNode(airTerminalNodes ,lastNode);
+            foreach (TreeNode airterminal in airTerminalNodes)
+            {
+                List<TreeNode> ductNodes = new List<TreeNode>();
+                TreeNode node3T4T = GetParentEquel3T4T(airterminal, ductNodes);
+
+                if (node3T4T != null)
+                {
+                    if (node3T4T.StrfireAireas.Count() > node3T4T.StrfireAireas.Count())
+                    {
+                        foreach (TreeNode ductnode in ductNodes)
+                        {
+                            Duct duct = new Duct((long)ductnode.Id);
+                            ducts.Add(duct);
+                        }
+                    }
+                }
+            }
+
+            return ducts;
+        }
+
+
+
+        private static void StructPareTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, List<TreeNode> LastNodes)
+        {            
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
-            {
-
-                newNode = new TreeNode();
-                //lastNode.addFather(newNode);     
-                //if (reader["linkElementId"].ToString() != m_strLastId)
-                if(!LastNodes.Exists(x => x.Id == Convert.ToInt64( reader["linkElementId"].ToString())))
-                {
+            {                       
+                if (!LastNodes.Exists(x => x.Id == Convert.ToInt64(reader["linkElementId"].ToString())))
+                { 
+                    int index = sql.IndexOf("=");                                     
+                    string strMainId = sql.Substring(index + 1, (sql.Length- index - 1));
+                    TreeNode lastNode = LastNodes.Find(x => x.Id == Convert.ToInt64(strMainId));
+                    newNode = new TreeNode();
                     AirTerminal airterminal = new AirTerminal(-1);
                     Duct duct = new Duct(-1);
                     DuctElbow ductElbow = new DuctElbow(-1);
@@ -2960,18 +3018,18 @@ namespace HVAC_CheckEngine
                     {
                         bGet = true;
                         newNode.Id = duct.Id;
-                  
+
                         if (lastNode.iType == 3)
                         {
-                            sql = "select * from MepConnectionRelations Where MainElementId = ";
+                            string sqll = "select * from MepConnectionRelations Where MainElementId = ";
                             strId = Convert.ToString(lastNode.Id);
-                            sql += strId;
+                            sqll += strId;
 
-                            sql += " and  linkElementId = ";
+                            sqll += " and  linkElementId = ";
                             strId = Convert.ToString(newNode.Id);
-                            sql += strId;
+                            sqll += strId;
 
-                            SQLiteCommand commandUserLabel = new SQLiteCommand(sql, dbConnection);
+                            SQLiteCommand commandUserLabel = new SQLiteCommand(sqll, dbConnection);
                             SQLiteDataReader readerUserLabel = commandUserLabel.ExecuteReader();
                             string strMain = "";
                             if (readerUserLabel.Read())
@@ -2985,25 +3043,30 @@ namespace HVAC_CheckEngine
                                     newNode.Parent = lastNode;
                                     if (newNode != null && newNode.Id != null)
                                     {
-                                        
-                                        lastNode = newNode;
+
+                                    
                                         LastNodes.Add(newNode);
-                                        StructSonTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                                        bool bGett = false;
+                                        StructSonTree(Convert.ToString(newNode.Id), dbConnection, ref newNode,  LastNodes);
+                                        if(bGett)
+                                            lastNode = newNode;
                                         continue;
                                     }
                                     break;
-                                case "主管":                                    
+                                case "主管":
                                     lastNode.Parent = newNode;
-                                    newNode.DirectNode = lastNode;                                  
+                                    newNode.DirectNode = lastNode;
                                     break;
                                 case "支管":
                                     lastNode.LeftNode = newNode;
                                     newNode.Parent = lastNode;
                                     if (newNode != null && newNode.Id != null)
                                     {
-                                        lastNode = newNode;
                                         LastNodes.Add(newNode);
-                                        StructSonTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
+                                        bool bGettt = false;
+                                        StructSonTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, LastNodes);
+                                        if (bGettt)
+                                            lastNode = newNode;
                                         continue;
                                     }
                                     break;
@@ -3028,7 +3091,7 @@ namespace HVAC_CheckEngine
                         lastNode.Parent = newNode;
                         newNode.iType = 2;
                         long longId = (long)ductElbow.Id;
-                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctElbows").Id;                       
+                        newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "DuctElbows").Id;
                     }
                     else if (GetDuctReducer(reader, dbConnection, ref ductReducer))
                     {
@@ -3097,18 +3160,17 @@ namespace HVAC_CheckEngine
                         {
                             case "直管":
                                 newNode.DirectNode = lastNode;
-                           
+
                                 break;
                             case "主管":
-                                newNode.Parent = lastNode.LeftNode;                             
+                                newNode.Parent = lastNode.LeftNode;
                                 break;
                             case "支管":
                                 newNode.LeftNode = lastNode;
-                          
+
                                 break;
                         }
-                    
-               
+
                     }
                     else if (GetDuct4T(reader, dbConnection, ref duct4t))
                     {
@@ -3152,24 +3214,17 @@ namespace HVAC_CheckEngine
                     }
 
                     if (newNode != null && newNode.Id != null)
-                    {
-                        if (bGet)
-                        {
-                            lastNode = newNode;
-                            LastNodes.Add(newNode);
-                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
-                        }
-                        else
-                        {                                                   
-                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
-                            LastNodes.Add(newNode);
-                        }
-                    }                                            
+                    {                                      
+                        LastNodes.Add(newNode);                   
+                        StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, LastNodes);                            
+                    }
                 }
-            }           
+            }
+
+            
         }
-               
-        private static void StructSonTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, ref TreeNode lastNode, List<TreeNode> LastNodes)
+
+        private static void StructSonTree(string strId, SQLiteConnection dbConnection, ref TreeNode newNode, List<TreeNode> LastNodes)
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
@@ -3182,6 +3237,10 @@ namespace HVAC_CheckEngine
                 //if (reader["linkElementId"].ToString() != m_strLastId)
                 if (!LastNodes.Exists(x => x.Id == Convert.ToInt64(reader["linkElementId"].ToString())))
                 {
+
+                    int index = sql.IndexOf("=");
+                    string strMainId = sql.Substring(index + 1, (sql.Length - index - 1));
+                    TreeNode lastNode = LastNodes.Find(x => x.Id == Convert.ToInt64(strMainId));
                     AirTerminal airterminal = new AirTerminal(-1);
                     Duct duct = new Duct(-1);
                     DuctElbow ductElbow = new DuctElbow(-1);
@@ -3195,7 +3254,7 @@ namespace HVAC_CheckEngine
                     if (GetAirterminal(reader, dbConnection, ref airterminal))
                     {
                         bGet = true;
-                        newNode.Id = airterminal.Id;                    
+                        newNode.Id = airterminal.Id;
                         newNode.Parent = lastNode;
                         newNode.iType = 0;
                         long longId = (long)airterminal.Id;
@@ -3204,7 +3263,7 @@ namespace HVAC_CheckEngine
                     else if (GetDuct(reader, dbConnection, ref duct))
                     {
                         bGet = true;
-                        newNode.Id = duct.Id;                 
+                        newNode.Id = duct.Id;
                         newNode.Parent = lastNode;
                         if (lastNode.iType == 3)
                         {
@@ -3311,7 +3370,7 @@ namespace HVAC_CheckEngine
                             strMain = readerUserLabel["userLabel"].ToString();
                         }
 
-                        newNode.Parent = lastNode;                    
+                        newNode.Parent = lastNode;
 
 
                     }
@@ -3339,86 +3398,22 @@ namespace HVAC_CheckEngine
 
                         long longId = (long)duct4t.Id;
                         newNode.strfireAirea = GetSmokeCompartmentOfElement(longId, "Duct4Ts").Id;
-                    }
+                    }               
 
-               
 
                     if (newNode != null && newNode.Id != null)
                     {
-                        if (bGet)
-                        {
-                            lastNode = newNode;
-                            LastNodes.Add(newNode);
-                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
-                        }
-                        else
-                        {
-                            StructPareTree(Convert.ToString(newNode.Id), dbConnection, ref newNode, ref lastNode, LastNodes);
-                            LastNodes.Add(newNode);
-                        }
+                        LastNodes.Add(newNode);
+                     
+                        StructSonTree(Convert.ToString(newNode.Id), dbConnection, ref newNode,  LastNodes);
+                    
                     }
                 }
             }
         }
 
-        public static List<Duct> GetBranchDamperDucts()
-        {
-            List<Duct> ducts = new List<Duct>();
-            List<AirTerminal> airtermials = GetAirterminals("排烟");
-            //建立樹結構
-            TreeNode lastNode = new TreeNode();
-            foreach (AirTerminal airterminal in airtermials)
-            {
-                //如果這個樹有這個風口節點，下一個風口向上構建樹
-                if (PreOrderFind(lastNode, airterminal)) continue;
-                TreeNode newNode = new TreeNode();
-                newNode.Id = airterminal.Id;
-                newNode.iType = 0;
-
-                string strId = Convert.ToString(airtermials[0].Id);
-
-                if (!System.IO.File.Exists(m_hvacXdbPath))
-                    return ducts;
-                string connectionstr = @"data source =" + m_hvacXdbPath;
-                SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-                dbConnection.Open();
-                //创建一个连接
-                List<TreeNode> LastNodes = new List<TreeNode>();
-                lastNode = newNode;
-                LastNodes.Add(newNode);
-
-                StructPareTree(strId, dbConnection, ref newNode, ref lastNode, LastNodes);
-            }
-                                          
-            //从根节点 标记子节点防火分区
-            PreOrderAddFireArea(lastNode);
-
-            //从根节点 找到子节点为风口的所有节点
-
-            List<TreeNode> airTerminalNodes = new List<TreeNode>();
-            PreOrderAirterminalNode(airTerminalNodes ,lastNode);
-            foreach (TreeNode airterminal in airTerminalNodes)
-            {
-                List<TreeNode> ductNodes = new List<TreeNode>();
-                TreeNode node3T4T = GetParentEquel3T4T(airterminal, ductNodes);
-
-                if (node3T4T != null)
-                {
-                    if (node3T4T.StrfireAireas.Count() > node3T4T.StrfireAireas.Count())
-                    {
-                        foreach (TreeNode ductnode in ductNodes)
-                        {
-                            Duct duct = new Duct((long)ductnode.Id);
-                            ducts.Add(duct);
-                        }
 
 
-                    }
-                }
-            }
-
-            return ducts;
-        }
 
         private static void AddArea(TreeNode nodeArea, TreeNode node)
         {
