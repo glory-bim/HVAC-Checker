@@ -561,6 +561,22 @@ namespace HVAC_CheckEngine
         }
 
 
+        public static OBB GetGeometryOBB(Geometry geo, string transformer)
+        {
+            PointIntList ptlist = new PointIntList();
+            ConvertVerticesToPointIntList(geo.vertices, transformer, ref ptlist);
+
+            // 暂时全部采用A包围盒，O.S.P后续视情况添加
+          //  AABB aabb = ptlist.GetAABB(geo.Id.ToString());
+            //PointInt ptCenter = aabb.Center();
+           // return aabb;
+
+            OBB obb = ptlist.GetOBB(geo.Id.ToString());
+           // obb.ToDataList_OBB();
+            return obb;
+        }
+
+
         /// <summary>
         /// 根据element的几何图形的顶点数据和转换矩阵，获取其位置点集
         /// </summary>

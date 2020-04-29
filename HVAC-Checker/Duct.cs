@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BCGL.Sharp;
 
 namespace HVAC_CheckEngine
 {
@@ -13,6 +14,10 @@ namespace HVAC_CheckEngine
             
         }
         public double? airVelocity { get; set; } = null;
-       
+
+        public PointInt ptStart { get; set; } = null;
+
+        public PointInt ptEnd { get; set; } = null;
+
     }
 }

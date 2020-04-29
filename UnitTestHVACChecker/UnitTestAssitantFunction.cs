@@ -420,9 +420,9 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange
                 FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
                 Room atria = new Room(21);
@@ -445,9 +445,9 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange
                 FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
                 Room atria = new Room(23);
@@ -467,9 +467,9 @@ namespace UnitTestAssitantFunction
         {
             using (ShimsContext.Create())
             {
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDoorsBetweenTwoRoomsRoomRoom = FakeHVACFunction.getDoorsBetweenTwoRooms_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetConnectedRoomsRoom = FakeHVACFunction.getConnectedRooms_new;
                 //arrange
                 FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
                 Room atria = new Room(24);
@@ -522,7 +522,7 @@ namespace UnitTestAssitantFunction
                     long airTerminalId = Convert.ToInt64(row.GetCell(sheet_airTerminals.getColNumber("ID")).NumericCellValue);
                     AirTerminal airTerminal = new AirTerminal(airTerminalId);
                     airTerminal.systemType= row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
-                    airTerminal.storyNo= Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
+                    airTerminal.m_iStoryNo= Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
                     string affordStoryIdString= row.GetCell(sheet_airTerminals.getColNumber("负担的楼层")).ToString();
                     List<Floor> floors = FakeHVACFunction.getAllFloorsByIdString(affordStoryIdString);
                     aimResult[airTerminal] = floors;
@@ -586,7 +586,7 @@ namespace UnitTestAssitantFunction
                     long airTerminalId = Convert.ToInt64(row.GetCell(sheet_airTerminals.getColNumber("ID")).NumericCellValue);
                     AirTerminal airTerminal = new AirTerminal(airTerminalId);
                     airTerminal.systemType = row.GetCell(sheet_airTerminals.getColNumber("系统类型")).ToString();
-                    airTerminal.storyNo = Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
+                    airTerminal.m_iStoryNo = Convert.ToInt32(row.GetCell(sheet_airTerminals.getColNumber("楼层编号")).NumericCellValue);
                     string affordStoryIdString = row.GetCell(sheet_airTerminals.getColNumber("负担的楼层")).ToString();
                     List<Floor> floors = FakeHVACFunction.getAllFloorsByIdString(affordStoryIdString);
                     aimResult[airTerminal] = floors;
@@ -595,7 +595,7 @@ namespace UnitTestAssitantFunction
                 //打开测试数据文件
                 //act
           
-                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(1, 15), airTerminals);
+                Dictionary<AirTerminal, List<Floor>> result = assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(assistantFunctions.filterFloorsBetweenlowestAndHighestm_iStoryNo(1, 15), airTerminals);
 
                 //assert
 
@@ -627,7 +627,7 @@ namespace UnitTestAssitantFunction
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
                 //arrange
 
 
@@ -653,15 +653,15 @@ namespace UnitTestAssitantFunction
 
                 stairCase.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
                 stairCase.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                stairCase.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                stairCase.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                stairCase.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                stairCase.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                stairCase.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                stairCase.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                stairCase.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
 
-                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
-                int lowestStoryNo = stairCase.storyNo.Value;
-                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+                int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                int lowestm_iStoryNo = stairCase.m_iStoryNo.Value;
+                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestm_iStoryNo(lowestm_iStoryNo, highestm_iStoryNo);
 
                 double hight = assistantFunctions.getAffordHeightOfFanByFloorDivision(fan,assistantFunctions.getFloorDivisionOfAirTerminalsBottomUp(floors, airTerminals));
 
@@ -696,7 +696,7 @@ namespace UnitTestAssitantFunction
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.getHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
                 //arrange
 
 
@@ -722,15 +722,15 @@ namespace UnitTestAssitantFunction
 
                 stairCase.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
                 stairCase.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                stairCase.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                stairCase.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                stairCase.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                stairCase.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                stairCase.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                stairCase.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                stairCase.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                stairCase.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                 List<AirTerminal> airTerminals = HVACFunction.GetRoomContainAirTerminal(stairCase);
 
-                int highestStoryNo = HVACFunction.getHighestStoryNoOfRoom(stairCase);
-                int lowestStoryNo = stairCase.storyNo.Value;
-                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestStoryNo(lowestStoryNo, highestStoryNo);
+                int highestm_iStoryNo = HVACFunction.GetHighestStoryNoOfRoom(stairCase);
+                int lowestm_iStoryNo = stairCase.m_iStoryNo.Value;
+                List<Floor> floors = assistantFunctions.filterFloorsBetweenlowestAndHighestm_iStoryNo(lowestm_iStoryNo, highestm_iStoryNo);
 
                 double hight = assistantFunctions.getAffordHeightOfFanByFloorDivision(fan, assistantFunctions.getFloorDivisionOfAirTerminalsTopToBottom(floors, airTerminals));
 
@@ -774,10 +774,10 @@ namespace UnitTestAssitantFunction
                         Room room = new Room(Id);
                         room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
                         room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                         aimRooms.Add(room);
                     }
                 }
@@ -839,10 +839,10 @@ namespace UnitTestAssitantFunction
                         Room room = new Room(Id);
                         room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
                         room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                         aimRooms.Add(room);
                     }
                 }
@@ -905,10 +905,10 @@ namespace UnitTestAssitantFunction
                         Room room = new Room(Id);
                         room.type = row.GetCell(sheet_rooms.getColNumber("房间类型")).StringCellValue;
                         room.name = row.GetCell(sheet_rooms.getColNumber("房间名称")).StringCellValue;
-                        room.area = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
-                        room.roomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
-                        room.numberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
-                        room.storyNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
+                        room.m_dArea = row.GetCell(sheet_rooms.getColNumber("房间面积")).NumericCellValue;
+                        room.m_eRoomPosition = (RoomPosition)row.GetCell(sheet_rooms.getColNumber("房间位置")).NumericCellValue;
+                        room.m_iNumberOfPeople = (int)row.GetCell(sheet_rooms.getColNumber("房间人数")).NumericCellValue;
+                        room.m_iStoryNo = (int)row.GetCell(sheet_rooms.getColNumber("房间楼层编号")).NumericCellValue;
                         aimRooms.Add(room);
                     }
                 }

@@ -12,5 +12,7 @@ namespace HVAC_CheckEngine
         public static string buildingType { get; set; } 
           
         public static bool haveSubentryMeasures { get; set; }
+
+        public static string climateZone { get; set; }
     }
 }
