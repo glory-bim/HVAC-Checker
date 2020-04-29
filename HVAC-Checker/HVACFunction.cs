@@ -258,6 +258,12 @@ namespace HVAC_CheckEngine
              return  poly != null;
         }
 
+        private static void SetAirterminalPara(ref AirTerminal airTerminal, SQLiteDataReader readerAirTerminals)
+        {
+            airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+            airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+        }
+
         //2 判断房间是否有某种构件并返回构件对象
         //  Room    某种构件  风口
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
@@ -285,16 +291,13 @@ namespace HVAC_CheckEngine
                 if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
                 {
                     AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                    airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                    airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                    SetAirterminalPara(ref airTerminal, readerAirTerminals);
+
                     AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         airterminals.Add(airTerminal);
                     }
@@ -495,10 +498,7 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerWindows, dbConnection);
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
                         window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
@@ -779,8 +779,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerDucts["AirFlowRate"].ToString());
-                        inlet.systemType = readerDucts["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerDucts);
                         inlets.Add(inlet);
                     }
                     else
@@ -876,8 +875,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -906,8 +904,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -1133,7 +1130,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static void GetDuctStartPointEndPoint(SQLiteDataReader ductReader,ref Duct duct)
+        private static void SetDuctPara(SQLiteDataReader ductReader, ref Duct duct)
         {
             string strVector = ductReader["DuctStartPoint"].ToString();
             int index = strVector.IndexOf(":");
@@ -1176,10 +1173,11 @@ namespace HVAC_CheckEngine
             dZ = Convert.ToDouble(strY);
 
 
-            duct.ptStart.X = Convert.ToInt32(dX);
-            duct.ptStart.Y = Convert.ToInt32(dY);
-            duct.ptStart.Z = Convert.ToInt32(dZ);
+            duct.ptEnd.X = Convert.ToInt32(dX);
+            duct.ptEnd.Y = Convert.ToInt32(dY);
+            duct.ptEnd.Z = Convert.ToInt32(dZ);
 
+            duct.airVelocity = Convert.ToDouble(ductReader["Velocity"].ToString());
         }
 
         static List<PointInt>  GetIntersectPoint(Polygon2D polygon,Duct duct)
@@ -1299,10 +1297,7 @@ namespace HVAC_CheckEngine
                     }
                     if (rooms[i].m_iStoryNo == Convert.ToInt32(reader["StoreyNo"].ToString()))
                     {
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {
                             return rooms[i];
                         }
@@ -1537,8 +1532,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                        duct.systemType = readerDucts["SystemType"].ToString();
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                         m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -1911,8 +1905,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -2603,8 +2596,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -2915,10 +2907,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(reader, dbConnection);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return fireCompartment;
                         }
@@ -2988,10 +2977,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return true;
                         }
@@ -3075,10 +3061,7 @@ namespace HVAC_CheckEngine
                     // AABB polySmokeCompartment = GetAABB(readerAirTerminals, dbConnection);
                     if(room.m_iStoryNo == room1.m_iStoryNo)
                     {                   
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(polySmokeCompartment, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Max))
+                        if (poly.Polygon2D_Contains_Polygon2D(polySmokeCompartment))
                         {
                             SmokeCompartment fireCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
                             fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
@@ -3292,9 +3275,8 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerDucts, dbConnection);
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                     {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                        duct.systemType = readerDucts["SystemType"].ToString();
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));                     
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                     }
                 }
@@ -3384,8 +3366,7 @@ namespace HVAC_CheckEngine
                         if((System.Math.Abs(dsX - deX)<0.01)&&(System.Math.Abs(dsY - deY) < 0.01) &&  (System.Math.Abs(dsZ - deZ) >0.01) )
                         {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                            SetDuctPara(readerDucts, ref duct);
 
                             AABB aabbDuct = GetAABB(readerDucts, dbConnection);
 
@@ -4152,10 +4133,7 @@ namespace HVAC_CheckEngine
                         {
                             return room;
                         }
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {                           
                             room.name = reader["name"].ToString();
                             room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
@@ -4200,6 +4178,7 @@ namespace HVAC_CheckEngine
             if (readerFans.Read())
             {
                 duct = new AirTerminal(Convert.ToInt64(readerFans["Id"].ToString()));
+                SetAirterminalPara(ref duct, readerFans);
                 return true;
             }
             return false;
@@ -4377,10 +4356,8 @@ namespace HVAC_CheckEngine
             string strId = "";           
             AABB aabbAirTerminal = new AABB(ptMin, ptMax, strId);
             if (readerAirTerminals.Read())
-            {               
-                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-                airTerminal.m_iStoryNo = Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString());
+            {
+                SetAirterminalPara(ref airTerminal, readerAirTerminals);       
                 aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
             }
 
