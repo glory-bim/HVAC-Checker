@@ -3570,7 +3570,7 @@ namespace HVAC_CheckEngine
 
             foreach(TreeNode node in LastNodes)
             {
-                if (node.LeftNode == null && node.RightNode == null && node.DirectNode == null && node.Parent == null)
+                if (node.Parent == null)
                 {
                     root = node;
                     return true;
