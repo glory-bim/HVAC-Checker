@@ -827,7 +827,7 @@ namespace HVAC_CheckEngine
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, obbDuct))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                     }
                 }
@@ -885,8 +885,8 @@ namespace HVAC_CheckEngine
                         if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
                         {
 
-                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));                       
+                            SetDuctPara(readerDucts, ref duct);
                             ducts.Add(duct);
                         }
                     }
@@ -954,12 +954,10 @@ namespace HVAC_CheckEngine
                        // AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
                         if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(polyJoint, aabbDuct))
                             {
-                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                            GetDuctStartPointEndPoint(readerDucts, ref duct);
-                             
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                            ducts.Add(duct);
-                        }
+                                Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                                SetDuctPara(readerDucts, ref duct);
+                                ducts.Add(duct);
+                            }
                     }                     
                          
                     }
@@ -969,7 +967,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static void GetDuctStartPointEndPoint(SQLiteDataReader ductReader,ref Duct duct)
+        private static void SetDuctPara(SQLiteDataReader ductReader, ref Duct duct)
         {
             string strVector = ductReader["DuctStartPoint"].ToString();
             int index = strVector.IndexOf(":");
@@ -1012,11 +1010,14 @@ namespace HVAC_CheckEngine
             dZ = Convert.ToDouble(strY);
 
 
-            duct.ptStart.X = Convert.ToInt32(dX);
-            duct.ptStart.Y = Convert.ToInt32(dY);
-            duct.ptStart.Z = Convert.ToInt32(dZ);
+            duct.ptEnd.X = Convert.ToInt32(dX);
+            duct.ptEnd.Y = Convert.ToInt32(dY);
+            duct.ptEnd.Z = Convert.ToInt32(dZ);
 
+            duct.airVelocity = Convert.ToDouble(ductReader["Velocity"].ToString());
         }
+
+ 
 
         List<PointInt> GetIntersect(Polygon2D polygon,Duct duct)
         {
@@ -1374,7 +1375,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                         m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -2826,8 +2827,8 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerDucts, dbConnection);
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                     {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));                     
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                     }
                 }
@@ -2917,8 +2918,7 @@ namespace HVAC_CheckEngine
                         if((System.Math.Abs(dsX - deX)<0.01)&&(System.Math.Abs(dsY - deY) < 0.01) &&  (System.Math.Abs(dsZ - deZ) >0.01) )
                         {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                            SetDuctPara(readerDucts, ref duct);
 
                             AABB aabbDuct = GetAABB(readerDucts, dbConnection);
 
