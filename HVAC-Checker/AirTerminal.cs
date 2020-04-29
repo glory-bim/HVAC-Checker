@@ -23,5 +23,7 @@ namespace HVAC_CheckEngine
 
         public double? width { get; set; } = null;
 
+        public double? ventilationEfficiency { get; set; } = null;
+
     }
 }

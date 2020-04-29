@@ -341,6 +341,157 @@ namespace HVAC_CheckEngine
      
         }
 
+        public static List<GasMeter> GetRoomContainGasMeters(Room room)
+        {
+            List<GasMeter> GasMeters = new List<GasMeter>();
+
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+            if (!GetRoomPolygon2D(room, ref poly))
+            {
+                return GasMeters;
+            }
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from GasMeters where StoreyNo=";
+            sql += room.m_iStoryNo.ToString();
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerGasMeters = commandHVAC.ExecuteReader();
+            while (readerGasMeters.Read())
+            {
+                 AABB aabbGasMeter = GetAABB(readerGasMeters, dbConnectionHVAC);
+                 if (poly.Polygon2D_Contains_AABB(aabbGasMeter))
+                 {
+                    GasMeter gasMeter = new GasMeter(Convert.ToInt64(readerGasMeters["Id"].ToString()));
+                    GasMeters.Add(gasMeter);
+                 }
+                   
+
+            }
+            //关闭连接
+            dbConnectionHVAC.Close();
+            return GasMeters;
+        }
+
+
+        public static List<HeatMeter> GetRoomContainHeatMeters(Room room)
+        {
+            List<HeatMeter> heatMeters = new List<HeatMeter>();
+
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+            if (!GetRoomPolygon2D(room, ref poly))
+            {
+                return heatMeters;
+            }
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from HeatMeters where StoreyNo=";
+            sql += room.m_iStoryNo.ToString();
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerHeatMeters = commandHVAC.ExecuteReader();
+            while (readerHeatMeters.Read())
+            {
+                AABB aabbHeatMeter = GetAABB(readerHeatMeters, dbConnectionHVAC);
+                if (poly.Polygon2D_Contains_AABB(aabbHeatMeter))
+                {
+                    HeatMeter heatMeter = new HeatMeter(Convert.ToInt64(readerHeatMeters["Id"].ToString()));
+                    heatMeters.Add(heatMeter);
+                }
+            }
+            //关闭连接
+            dbConnectionHVAC.Close();
+            return heatMeters;
+        }
+
+
+        public static List<WaterMeter> GetRoomContainWaterMeters(Room room)
+        {
+            List<WaterMeter> waterMeters = new List<WaterMeter>();
+
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+            if (!GetRoomPolygon2D(room, ref poly))
+            {
+                return waterMeters;
+            }
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from WaterMeters where StoreyNo=";
+            sql += room.m_iStoryNo.ToString();
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerWaterMeter = commandHVAC.ExecuteReader();
+            while (readerWaterMeter.Read())
+            {
+                AABB aabbWaterMeter = GetAABB(readerWaterMeter, dbConnectionHVAC);
+                if (poly.Polygon2D_Contains_AABB(aabbWaterMeter))
+                {
+                    WaterMeter waterMeter = new WaterMeter(Convert.ToInt64(readerWaterMeter["Id"].ToString()));
+                    waterMeters.Add(waterMeter);
+                }
+            }
+            //关闭连接
+            dbConnectionHVAC.Close();
+            return waterMeters;
+        }
+
+
+
+        public static List<Boiler> GetRoomContainBoilers(Room room)
+        {
+            List<Boiler> boilers = new List<Boiler>();
+
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+            if (!GetRoomPolygon2D(room, ref poly))
+            {
+                return boilers;
+            }
+            //创建一个连接
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from Boilers where StoreyNo=";
+            sql += room.m_iStoryNo.ToString();
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerBoiler = commandHVAC.ExecuteReader();
+            while (readerBoiler.Read())
+            {
+                AABB aabbBoiler = GetAABB(readerBoiler, dbConnectionHVAC);
+                if (poly.Polygon2D_Contains_AABB(aabbBoiler))
+                {
+                    Boiler boiler = new Boiler(Convert.ToInt64(readerBoiler["Id"].ToString()));
+                    boiler.type = readerBoiler["BoilerType"].ToString();
+                    boiler.thermalPower = Convert.ToDouble(readerBoiler["ThermalPower"].ToString());
+                    boiler.ThermalEfficiency = Convert.ToDouble(readerBoiler["ThermalEfficiency"].ToString());
+                    boiler.mediaType = readerBoiler["HeatMediumType"].ToString();
+                    boiler.fuelType = readerBoiler["FuelType"].ToString();
+                    boiler.evaporationCapacity = Convert.ToDouble(readerBoiler["Evaporation"].ToString());
+                    boilers.Add(boiler);
+                }
+            }
+            //关闭连接
+            dbConnectionHVAC.Close();
+            return boilers;
+        }
 
 
         public static List<Window> GetWindowsInRoom(Room room)
@@ -1418,7 +1569,7 @@ namespace HVAC_CheckEngine
         }
 
         //18获得防烟分区长边长度
-        public static double GetFireDistrictLength(FireCompartment fireDistrict)
+        public static double GetSmokeCompartmentLength(SmokeCompartment smokeCompartment)
         {
             double dLength = 0.0;
             if (!System.IO.File.Exists(m_archXdbPath))
@@ -1429,7 +1580,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string sql = "select * from Spaces where Id = ";
-            sql += fireDistrict.Id;
+            sql += smokeCompartment.Id;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -1548,6 +1699,7 @@ namespace HVAC_CheckEngine
                 room.name = reader["name"].ToString();
                 room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
                 room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
+                room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString());
                 room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
                 //room.m_dMaxlength
                 //     room.m_dVolume
@@ -1917,6 +2069,12 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Boiler boiler = new Boiler(Convert.ToInt64(reader["Id"].ToString()));
+                boiler.type = reader["BoilerType"].ToString();
+                boiler.thermalPower = Convert.ToDouble(reader["ThermalPower"].ToString());
+                boiler.ThermalEfficiency = Convert.ToDouble(reader["ThermalEfficiency"].ToString());
+                boiler.mediaType = reader["HeatMediumType"].ToString();
+                boiler.fuelType = reader["FuelType"].ToString();
+                boiler.evaporationCapacity = Convert.ToDouble(reader["Evaporation"].ToString());
                 boilers.Add(boiler);
             }
 
@@ -1939,6 +2097,9 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AbsorptionChiller absorptionChiller = new AbsorptionChiller(Convert.ToInt64(reader["Id"].ToString()));
+                absorptionChiller.coolingCoefficient = Convert.ToDouble(reader["PerformanceRate"].ToString());
+                absorptionChiller.heatingCoefficient= Convert.ToDouble(reader["HeatingPerformanceRate"].ToString());
+                absorptionChiller.m_iStoryNo = Convert.ToInt32(reader["StoreyNo"].ToString());
                 absorptionChillers.Add(absorptionChiller);
             }
 
@@ -1961,6 +2122,12 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Chiller chiller = new Chiller(Convert.ToInt64(reader["Id"].ToString()));
+                chiller.capacity= Convert.ToDouble(reader["CoolingCapacity"].ToString());
+                chiller.coolingType =reader["CoolingType"].ToString();
+                chiller.COP= Convert.ToDouble(reader["COP"].ToString());
+                chiller.isFrequencyConversion= Convert.ToBoolean(reader["IfFrequencyConversion"].ToString());
+                chiller.type= reader["ChillerType"].ToString();
+                chiller.m_iStoryNo = Convert.ToInt32(reader["StoreyNo"].ToString());
                 chillers.Add(chiller);
             }
 
@@ -1983,6 +2150,10 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 RoofTopAHU roofTopAHU  = new RoofTopAHU(Convert.ToInt64(reader["Id"].ToString()));
+                roofTopAHU.capacity= Convert.ToDouble(reader["CoolingCapacity"].ToString());
+                roofTopAHU.coolingType = reader["CoolingType"].ToString();
+                roofTopAHU.EER= Convert.ToDouble(reader["EER"].ToString());
+                roofTopAHU.m_iStoryNo = Convert.ToInt32(reader["StoreyNo"].ToString());
                 roofTopAHUs.Add(roofTopAHU);
             }
 
@@ -2005,6 +2176,11 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 OutDoorUnit outDoorUnit = new OutDoorUnit(Convert.ToInt64(reader["Id"].ToString()));
+                outDoorUnit.capacity= Convert.ToDouble(reader["CoolingCapacity"].ToString());
+                outDoorUnit.coolingType= reader["CoolingType"].ToString();
+                outDoorUnit.EER = Convert.ToDouble(reader["EER"].ToString());
+                outDoorUnit.IPLV= Convert.ToDouble(reader["IPLV"].ToString());
+                outDoorUnit.m_iStoryNo = Convert.ToInt32(reader["StoreyNo"].ToString());
                 outDoorUnits.Add(outDoorUnit);
             }
 
@@ -2027,6 +2203,11 @@ namespace HVAC_CheckEngine
             while (reader.Read()&&reader["userLabel"].Equals("VRV"))
             {
                 OutDoorUnit outDoorUnit = new OutDoorUnit(Convert.ToInt64(reader["Id"].ToString()));
+                outDoorUnit.capacity = Convert.ToDouble(reader["CoolingCapacity"].ToString());
+                outDoorUnit.coolingType = reader["CoolingType"].ToString();
+                outDoorUnit.EER = Convert.ToDouble(reader["EER"].ToString());
+                outDoorUnit.IPLV = Convert.ToDouble(reader["IPLV"].ToString());
+                outDoorUnit.m_iStoryNo = Convert.ToInt32(reader["StoreyNo"].ToString());
                 outDoorUnits.Add(outDoorUnit);
             }
 
@@ -4040,12 +4221,13 @@ namespace HVAC_CheckEngine
                 {
                     return false;
                 }
-                else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
+                else if (poly.IsPolygon2DIntersectsAABB(aabbAirTerminal))
                 {
                     List<AABB> sideWallAABBsOfRoom = GetAllSideWallsAABBOfRoom(room);
                     foreach(AABB sideWallAABB in sideWallAABBsOfRoom)
                     {
-                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(aabbAirTerminal, sideWallAABB))
+
+                        if (aabbAirTerminal.IsBBoxIntersectsBBox3D(sideWallAABB))
                             return true;
                     }
                     return false;

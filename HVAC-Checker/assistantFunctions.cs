@@ -300,6 +300,29 @@ namespace HVAC_CheckEngine
             return aimAirTerminals;
         }
 
+        public static List<Window> filtrateSomkeExhaustWindows(List<Window>windows)
+        {
+            List<Window> smokeExhaustWindows = new List<Window>();
+            foreach (Window window in windows)
+            {
+                if (window.isSmokeExhaustWindow.Value)
+                    smokeExhaustWindows.Add(window);
+            }
+            return smokeExhaustWindows;
+        }
+
+        public static Dictionary<string,List<Window>> sortWindowsByOrient(List<Window>windows)
+        {
+            Dictionary<string, List<Window>> windowsSortByOrient = new Dictionary<string, List<Window>>();
+            foreach(Window window in windows)
+            {
+                if (!windowsSortByOrient.ContainsKey(window.sFaceOrient))
+                    windowsSortByOrient.Add(window.sFaceOrient, new List<Window>());
+                windowsSortByOrient[window.sFaceOrient].Add(window);
+            }
+            return windowsSortByOrient;
+        }
+
         public static Window findWindowNoSmallerThanSomeEffectiveArea(this List<Window> windows, double area)
         {
             if (windows == null)
@@ -1308,7 +1331,7 @@ namespace HVAC_CheckEngine
 
         public static double getShutterSpeed(AirTerminal shutter)
         {
-            return shutter.airFlowRate.Value / shutter.height.Value / shutter.width.Value / 3600;
+            return shutter.airFlowRate.Value / shutter.height.Value / shutter.width.Value / 3600/shutter.ventilationEfficiency.Value;
         }
 
 

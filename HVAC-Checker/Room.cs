@@ -24,6 +24,8 @@ namespace HVAC_CheckEngine
 
         public double? m_dHeight { get; set; } = null;
         public double? m_dMaxlength { get; set; } = null;
+
+        public double? m_dWidth { get; set; } = null;
         
     }
 
