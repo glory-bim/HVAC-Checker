@@ -19,5 +19,7 @@ namespace HVAC_CheckEngine
 
         public PointInt ptEnd { get; set; } = null;
 
+        public string systemType { get; set; } = null;
+
     }
 }

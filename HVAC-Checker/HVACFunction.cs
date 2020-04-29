@@ -253,34 +253,15 @@ namespace HVAC_CheckEngine
         }
 
         private static bool GetMovementJointPolygon2D(MovementJoint movementJoint, ref Polygon2D poly)
+        {      
+             poly = GetSpaceBBox(movementJoint.boundaryLoops, movementJoint.Id.ToString());
+             return  poly != null;
+        }
+
+        private static void SetAirterminalPara(ref AirTerminal airTerminal, SQLiteDataReader readerAirTerminals)
         {
-            string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionstr);
-            dbConnectionArch.Open();
-            string strBianxing = "变形缝";
-            string sql = "select * from Proxys Where Id =";
-            sql = sql + strBianxing ;         
-            SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
-            SQLiteDataReader readerProxys = commandArch.ExecuteReader();        
-
-            if (readerProxys.Read())
-            {              
-                movementJoint.boundaryLoops = readerProxys["boundaryLoops"].ToString();
-                poly = GetSpaceBBox(movementJoint.boundaryLoops, movementJoint.Id.ToString());
-
-                sql = "select * from Storeys where  Id =  ";
-                sql = sql + readerProxys["storeyId"].ToString();
-                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnectionArch);
-                SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                if (reader1.Read())
-                {
-                    movementJoint.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                }
-                dbConnectionArch.Close();
-                return true;
-            }
-            return false;
+            airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+            airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
         }
 
         //2 判断房间是否有某种构件并返回构件对象
@@ -310,16 +291,13 @@ namespace HVAC_CheckEngine
                 if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
                 {
                     AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                    airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                    airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                    SetAirterminalPara(ref airTerminal, readerAirTerminals);
+
                     AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         airterminals.Add(airTerminal);
                     }
@@ -520,10 +498,7 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerWindows, dbConnection);
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
                         window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
@@ -804,8 +779,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerDucts["AirFlowRate"].ToString());
-                        inlet.systemType = readerDucts["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerDucts);
                         inlets.Add(inlet);
                     }
                     else
@@ -901,8 +875,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -931,8 +904,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -946,9 +918,9 @@ namespace HVAC_CheckEngine
 
 
         //7找到穿越某些房间的风管对象集合  清华引擎 构件相交  包含
-        public static List<Duct> GetDuctsCrossSpace(Room room)
+        public static Dictionary<Duct, List<PointInt>> GetDuctsCrossSpace(Room room)
         {
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             if (!System.IO.File.Exists(m_archXdbPath))
                 return ducts;
 
@@ -964,24 +936,27 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
             dbConnectionHVAC.Open();
-            string sql = "select * from Ducts";
+
+            string sql = "select * from Ducts where StoreyNo=";
+            sql += room.m_iStoryNo.ToString();
             SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
             SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
             while (readerDucts.Read())
             {
-
-               // AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
-
                 OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
-                if (room.m_iStoryNo == Convert.ToInt32(readerDucts["StoreyNo"].ToString()))
+
+                if (poly.IsPolygon2DIntersectsOBB(obbDuct))
                 {
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, obbDuct))
+                    Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                    duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                    List<PointInt> pointList = GetIntersectPoint(poly, duct);
+                    if (!ducts.ContainsKey(duct))
                     {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                        ducts.Add(duct);
+                        ducts.Add(duct, new List<PointInt>());
                     }
+                    ducts[duct].AddRange(pointList);
                 }
+
             }
 
             //关闭连接
@@ -990,9 +965,9 @@ namespace HVAC_CheckEngine
             return ducts;
         }
         //8找到穿越防火分区的风管对象集合  userlable
-        public static List<Duct> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
+        public static Dictionary<Duct, List<PointInt>> GetDuctsCrossFireDistrict(FireCompartment fireDistrict)
         {
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //如果不存在，则创建一个空的数据库,
             if (!System.IO.File.Exists(m_archXdbPath))
                 return ducts;
@@ -1025,102 +1000,137 @@ namespace HVAC_CheckEngine
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
-                sql = "select * from Ducts";
+                sql = "select * from Ducts where StoreyNo=";
+                sql += fireDistrict.m_iStoryNo.ToString();
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
                 {
-                    if (fireDistrict.m_iStoryNo == Convert.ToInt32(readerDucts["StoreyNo"].ToString()))
-                    {
-                        AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
-                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
-                        {
-
+                    OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
+                     if (poly.IsPolygon2DIntersectsOBB(obbDuct))
+                     {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                             duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                            ducts.Add(duct);
-                        }
-                    }
+                            List<PointInt> pointList = GetIntersectPoint(poly, duct);
+                            if(!ducts.ContainsKey(duct))
+                            {
+                                ducts.Add(duct, new List<PointInt>());
+                            }
+                            ducts[duct].AddRange(pointList);
+                     }
                 
                 }
+                dbConnectionHVAC.Close();
             }
 
             //关闭连接
             dbConnection.Close();
             return ducts;
         }
-        //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
-        public static List<Duct> GetDuctsCrossMovementJointAndFireSide()
+
+        //8找到穿越防火分区的风管对象集合  userlable
+        public static Dictionary<Duct, List<PointInt>> GetAllDuctsCrossMoveJoint(MovementJoint movementJoint)
         {
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
+            //如果不存在，则创建一个空的数据库,
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return ducts;
 
-            List<FireCompartment> fireDistricts = GetALLFireCompartment();
-
-            foreach (FireCompartment fireDistrict in fireDistricts)
-            {
-                //如果不存在，则创建一个空的数据库,
-                if (!System.IO.File.Exists(m_archXdbPath))
-                    return ducts;
-
-                List<PointIntList> PointLists = new List<PointIntList>();
-                PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
-                string sSpaceId = "0";
-
-                Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
-                if (!GetRoomPolygon2D(fireDistrict, ref poly))
-                {
-                    return ducts;
-                }                   
+            //创建一个连接
+           
+           
+                Polygon2D poly = GetSpaceBBox(movementJoint.boundaryLoops, movementJoint.Id.ToString());
+                
 
                 //创建一个连接
                 string connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
-                string sql = "select * from Ducts";
+                string sql = "select * from Ducts where StoreyNo=";
+                sql += movementJoint.m_iStoryNo.ToString();
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
                 {
-                  
-
-
-                    AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
-                    if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
+                    OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
+                    if (poly.IsPolygon2DIntersectsOBB(obbDuct))
                     {
-                    connectionstr = @"data source =" + m_archXdbPath;
-                    SQLiteConnection dbConnectionArch= new SQLiteConnection(connectionstr);
-                    dbConnectionArch.Open();
-                        string strBianxing = "变形缝";
-                        sql = "select * from Proxys Where CHARINDEX(";
-                        sql = sql + "'" + strBianxing + "'";
-                        sql = sql + ",userLabel)> 0";
-                        SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
-                        SQLiteDataReader readerProxys = commandArch.ExecuteReader();
-                    while (readerProxys.Read())
-                    {
-                            MovementJoint moveJoint = new MovementJoint(Convert.ToInt64(readerProxys["Id"].ToString()));
-                            Polygon2D polyJoint = new Polygon2D(PointLists, sSpaceId);
-                            GetMovementJointPolygon2D(moveJoint, ref polyJoint);
-
-                       // AABB aabbjoint = GetAABB(readerProxys, dbConnectionArch);
-                        if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(polyJoint, aabbDuct))
-                            {
-                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                            GetDuctStartPointEndPoint(readerDucts, ref duct);
-                             
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
-                            ducts.Add(duct);
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        List<PointInt> pointList = GetIntersectPoint(poly, duct);
+                        if (!ducts.ContainsKey(duct))
+                        {
+                            ducts.Add(duct, new List<PointInt>());
                         }
-                    }                     
-                         
+                        ducts[duct].AddRange(pointList);
+                    }
+
+                }
+
+
+            //关闭连接
+            dbConnectionHVAC.Close();
+            return ducts;
+        }
+        //9找到穿越防火分隔处的变形缝两侧的风管集合  差变形缝对象
+
+        //获得所有防火分区对象
+        //对防火分区对象按楼层进行分类
+        //获得所有变形缝对象的集合
+        //依次遍历每一个变形缝对象
+        //获得穿越变形缝的风管
+        //依次遍历每一个风管
+        //依次遍历与风管同层的防火分区对象
+        //如果风管与防火分区相交
+        //求出风管与防火分区的交点
+        //如果交点是否在风管穿越变形位置的附近
+        //将风管加入到风管集合中
+        //返回风管集合。
+        public static Dictionary<Duct,List<PointInt>> GetDuctsCrossMovementJointAndFireSide()
+        {
+            Dictionary<Duct, List<PointInt>> ductsCrossMovementJointAndFireSide = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
+            // 获得所有防火分区对象
+            List<FireCompartment> fireCompartments = GetALLFireCompartment();
+            //对防火分区对象按楼层进行分类
+            Dictionary<int, List<FireCompartment>> fireCompartmentSortByStoreyNo = assistantFunctions.sortElementsByStoryNo(fireCompartments);
+            //获得所有变形缝对象的集合
+            List<MovementJoint> movementJoints = GetALLMovementJoints();
+            //依次遍历每一个变形缝对象
+            Dictionary<Duct, List<PointInt>> ductsCrossMoveJoint = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
+            foreach (MovementJoint movementJoint in movementJoints)
+            {
+                //获得穿越变形缝的风管
+                ductsCrossMoveJoint.addDuctsToDictionary(GetAllDuctsCrossMoveJoint(movementJoint));
+            }
+            //依次遍历每一个风管
+            foreach (KeyValuePair<Duct, List<PointInt>> pair in ductsCrossMoveJoint)
+            {
+                //依次遍历与风管同层的防火分区对象
+               foreach (FireCompartment fireCompartment in fireCompartmentSortByStoreyNo[pair.Key.m_iStoryNo.Value])
+               {
+                    //求解风管与防火分区的交点
+                    Polygon2D poly = GetSpaceBBox(fireCompartment.boundaryLoops, fireCompartment.Id.ToString());
+                    List<PointInt> pointList = GetIntersectPoint(poly, pair.Key);
+
+                    //依次遍历每一个交点，如果交点在风管穿越变形位置的附近
+                    foreach (PointInt point in pointList)
+                    {
+                        if(pair.Value.Exists(x=>x.X==point.X&&x.Y==point.Y&&x.Z==point.Z))
+                        {
+                            //将风管加入到风管集合中
+                            if (!ductsCrossMovementJointAndFireSide.ContainsKey(pair.Key))
+                                ductsCrossMovementJointAndFireSide.Add(pair.Key, new List<PointInt>());
+                            ductsCrossMovementJointAndFireSide[pair.Key].Add(point);
+                        }
                     }
                 }
-                }                     
-            return ducts;
+            }
+            //返回风管集合。
+            return ductsCrossMovementJointAndFireSide;
         }
 
 
-        private static void GetDuctStartPointEndPoint(SQLiteDataReader ductReader,ref Duct duct)
+        private static void SetDuctPara(SQLiteDataReader ductReader, ref Duct duct)
         {
             string strVector = ductReader["DuctStartPoint"].ToString();
             int index = strVector.IndexOf(":");
@@ -1163,21 +1173,22 @@ namespace HVAC_CheckEngine
             dZ = Convert.ToDouble(strY);
 
 
-            duct.ptStart.X = Convert.ToInt32(dX);
-            duct.ptStart.Y = Convert.ToInt32(dY);
-            duct.ptStart.Z = Convert.ToInt32(dZ);
+            duct.ptEnd.X = Convert.ToInt32(dX);
+            duct.ptEnd.Y = Convert.ToInt32(dY);
+            duct.ptEnd.Z = Convert.ToInt32(dZ);
 
+            duct.airVelocity = Convert.ToDouble(ductReader["Velocity"].ToString());
         }
 
-        List<PointInt> GetIntersect(Polygon2D polygon,Duct duct)
+        static List<PointInt>  GetIntersectPoint(Polygon2D polygon,Duct duct)
         {
             List<PointInt> ptList = new List<PointInt>();
             foreach ( PointIntList list in polygon.Points)
             {
-                if(list.Count()>2)
+                if(list.Count()>=2)
                 {
                    
-                    for (int i = 0;i<list.Count();i++)
+                    for (int i = 0;i<list.Count()-1;i++)
                     {
                        PointInt ptInter = new PointInt(0,0,0);
 
@@ -1286,10 +1297,7 @@ namespace HVAC_CheckEngine
                     }
                     if (rooms[i].m_iStoryNo == Convert.ToInt32(reader["StoreyNo"].ToString()))
                     {
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {
                             return rooms[i];
                         }
@@ -1524,7 +1532,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                         m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -1897,8 +1905,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -2077,7 +2084,7 @@ namespace HVAC_CheckEngine
             return rooms;
         }
 
-        public static List<Room> GetAllRoomsInCertainStory(int storeyNo)
+        public static List<Room> GetAllRoomsInCertainStorey(int storeyNo)
         {
             List<Room> rooms = new List<Room>();
             if (!System.IO.File.Exists(m_archXdbPath))
@@ -2589,8 +2596,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -2735,6 +2741,33 @@ namespace HVAC_CheckEngine
             return smokeCompartments;
         }
 
+        public static List<MovementJoint> GetALLMovementJoints()
+        {
+            List<MovementJoint> moveJoints = new List<MovementJoint>();
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return moveJoints;
+
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionstr);
+
+            string strBianxing = "变形缝";
+            string sql = "select * from Proxys Where CHARINDEX(";
+            sql = sql + "'" + strBianxing + "'";
+            sql = sql + ",userLabel)> 0";
+            SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
+            SQLiteDataReader readerProxys = commandArch.ExecuteReader();
+            while (readerProxys.Read())
+            {
+                MovementJoint moveJoint = new MovementJoint(Convert.ToInt64(readerProxys["Id"].ToString()));
+                moveJoint.boundaryLoops = readerProxys["extendProperty"].ToString();
+                moveJoints.Add(moveJoint);
+            }
+            //关闭连接
+            dbConnectionArch.Close();
+
+            return moveJoints;
+        }
+
         public static List<Wall> GetAllWallsOfRoom(Room room)
         {
             List<Wall> walls = new List<Wall>();
@@ -2874,10 +2907,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(reader, dbConnection);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return fireCompartment;
                         }
@@ -2947,10 +2977,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return true;
                         }
@@ -3034,10 +3061,7 @@ namespace HVAC_CheckEngine
                     // AABB polySmokeCompartment = GetAABB(readerAirTerminals, dbConnection);
                     if(room.m_iStoryNo == room1.m_iStoryNo)
                     {                   
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(polySmokeCompartment, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Max))
+                        if (poly.Polygon2D_Contains_Polygon2D(polySmokeCompartment))
                         {
                             SmokeCompartment fireCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
                             fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
@@ -3251,8 +3275,8 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerDucts, dbConnection);
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                     {
-                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));                     
+                        SetDuctPara(readerDucts, ref duct);
                         ducts.Add(duct);
                     }
                 }
@@ -3342,8 +3366,7 @@ namespace HVAC_CheckEngine
                         if((System.Math.Abs(dsX - deX)<0.01)&&(System.Math.Abs(dsY - deY) < 0.01) &&  (System.Math.Abs(dsZ - deZ) >0.01) )
                         {
                             Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                            SetDuctPara(readerDucts, ref duct);
 
                             AABB aabbDuct = GetAABB(readerDucts, dbConnection);
 
@@ -4110,10 +4133,7 @@ namespace HVAC_CheckEngine
                         {
                             return room;
                         }
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {                           
                             room.name = reader["name"].ToString();
                             room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
@@ -4158,6 +4178,7 @@ namespace HVAC_CheckEngine
             if (readerFans.Read())
             {
                 duct = new AirTerminal(Convert.ToInt64(readerFans["Id"].ToString()));
+                SetAirterminalPara(ref duct, readerFans);
                 return true;
             }
             return false;
@@ -4282,6 +4303,42 @@ namespace HVAC_CheckEngine
             }
             return false;
         }
+
+        public static bool isAirTerminalInRoom(AirTerminal airTerminal, Room room)
+        {
+            List<PointIntList> PointLists = new List<PointIntList>();
+            PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
+            string sSpaceId = "0";
+            Polygon2D poly = new Polygon2D(PointLists, sSpaceId);
+
+            if (!GetRoomPolygon2D(room, ref poly))
+            {
+                return false;
+            }
+
+            string connectionstr = @"data source =" + m_hvacXdbPath;
+            SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
+            dbConnectionHVAC.Open();
+            string sql = "select * from AirTerminals Where Id = ";
+            sql += airTerminal.Id;
+            SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+            SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
+            PointInt ptMin = new PointInt(0, 0, 0);
+            PointInt ptMax = new PointInt(0, 0, 0);
+            string strId = "";
+            AABB aabbAirTerminal = new AABB(ptMin, ptMax, strId);
+            if (readerAirTerminals.Read())
+            {
+                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                airTerminal.m_iStoryNo = Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString());
+                aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
+            }
+            else
+                return false;
+
+            return poly.Polygon2D_Contains_AABB(aabbAirTerminal);
+        }
   
         
         public static bool isOuterAirTerminal(AirTerminal airTerminal)
@@ -4299,17 +4356,13 @@ namespace HVAC_CheckEngine
             string strId = "";           
             AABB aabbAirTerminal = new AABB(ptMin, ptMax, strId);
             if (readerAirTerminals.Read())
-            {               
-                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
-                airTerminal.m_iStoryNo = Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString());
+            {
+                SetAirterminalPara(ref airTerminal, readerAirTerminals);       
                 aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
-                
-          
             }
 
             List<Room> rooms = new List<Room>();
-            rooms = GetAllRoomsInCertainStory(airTerminal.m_iStoryNo.Value);
+            rooms = GetAllRoomsInCertainStorey(airTerminal.m_iStoryNo.Value);
             List<PointIntList> PointLists = new List<PointIntList>();
             PointLists.Add(new PointIntList() { new PointInt(0, 0, 0) });
             string sSpaceId = "0";
@@ -4376,6 +4429,27 @@ namespace HVAC_CheckEngine
             return AABBs;
         }
 
+    }
+
+    public class ElementEqualityComparer : IEqualityComparer<Element>
+    {
+        public bool Equals(Element element_1, Element element_2)
+        {
+            if (element_1 == null && element_2 == null)
+                return true;
+            else if (element_1 == null || element_2 == null)
+                return false;
+            else if (element_1.Id==element_2.Id)
+                return true;
+            else
+                return false;
+        }
+
+        public int GetHashCode(Element element)
+        {
+            long hCode = element.Id.Value;
+            return hCode.GetHashCode();
+        }
     }
 
     [Flags]
