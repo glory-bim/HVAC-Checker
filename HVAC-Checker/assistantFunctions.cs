@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BCGL.Sharp;
 
 namespace HVAC_CheckEngine
 {
@@ -55,6 +56,40 @@ namespace HVAC_CheckEngine
                 return false;
         }
 
+
+        public static bool isRoomExhaustSystemIndependentSet(Room room)
+        {
+            if (room == null)
+                throw new ArgumentException();
+            //获得前室中的风口的集合airTerminalsInAtria
+            List<AirTerminal> airTerminalsInRoom = HVACFunction.GetRoomContainAirTerminal(room);
+            airTerminalsInRoom = filtrateAirTerminalOfSomeSystem(airTerminalsInRoom, "排风");
+            if (airTerminalsInRoom.Count == 0)
+                throw new ArgumentException("未设置排风口");
+            //获得airTerminalsInAtria集合中所有风口所连接的风机的集合Fans
+            List<Fan> fans = new List<Fan>();
+            foreach (AirTerminal airTerminal in airTerminalsInRoom)
+            {
+                fans.AddRange(HVACFunction.GetFanConnectingAirterminal(airTerminal));
+            }
+            if (fans.Count <= 0)
+                throw new modelException("风口未连接风机");
+
+            //获得Fans集合中风机所连接的所有风口的集合airTerminalsConnectToFans
+            List<AirTerminal> airTerminalsConnectToFans = new List<AirTerminal>();
+            foreach (Fan fan in fans)
+            {
+                airTerminalsConnectToFans.AddRange(HVACFunction.GetOutletsOfFan(fan));
+            }
+
+            foreach(AirTerminal airTerminal in airTerminalsConnectToFans)
+            {
+                if (!HVACFunction.isAirTerminalInRoom(airTerminal, room))
+                    return false;
+            }
+            return true;
+
+        }
 
         public static bool isRoomHaveSomeMechanicalSystem(Room room, string systemName)
         {
@@ -419,6 +454,28 @@ namespace HVAC_CheckEngine
             }
             return firstList;
         }
+        
+        //依次遍历第二个风管字典
+        //如果第一个字典有当前遍历风管
+        //如果当前风管没有在第一个风管字典中
+        //在第一个风管字典中加入一个新的风管
+        //将当前风管点击合并到第一个风管字典对应的风管点集中
+        //返回第一个字典
+        public static Dictionary<Duct,List<PointInt>> addDuctsToDictionary(this Dictionary<Duct, List<PointInt>> firstDictionary, Dictionary<Duct, List<PointInt>> secondDictionary)
+        {
+            if (firstDictionary == null && secondDictionary == null)
+                throw new ArgumentException();
+
+            foreach(KeyValuePair<Duct, List<PointInt>>pair in secondDictionary)
+            {
+                if(!firstDictionary.ContainsKey(pair.Key))
+                {
+                    firstDictionary.Add(pair.Key, new List<PointInt>());
+                }
+                firstDictionary[pair.Key].AddRange(pair.Value);
+            }
+            return firstDictionary;
+        }
 
         public static List<Duct> filterSomeSystemTypeDuctsFromList(this List<Duct> list, List<string> systemTypes)
         {
@@ -440,6 +497,26 @@ namespace HVAC_CheckEngine
             return aimList;
         }
 
+        public static Dictionary<Duct,List<PointInt>> filterSomeSystemTypeDuctsDictionary(this Dictionary<Duct, List<PointInt>> ducts, List<string> systemTypes)
+        {
+            if (ducts == null || systemTypes == null)
+                throw new ArgumentException();
+            Dictionary<Duct, List<PointInt>> aimDictionary = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer()) ;
+            foreach (KeyValuePair<Duct,List < PointInt >>pair in ducts)
+            {
+                foreach (string systemType in systemTypes)
+                {
+                    if (pair.Key.systemType.Contains(systemType))
+                    {
+                        aimDictionary.Add(pair.Key,pair.Value);
+                        break;
+                    }
+                }
+            }
+            ducts = aimDictionary;
+            return ducts;
+        }
+
         public static List<Duct>filterSameDuctsInTwoList(List<Duct>firstList,List<Duct>secondList)
         {
             List<Duct> aimDucts = new List<Duct>();
@@ -453,7 +530,23 @@ namespace HVAC_CheckEngine
             return aimDucts;
         }
 
-        public static List<Duct> removeDuctsFromList(this List<Duct> list,List<Duct>ducts)
+        public static Dictionary<Duct, List<PointInt>> removeDuctsFromDictionary(this Dictionary<Duct, List<PointInt>> dictionary,List<Duct>ducts)
+        {
+            if (dictionary == null || ducts == null)
+                throw new ArgumentException();
+            foreach (Duct duct in ducts)
+            {
+                
+                if (dictionary.ContainsKey(duct))
+                {
+                    dictionary.Remove(duct);
+                }
+            }
+            return dictionary;
+        }
+
+
+        public static List<Duct> removeDuctsFromDictionary(this List<Duct> list, List<Duct> ducts)
         {
             if (list == null || ducts == null)
                 throw new ArgumentException();
@@ -1378,17 +1471,17 @@ namespace HVAC_CheckEngine
 
         }
 
-        public static Dictionary<int,List<AirTerminal>> sortAirTerminalByStoryNo(List<AirTerminal>airTerminals)
+        public static Dictionary<int,List<T>> sortElementsByStoryNo<T>(List<T>elements)where T:Element
         {
-            Dictionary<int, List<AirTerminal>> airTerminalsByStoryNo = new Dictionary<int, List<AirTerminal>>();
-            foreach(AirTerminal airTerminal in airTerminals)
+            Dictionary<int, List<T>> elementsByStoryNo = new Dictionary<int, List<T>>();
+            foreach(T element in elements)
             {
-                if (!airTerminalsByStoryNo.ContainsKey(airTerminal.m_iStoryNo.Value))
-                    airTerminalsByStoryNo.Add(airTerminal.m_iStoryNo.Value,new List<AirTerminal>());
+                if (!elementsByStoryNo.ContainsKey(element.m_iStoryNo.Value))
+                    elementsByStoryNo.Add(element.m_iStoryNo.Value,new List<T>());
 
-                airTerminalsByStoryNo[airTerminal.m_iStoryNo.Value].Add(airTerminal);
+                elementsByStoryNo[element.m_iStoryNo.Value].Add(element);
             }
-            return airTerminalsByStoryNo;
+            return elementsByStoryNo;
         }
 
 

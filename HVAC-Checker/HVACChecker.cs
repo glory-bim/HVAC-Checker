@@ -493,96 +493,100 @@ namespace HVAC_CheckEngine
             //将审查结果初始化
             BimReview result = new BimReview("GB50016_2014", "9.3.11");
 
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //获得所有防火分区对象
             List<FireCompartment> fireCompartments = HVACFunction.GetFireCompartment("");
-            List<Duct> ductsCrossFireCompartment = new List<Duct>();
+            Dictionary<Duct,List<PointInt>> ductsCrossFireCompartment = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //依次遍历每一个防火分区对象
             foreach (FireCompartment fireCompartment in fireCompartments)
             {
                 //获得所有穿越防火分区的风管集合ductsCrossFireCompartment
-                ductsCrossFireCompartment=ductsCrossFireCompartment.addDuctsToList( HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
+                ductsCrossFireCompartment.addDuctsToDictionary( HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
             }
             List<string> systemTypes = new List<string>();
             systemTypes.Add("通风");
             systemTypes.Add("空调");
             //从风管集合ductsCrossFireCompartment中筛选出所有空调、通风管道
-            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsDictionary(systemTypes);
             //获得所有的竖井
             List<Room> shafts = HVACFunction.GetRooms("竖井");
             //依次遍历每一个竖井，获得竖井内的风管集合ductsInShaft以及穿越竖井的风管的集合ductsCrossShaft
             List<Duct> ductsInShaft = new List<Duct>();
-            List<Duct> ductsCrossShaft = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ductsCrossShaft = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             foreach (Room shaft in shafts)
             {
                 ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
-                ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
+                ductsCrossShaft.addDuctsToDictionary(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有空调、通风管道
-            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsDictionary(systemTypes);
             ductsInShaft= ductsInShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
             //从跨越防火分区的风管集合中除去处于竖井内的风管并将剩余的风管放于ducts集合中。
-            ducts.addDuctsToList(ductsCrossFireCompartment);
-            ducts.removeDuctsFromList(ductsInShaft);
+            ducts.addDuctsToDictionary(ductsCrossFireCompartment);
+            ducts.removeDuctsFromDictionary(ductsInShaft);
             //获得穿越设备机房的风管集合并将风管放于ducts集合中。
             List<Room> EquipmentRoom = HVACFunction.GetRooms("设备用房");
             foreach(Room room in EquipmentRoom)
             {
-                ducts=ducts.addDuctsToList(HVACFunction.GetDuctsCrossSpace(room));
+                ducts=ducts.addDuctsToDictionary(HVACFunction.GetDuctsCrossSpace(room));
             }
             //获得所有重要房间（具有防火门的房间）
             List<Room> importantRoom = HVACFunction.GetALLRoomsHaveFireDoor();
             //获得穿越重要房间的风管集合并将风管放于ducts集合中。
             foreach (Room room in importantRoom)
             {
-                ducts = ducts.addDuctsToList(HVACFunction.GetDuctsCrossSpace(room));
+                ducts = ducts.addDuctsToDictionary(HVACFunction.GetDuctsCrossSpace(room));
             }
             //依次遍历穿越竖井的风管集合ductsCrossShaft中的风管
-            foreach(Duct duct in ductsCrossShaft)
+            foreach(KeyValuePair<Duct,List<PointInt>> pair in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct>verticalDucts= HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
+                List<Duct>verticalDucts= HVACFunction.GetAllVerticalDuctConnectedToDuct(pair.Key);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach(Duct verticalDuct in verticalDucts)
                 {
-                    if(ductsCrossFireCompartment.findItem(verticalDuct) !=null)
+                    if(ductsCrossFireCompartment.ContainsKey(verticalDuct))
                     {
-                        ducts.Add(duct);
+                        if(!ducts.ContainsKey(pair.Key))
+                        {
+                            ducts.Add(pair.Key, new List<PointInt>());
+                        }
+                        ducts[pair.Key].AddRange(pair.Value);
                         break;
                     }
                 }
             }
 
             //依次遍历ducts集合中的每一根风管
-            foreach(Duct duct in ducts)
+            foreach(KeyValuePair<Duct, List<PointInt>> pair in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(pair.Key);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if(fireDampers.Count<1)
                 {
                     result.isPassCheck = false;
                     string remark = string.Empty;
                     remark = "此风管未设置防火阀";
-                    result.AddViolationComponent(duct.Id.Value, "风管", remark);
+                    result.AddViolationComponent(pair.Key.Id.Value, "风管", remark);
                     continue;
                 }
 
             }
             //获得所有穿越防火分隔处的变形缝的风管集合
-            List<Duct> ductsCrossMovementJointAndFireSide = HVACFunction.GetDuctsCrossMovementJointAndFireSide();
+            Dictionary<Duct, List<PointInt>> ductsCrossMovementJointAndFireSide = HVACFunction.GetDuctsCrossMovementJointAndFireSide();
             //依次判断以上风管集合
-            foreach (Duct duct in ductsCrossMovementJointAndFireSide)
+            foreach (KeyValuePair<Duct, List<PointInt>> pair in ductsCrossMovementJointAndFireSide)
             {
                 //获得风管上的所有风阀
-                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(pair.Key);
                 //如果风阀少于两个或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if(fireDampers.Count < 2)
                 {
                     result.isPassCheck = false;
                     string remark = string.Empty;
                     remark = "此风管未在穿越变形缝两侧设置防火阀";
-                    result.AddViolationComponent(duct.Id.Value, "风管", remark);
+                    result.AddViolationComponent(pair.Key.Id.Value, "风管", remark);
                     continue;
                 }
             }
@@ -1136,7 +1140,7 @@ namespace HVAC_CheckEngine
                 List<AirTerminal> airTerminals = HVACFunction.GetInletsOfFan(fan);
                 //将所有风口进行分层
                 Dictionary<int, List<AirTerminal>> airTerminalsByStoryNo = new Dictionary<int, List<AirTerminal>>();
-                airTerminalsByStoryNo = assistantFunctions.sortAirTerminalByStoryNo(airTerminals);
+                airTerminalsByStoryNo = assistantFunctions.sortElementsByStoryNo(airTerminals);
                 //依次判断每层所有排烟口是否都在一个防火分区中
                 foreach(KeyValuePair<int,List<AirTerminal>> pair in airTerminalsByStoryNo)
                 {
@@ -1525,49 +1529,53 @@ namespace HVAC_CheckEngine
             //将审查结果初始化
             BimReview result = new BimReview("GB51251_2017", "4.4.10");
 
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //获得所有防火分区对象
             List<FireCompartment> fireCompartments = HVACFunction.GetFireCompartment("");
-            List<Duct> ductsCrossFireCompartment = new List<Duct>();
+            Dictionary<Duct,List<PointInt>> ductsCrossFireCompartment = new Dictionary<Duct, List<PointInt>> (new ElementEqualityComparer());
             //依次遍历每一个防火分区对象
             foreach (FireCompartment fireCompartment in fireCompartments)
             {
                 //获得所有穿越防火分区的风管集合ductsCrossFireCompartment
-                ductsCrossFireCompartment = ductsCrossFireCompartment.addDuctsToList(HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
+                ductsCrossFireCompartment = ductsCrossFireCompartment.addDuctsToDictionary(HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
             }
             List<string> systemTypes = new List<string>();
             systemTypes.Add("排烟");
             //从风管集合ductsCrossFireCompartment中筛选出所有排烟管道
-            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsDictionary(systemTypes);
             //获得所有的竖井
             List<Room> shafts = HVACFunction.GetRooms("竖井");
             //依次遍历每一个竖井，获得竖井内的风管集合ductsInShaft以及穿越竖井的风管的集合ductsCrossShaft
             List<Duct> ductsInShaft = new List<Duct>();
-            List<Duct> ductsCrossShaft = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ductsCrossShaft = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             foreach (Room shaft in shafts)
             {
                 ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
-                ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
+                ductsCrossShaft.addDuctsToDictionary(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有排烟风管
-            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsDictionary(systemTypes);
             ductsInShaft = ductsInShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
             //从跨越防火分区的风管集合中除去处于竖井内的风管并将剩余的风管放于ducts集合中。
-            ducts.addDuctsToList(ductsCrossFireCompartment);
-            ducts.removeDuctsFromList(ductsInShaft);
+            ducts.addDuctsToDictionary(ductsCrossFireCompartment);
+            ducts.removeDuctsFromDictionary(ductsInShaft);
             
           
             //依次遍历穿越竖井的风管集合ductsCrossShaft中的风管
-            foreach (Duct duct in ductsCrossShaft)
+            foreach (KeyValuePair <Duct,List < PointInt >> pair in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
+                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(pair.Key);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach (Duct verticalDuct in verticalDucts)
                 {
-                    if (ductsCrossFireCompartment.findItem(verticalDuct) != null)
+                    if (ductsCrossFireCompartment.ContainsKey(verticalDuct))
                     {
-                        ducts.Add(duct);
+                        if (!ducts.ContainsKey(pair.Key))
+                        {
+                            ducts.Add(pair.Key, new List<PointInt>());
+                        }
+                        ducts[pair.Key].AddRange(pair.Value);
                         break;
                     }
                 }
@@ -1575,17 +1583,17 @@ namespace HVAC_CheckEngine
             //获得所有与排烟风机相连的入口风管，并放入ducts集合中。
 
             //依次遍历ducts集合中的每一根风管
-            foreach (Duct duct in ducts)
+            foreach (KeyValuePair<Duct, List<PointInt>> pair in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(pair.Key);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if (fireDampers.Count < 1)
                 {
                     result.isPassCheck = false;
                     string remark = string.Empty;
                     remark = "此风管未设置防火阀";
-                    result.AddViolationComponent(duct.Id.Value, "风管", remark);
+                    result.AddViolationComponent(pair.Key.Id.Value, "风管", remark);
                     continue;
                 }
 
@@ -1863,7 +1871,7 @@ namespace HVAC_CheckEngine
                 rooms.AddRange(HVACFunction.GetRooms("长通道", "", 0, RoomPosition.underground));
                 rooms.AddRange(HVACFunction.GetRooms("出入口通道", "", 0, RoomPosition.underground));
 
-                Dictionary<Fan, List<SmokeCompartment>> fanAffordSmokeCompartmentsRelation = new Dictionary<Fan, List<SmokeCompartment>>();
+                Dictionary<Fan, List<SmokeCompartment>> fanAffordSmokeCompartmentsRelation = new Dictionary<Fan, List<SmokeCompartment>>(new ElementEqualityComparer());
                 //依次遍历这些房间
                 foreach(Room room in rooms)
                 {
@@ -2253,67 +2261,71 @@ namespace HVAC_CheckEngine
             //将审查结果初始化
             BimReview result = new BimReview("GB50157_2013", "28.4.22");
 
-            List<Duct> ducts = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //获得所有防火分区对象
             List<FireCompartment> fireCompartments = HVACFunction.GetFireCompartment("");
-            List<Duct> ductsCrossFireCompartment = new List<Duct>();
+            Dictionary<Duct,List<PointInt>> ductsCrossFireCompartment = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //依次遍历每一个防火分区对象
             foreach (FireCompartment fireCompartment in fireCompartments)
             {
                 //获得所有穿越防火分区的风管集合ductsCrossFireCompartment
-                ductsCrossFireCompartment = ductsCrossFireCompartment.addDuctsToList(HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
+                ductsCrossFireCompartment = ductsCrossFireCompartment.addDuctsToDictionary(HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
             }
             List<string> systemTypes = new List<string>();
             systemTypes.Add("通风");
             systemTypes.Add("空调");
             //从风管集合ductsCrossFireCompartment中筛选出所有空调、通风管道
-            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsDictionary(systemTypes);
             //获得所有的竖井
             List<Room> shafts = HVACFunction.GetRooms("竖井");
             //依次遍历每一个竖井，获得竖井内的风管集合ductsInShaft以及穿越竖井的风管的集合ductsCrossShaft
             List<Duct> ductsInShaft = new List<Duct>();
-            List<Duct> ductsCrossShaft = new List<Duct>();
+            Dictionary<Duct, List<PointInt>> ductsCrossShaft = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             foreach (Room shaft in shafts)
             {
                 ductsInShaft.AddRange(HVACFunction.GetAllDuctsInRoom(shaft));
-                ductsCrossShaft.AddRange(HVACFunction.GetDuctsCrossSpace(shaft));
+                ductsCrossShaft.addDuctsToDictionary(HVACFunction.GetDuctsCrossSpace(shaft));
             }
             //从风管集合ductsInShaft和风管的集合ductsCrossShaft中筛选出所有空调、通风管道
-            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
+            ductsCrossShaft = ductsCrossShaft.filterSomeSystemTypeDuctsDictionary(systemTypes);
             ductsInShaft = ductsInShaft.filterSomeSystemTypeDuctsFromList(systemTypes);
             //从跨越防火分区的风管集合中除去处于竖井内的风管并将剩余的风管放于ducts集合中。
-            ducts.addDuctsToList(ductsCrossFireCompartment);
-            ducts.removeDuctsFromList(ductsInShaft);
+            ducts.addDuctsToDictionary(ductsCrossFireCompartment);
+            ducts.removeDuctsFromDictionary(ductsInShaft);
            
             //依次遍历穿越竖井的风管集合ductsCrossShaft中的风管
-            foreach (Duct duct in ductsCrossShaft)
+            foreach (KeyValuePair<Duct,List<PointInt>>pair in ductsCrossShaft)
             {
                 //判断风管连接的立管是否跨越了防火分区。如果立管跨越了防火分区，则将风管放入ducts中
-                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(duct);
+                List<Duct> verticalDucts = HVACFunction.GetAllVerticalDuctConnectedToDuct(pair.Key);
                 verticalDucts = assistantFunctions.filterSameDuctsInTwoList(verticalDucts, ductsInShaft);
                 foreach (Duct verticalDuct in verticalDucts)
                 {
-                    if (ductsCrossFireCompartment.findItem(verticalDuct) != null)
+                    if (ductsCrossFireCompartment.ContainsKey(verticalDuct))
                     {
-                        ducts.Add(duct);
+                        if (!ducts.ContainsKey(pair.Key))
+                        {
+                            ducts.Add(pair.Key, new List<PointInt>());
+                        }
+                        ducts[pair.Key].AddRange(pair.Value);
                         break;
                     }
                 }
             }
 
-            ducts.addDuctsToList(HVACFunction.GetDuctsCrossMovementJointAndFireSide());
+            ducts.addDuctsToDictionary(HVACFunction.GetDuctsCrossMovementJointAndFireSide());
             //依次遍历ducts集合中的每一根风管
-            foreach (Duct duct in ducts)
+            foreach (KeyValuePair<Duct, List<PointInt>> pair in ducts)
             {
                 //获得风管上的防火阀
-                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(duct);
+                List<FireDamper> fireDampers = HVACFunction.GetFireDamperOfDuct(pair.Key);
                 //如果没有风阀或者风阀没有在穿越点附近,则在审查结果中标记审查不通过，并将风管加入到审查结果，在风管构件的备注中记录此风管未在穿越点附近设置防火阀
                 if (fireDampers.Count < 1)
                 {
                     result.isPassCheck = false;
                     string remark = string.Empty;
                     remark = "此风管未设置防火阀";
-                    result.AddViolationComponent(duct.Id.Value, "风管", remark);
+                    result.AddViolationComponent(pair.Key.Id.Value, "风管", remark);
                     continue;
                 }
             }
@@ -3836,6 +3848,138 @@ namespace HVAC_CheckEngine
             {
                 result.comment = "设计不满足规范GB50490_2009中第8.4.17条条文规定。";
             }
+            return result;
+        }
+
+        //《锅炉房设计规范》GB50041-2008
+        //15．3．7 设在其他建筑物内的燃油、燃气锅炉房的锅炉间，应设置独立的送排风系统，其通风装置应防爆，新风量必须符合下列要求：
+        //1 锅炉房设置在首层时，对采用燃油作燃料的，其正常换气次数每小时不应少于3次，事故换气次数每小时不应少于6次；对采用燃气作燃料的，其正常换气次数每小时不应少于6次，事故换气次数每小时不应少于12次；
+        //2 锅炉房设置在半地下或半地下室时，其正常换气次数每小时不应少于6次，事故换气次数每小时不应少于12次；
+        //3 锅炉房设置在地下或地下室时，其换气次数每小时不应少于12次；
+        //4 送入锅炉房的新风总量，必须大于锅炉房3次的换气量；
+        //5 送入控制室的新风量，应按最大班操作人员计算。
+        //注：换气量中不包括锅炉燃烧所需空气量。
+
+        //获取锅炉房集合
+        //依次遍历每一个锅炉房
+        //获得房间内的锅炉对象
+        //如果房间内设置了锅炉
+        //如果房间是采用了机械通风时
+        //如果房间未独立设置机械排风系统
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房未独立设置机械排风系统。
+        //如果锅炉房是地上房间且为燃油锅炉房
+        //计算按6次换气计算房间目标排风量并计算实际排风量
+        //如果实际排风量小于目标排风量
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房排风量不满足规范要求。
+        //如果锅炉房是地上房间且为燃气锅炉房
+        //计算按12次换气计算房间目标排风量并计算实际排风量
+        //如果实际排风量小于目标排风量
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房排风量不满足规范要求。  
+        //如果锅炉房为半地下房间
+        //计算按12次换气计算房间目标排风量并计算实际排风量
+        //如果实际排风量小于目标排风量
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房排风量不满足规范要求。  
+        //如果锅炉房为地下房间
+        //计算按12次换气计算房间目标排风量并计算实际排风量
+        //如果实际排风量小于目标排风量
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房排风量不满足规范要求。  
+        //计算按3次换气计算房间目标送风量并计算实际送风量
+        //如果实际送风量小于目标送风量
+        //则在审查结果中标记审查不通过，并将房间记录到审查结果中，并在批注中注明锅炉房送风量不满足规范要求。  
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
+        public static BimReview GB50041_2008_15_3_7()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB50041_2008", "15.3.7");
+            //获取锅炉房集合
+            List<Room> rooms = HVACFunction.GetRooms("锅炉房");
+            foreach (Room room in rooms)
+            {
+                List<Boiler> boilers = HVACFunction.GetRoomContainBoilers(room);
+                if (boilers.Count == 0)
+                    continue;
+
+                if (assistantFunctions.isRoomHaveSomeMechanicalSystem(room, "排风"))
+                {
+                    if(!assistantFunctions.isRoomExhaustSystemIndependentSet(room))
+                    {
+                        result.isPassCheck = false;
+                        string remark = "锅炉房未独立设置机械排风系统";
+                        result.AddViolationComponent(room.Id.Value, "房间", remark);
+                        continue;
+                    }
+                    else if (room.m_eRoomPosition==RoomPosition.overground&& boilers.First().fuelType.Contains("燃气"))
+                    {
+                        double aimExhaustFlowRate = room.m_dVolume.Value * 12;
+                        double actualExhaustFlowRate = assistantFunctions.calculateExhaustFlowOfRoom(room);
+                        if (actualExhaustFlowRate < aimExhaustFlowRate)
+                        {
+                            result.isPassCheck = false;
+                            string remark = "锅炉房排风量不满足规范要求";
+                            result.AddViolationComponent(room.Id.Value, "房间", remark);
+                            continue;
+                        }
+
+                    }
+                    else if (room.m_eRoomPosition == RoomPosition.overground && boilers.First().fuelType.Contains("油"))
+                    {
+                        double aimExhaustFlowRate = room.m_dVolume.Value * 6;
+                        double actualExhaustFlowRate = assistantFunctions.calculateExhaustFlowOfRoom(room);
+                        if (actualExhaustFlowRate < aimExhaustFlowRate)
+                        {
+                            result.isPassCheck = false;
+                            string remark = "锅炉房排风量不满足规范要求";
+                            result.AddViolationComponent(room.Id.Value, "房间", remark);
+                            continue;
+                        }
+                    }
+                    else if(room.m_eRoomPosition==RoomPosition.semi_underground||room.m_eRoomPosition==RoomPosition.underground)
+                    {
+                        double aimExhaustFlowRate = room.m_dVolume.Value * 12;
+                        double actualExhaustFlowRate = assistantFunctions.calculateExhaustFlowOfRoom(room);
+                        if (actualExhaustFlowRate < aimExhaustFlowRate)
+                        {
+                            result.isPassCheck = false;
+                            string remark = "锅炉房排风量不满足规范要求";
+                            result.AddViolationComponent(room.Id.Value, "房间", remark);
+                            continue;
+                        }
+                    }
+
+                    double aimSupplyFlowRate = room.m_dVolume.Value * 3;
+                    double actualSupplyFlowRate = assistantFunctions.calculateSupplyFlowOfRoom(room);
+                    if (actualSupplyFlowRate < aimSupplyFlowRate)
+                    {
+                        result.isPassCheck = false;
+                        string remark = "锅炉房送风量不满足规范要求";
+                        result.AddViolationComponent(room.Id.Value, "房间", remark);
+                        continue;
+                    }
+                }
+                else 
+                {
+                    result.isPassCheck = false;
+                    string remark = "锅炉房未设置排风系统";
+                    result.AddViolationComponent(room.Id.Value, "房间", remark);
+                }
+            }
+
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB50041_2008中第15.3.7条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB50041_2008中第15.3.7条条文规定。";
+            }
+
             return result;
         }
     }
