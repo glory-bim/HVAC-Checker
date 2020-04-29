@@ -1029,6 +1029,11 @@ namespace HVAC_CheckEngine
                     for (int i = 0;i<list.Count();i++)
                     {
                        PointInt ptInter = new PointInt(0,0,0);
+
+                        duct.ptEnd.Z = duct.ptStart.Z;
+                        list[i].Z = duct.ptStart.Z;
+                        list[i + 1].Z = duct.ptStart.Z;
+
                         if (PointInt.IsLineIntersectsLine2D(duct.ptStart, duct.ptEnd, list[i], list[i + 1]))
                         {
                             ptInter = PointInt.GetLinesIntersectionPoint_2D(duct.ptStart, duct.ptEnd, list[i], list[i + 1]);
