@@ -283,6 +283,12 @@ namespace HVAC_CheckEngine
             return false;
         }
 
+        private static void SetAirterminalPara(ref AirTerminal airTerminal, SQLiteDataReader readerAirTerminals)
+        {
+            airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
+            airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+        }
+
         //2 判断房间是否有某种构件并返回构件对象
         //  Room    某种构件  风口
         public static List<AirTerminal> GetRoomContainAirTerminal(Room room)
@@ -310,8 +316,8 @@ namespace HVAC_CheckEngine
                 if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
                 {
                     AirTerminal airTerminal = new AirTerminal(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
-                    airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                    airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+                    SetAirterminalPara(ref airTerminal, readerAirTerminals);
+
                     AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
 
@@ -653,8 +659,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerDucts["AirFlowRate"].ToString());
-                        inlet.systemType = readerDucts["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerDucts);
                         inlets.Add(inlet);
                     }
                     else
@@ -750,8 +755,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -780,8 +784,7 @@ namespace HVAC_CheckEngine
                     if (readerAirTerminal.Read())
                     {
                         AirTerminal inlet = new AirTerminal(Convert.ToInt64(readerAirTerminal["Id"].ToString()));
-                        inlet.airVelocity = Convert.ToDouble(readerAirTerminal["AirFlowRate"].ToString());
-                        inlet.systemType = readerAirTerminal["SystemType"].ToString();
+                        SetAirterminalPara(ref inlet, readerAirTerminal);
                         inlets.Add(inlet);
                     }
                     else
@@ -1752,8 +1755,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -2165,8 +2167,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 AirTerminal pipe = new AirTerminal(Convert.ToInt64(reader["Id"].ToString()));
-                pipe.airVelocity = Convert.ToDouble(reader["AirFlowRate"].ToString());
-                pipe.systemType = reader["SystemType"].ToString();
+                SetAirterminalPara(ref pipe, reader);
                 pipes.Add(pipe);
             }
             return pipes;
@@ -3733,6 +3734,7 @@ namespace HVAC_CheckEngine
             if (readerFans.Read())
             {
                 duct = new AirTerminal(Convert.ToInt64(readerFans["Id"].ToString()));
+                SetAirterminalPara(ref duct, readerFans);
                 return true;
             }
             return false;
@@ -3874,9 +3876,8 @@ namespace HVAC_CheckEngine
             string strId = "";           
             AABB aabbAirTerminal = new AABB(ptMin, ptMax, strId);
             if (readerAirTerminals.Read())
-            {               
-                airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
-                airTerminal.systemType = readerAirTerminals["SystemType"].ToString();
+            {
+                SetAirterminalPara(ref airTerminal, readerAirTerminals);       
                 aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
                // if (room.m_iStoryNo == Convert.ToInt32(readerAirTerminals["StoreyNo"].ToString()))
           
