@@ -322,10 +322,7 @@ namespace HVAC_CheckEngine
 
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         airterminals.Add(airTerminal);
                     }
@@ -375,10 +372,7 @@ namespace HVAC_CheckEngine
                     AABB aabbAirTerminal = GetAABB(readerWindows, dbConnection);
 
                     PointInt pt = aabbAirTerminal.Center();
-                    if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                        || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                    if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                     {
                         Window window = new Window(Convert.ToInt64(readerWindows["Id"].ToString()));
                         window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
@@ -1139,10 +1133,7 @@ namespace HVAC_CheckEngine
                     }
                     if (rooms[i].m_iStoryNo == Convert.ToInt32(reader["StoreyNo"].ToString()))
                     {
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                                       || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {
                             return rooms[i];
                         }
@@ -2451,10 +2442,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(reader, dbConnection);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return fireCompartment;
                         }
@@ -2524,10 +2512,7 @@ namespace HVAC_CheckEngine
                         AABB aabbAirTerminal = GetAABB(readerAirTerminals, dbConnectionHVAC);
 
                         PointInt pt = aabbAirTerminal.Center();
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                         {
                             return true;
                         }
@@ -2611,10 +2596,7 @@ namespace HVAC_CheckEngine
                     // AABB polySmokeCompartment = GetAABB(readerAirTerminals, dbConnection);
                     if(room.m_iStoryNo == room1.m_iStoryNo)
                     {                   
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(polySmokeCompartment, poly.Center())
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Min)
-                            || Geometry_Utils_BBox.IsPointInBBox2D(poly, polySmokeCompartment.Max))
+                        if (poly.Polygon2D_Contains_Polygon2D(polySmokeCompartment))
                         {
                             SmokeCompartment fireCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
                             fireCompartment.boundaryLoops = reader["boundaryLoops"].ToString();
@@ -3686,10 +3668,7 @@ namespace HVAC_CheckEngine
                         {
                             return room;
                         }
-                        if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(aabbTerminal, poly.Center())
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Min)
-                      || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbTerminal.Max))
+                        if (poly.Polygon2D_Contains_AABB(aabbTerminal))
                         {                           
                             room.name = reader["name"].ToString();
                             room.m_dHeight = Convert.ToDouble(readerRoom["dHeight"].ToString());
@@ -3897,10 +3876,7 @@ namespace HVAC_CheckEngine
                 }
 
                 PointInt pt = aabbAirTerminal.Center();
-                if (Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Center())
-                    || Geometry_Utils_BBox.IsPointInBBox2D(aabbAirTerminal, poly.Center())
-                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Min)
-                    || Geometry_Utils_BBox.IsPointInBBox2D(poly, aabbAirTerminal.Max))
+                if (poly.Polygon2D_Contains_AABB(aabbAirTerminal))
                 {
                     return false;
                 }
