@@ -209,10 +209,10 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetFireDistrictLengthTest()
         {
-            FireCompartment fireDis = new FireCompartment(573789);
+            SmokeCompartment fireDis = new SmokeCompartment(573789);
             double dLength = 0.0;
             HVACFunction.m_archXdbPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
-            dLength = HVACFunction.GetFireDistrictLength(fireDis);
+            dLength = HVACFunction.GetSmokeCompartmentLength(fireDis);
             Assert.IsTrue(dLength > 0);
 
         }
@@ -275,7 +275,7 @@ namespace HVAC_CheckEngine.Tests
 
 
             //act
-            List<Room>rooms= HVACFunction.GetAllRoomsInCertainStory(1);
+            List<Room>rooms= HVACFunction.GetAllRoomsInCertainStorey(1);
 
             //assert
             Assert.IsTrue(rooms.Exists(x => x.Id == 726561));
