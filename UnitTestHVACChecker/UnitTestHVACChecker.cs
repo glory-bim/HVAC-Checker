@@ -171,6 +171,32 @@ namespace UnitTestHVACChecker
             }
 
         }
+
+        [TestMethod]
+        public void test_notpass_XDB()
+        {
+            globalData.buildingHeight = 50;
+            globalData.buildingType = "公共建筑";
+            //arrange
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50016_2014_8_5_1\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50016_2014_8_5_1\机电模型.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+
+            string comment = "设计不满足规范GB50016_2014中第8.5.1条条文规定。";
+            //List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+
+
+                
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB50016_2014_8_5_1();
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                //Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+        }
+
         private static string ExcelPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据.xlsx";
 
         private TestContext context;
@@ -900,11 +926,11 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetALLRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
 
@@ -912,7 +938,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
 
 
@@ -979,11 +1005,11 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetALLRoomsHaveFireDoor = FakeHVACFunction.getAllRoomsHaveFireDoor_new;
 
@@ -991,7 +1017,7 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
 
 
@@ -4116,17 +4142,17 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+               //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
 
 
@@ -4186,17 +4212,17 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
 
 
@@ -4282,17 +4308,17 @@ namespace UnitTestHVACChecker
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireCompartmentString = FakeHVACFunction.GetFireCompartment_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossFireDistrictFireCompartment = FakeHVACFunction.GetDuctsCrossFireDistrict_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllDuctsInRoomRoom = FakeHVACFunction.getAllDuctsInRoom_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
+                //HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossSpaceRoom = FakeHVACFunction.GetDuctsCrossSpace_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetAllVerticalDuctConnectedToDuctDuct = FakeHVACFunction.getAllVerticalDuctConnectedToDuct_new;
 
                 HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFireDamperOfDuctDuct = FakeHVACFunction.getFireDamperOfDuct_new;
 
-                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
+               // HVAC_CheckEngine.Fakes.ShimHVACFunction.GetDuctsCrossMovementJointAndFireSide = FakeHVACFunction.GetDuctsCrossMovementJointAndFireSide_new;
                 //arrange
 
 
