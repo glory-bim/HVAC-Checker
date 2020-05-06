@@ -926,10 +926,7 @@ namespace HVAC_CheckEngine
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
-                {
-                  
-
-
+                {              
                     AABB aabbDuct = GetAABB(readerDucts, dbConnectionHVAC);
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbDuct))
                     {
@@ -1015,6 +1012,7 @@ namespace HVAC_CheckEngine
         }
 
  
+
 
         List<PointInt> GetIntersect(Polygon2D polygon,Duct duct)
         {
