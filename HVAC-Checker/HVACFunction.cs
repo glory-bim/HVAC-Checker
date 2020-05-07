@@ -15,6 +15,10 @@ using Newtonsoft.Json.Linq;
 namespace HVAC_CheckEngine
 {
 
+  
+
+
+
     public class TreeNode
     {
         public long? Id { get; set; } = null;
@@ -72,6 +76,36 @@ namespace HVAC_CheckEngine
             currentDirectory = currentDirectory.Substring(0, iSub);
             string strPath = new DirectoryInfo(currentDirectory + dbName).FullName;
             return strPath;
+        }
+
+
+        public static bool GetGlobalData()
+        {
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return false;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();
+
+            string sql = "select * from BuildingBCs Where Key = ";
+            sql = sql + "建筑名称";        
+
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {            
+                string strBuildingType  = reader["value"].ToString();          
+                string[] chMsg = strBuildingType.Split(new char[] { '+' });
+                if(chMsg.Length > 0)
+                {
+                    globalData.buildingType = chMsg[0];
+                }
+                
+                return true;
+            }
+            return false;
         }
 
         //1获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合

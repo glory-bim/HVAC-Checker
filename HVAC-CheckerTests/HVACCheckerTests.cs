@@ -214,5 +214,19 @@ namespace HVAC_CheckEngine.Tests
             // Assert.AreEqual(comment, result.comment);
             Assert.IsFalse(result.isPassCheck);
         }
+
+        [TestMethod()]
+        public void GB50016_2014_8_5_3Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-ARCH.GDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//6.2.2-HVAC.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50016_2014_8_5_3();
+
+            string comment = "设计满足规范GB50016_2014中第8.5.3条条文规定。";
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
     }
 }
