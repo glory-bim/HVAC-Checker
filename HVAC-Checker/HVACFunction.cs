@@ -89,8 +89,11 @@ namespace HVAC_CheckEngine
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
 
-            string sql = "select * from BuildingBCs Where Key = ";
-            sql = sql + "建筑名称";        
+      
+
+            string sql = "select * from BuildingBCs Where key = ";
+            sql = sql + "'" + "建筑名称" + "'";
+              
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
