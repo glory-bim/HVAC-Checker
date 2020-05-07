@@ -12,6 +12,7 @@ namespace HVAC_CheckEngine
     {
         static HVACChecker()
         {
+
             HVACFunction.GetGlobalData();
         }
         /**
