@@ -1,0 +1,14 @@
+[ODBC]
+DRIVER=Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)
+UID=admin
+UserCommitSync=Yes
+Threads=3
+SafeTransactions=0
+ReadOnly=1
+PageTimeout=5
+MaxScanRows=8
+MaxBufferSize=2048
+FIL=excel 12.0
+DriverId=1046
+DefaultDir=D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据
+DBQ=D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据.xlsx
