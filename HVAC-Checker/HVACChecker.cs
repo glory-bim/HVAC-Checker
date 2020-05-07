@@ -10,6 +10,10 @@ namespace HVAC_CheckEngine
 
     public static class HVACChecker
     {
+        static HVACChecker()
+        {
+            HVACFunction.GetGlobalData();
+        }
         /**
      建筑设计防火规范 GB50016-2014：8.5.1条文：
      建筑的下列场所或部位应设置防烟设施：

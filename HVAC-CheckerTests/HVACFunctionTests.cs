@@ -144,9 +144,10 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GetRoomsTest1()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            //  string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//建筑.GDB";
+            string strArchPath = "C://Users//zheny//Documents//WXWork//1688853814885410//Cache//File//2020-05//建筑模型.XDB";
             HVACFunction.m_archXdbPath = strArchPath;
-            Assert.IsTrue(HVACFunction.GetRooms("间").Count() > 0);
+            Assert.IsTrue(HVACFunction.GetRooms("前室").Count() > 0);
         }
 
         [TestMethod()]
