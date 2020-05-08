@@ -228,5 +228,57 @@ namespace HVAC_CheckEngine.Tests
             Assert.AreEqual(comment, result.comment);
             Assert.IsFalse(result.isPassCheck);
         }
+
+        [TestMethod()]
+        public void GB50016_2014_8_5_4Test()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8_5_4-ARCH.XDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8_5_4-HVAC.XDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50016_2014_8_5_4();
+
+            string comment = "设计满足规范GB50016_2014中第8.5.3条条文规定。";
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB50016_2014_9_3_16Test1()
+        {
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8_5_4-ARCH.XDB";
+            string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8_5_4-HVAC.XDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50016_2014_9_3_16();
+
+            string comment = "设计满足规范GB50016_2014中第8.5.3条条文规定。";
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_3_2_2Test1()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_3_2_3Test1()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_3_3_7Test1()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod()]
+        public void GB51251_2017_4_2_4Test1()
+        {
+            Assert.Fail();
+        }
     }
 }
