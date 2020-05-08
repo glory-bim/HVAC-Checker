@@ -87,9 +87,7 @@ namespace HVAC_CheckEngine
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
-            m_dbConnection.Open();
-
-      
+            m_dbConnection.Open();      
 
             string sql = "select * from BuildingBCs Where key = ";
             sql = sql + "'" + "建筑名称" + "'";
@@ -101,9 +99,30 @@ namespace HVAC_CheckEngine
             {            
                 string strBuildingType  = reader["value"].ToString();          
                 string[] chMsg = strBuildingType.Split(new char[] { '+' });
-                if(chMsg.Length > 0)
+                if(chMsg.Length == 3)
                 {
-                    globalData.buildingType = chMsg[0];
+                    if(chMsg[0] == "公共建筑")
+                    {
+                        globalData.buildingType = chMsg[0];
+                    }
+                    else if(chMsg[0] == "居住建筑")
+                    {
+                        if(chMsg[1] == "住宅建筑")
+                        {
+                            if (chMsg[2] == "公寓")
+                            {
+                                globalData.buildingType = "公共建筑";
+                            }
+                            else 
+                            {
+                                globalData.buildingType = "住宅";
+                            }
+                        }
+                        else if(chMsg[1] == "宿舍建筑")
+                        {
+                            globalData.buildingType = "公共建筑";
+                        }
+                    }                   
                 }
                 
                 return true;
