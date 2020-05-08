@@ -1930,6 +1930,7 @@ namespace HVAC_CheckEngine
             m_dbConnection.Close();
         }
 
+        //不知道 FromRoomId 和 ToRoomId 顺序所以  分别查询
         public static List<Door> GetDoorsBetweenTwoRooms(Room firstRoom, Room SecondRoom)
         {
             List<Door> doors = new List<Door>();
