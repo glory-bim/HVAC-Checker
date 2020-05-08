@@ -1933,7 +1933,6 @@ namespace HVAC_CheckEngine
         public static List<Door> GetDoorsBetweenTwoRooms(Room firstRoom, Room SecondRoom)
         {
             List<Door> doors = new List<Door>();
-
             if (!System.IO.File.Exists(m_archXdbPath))
                 return doors;
 
@@ -1950,10 +1949,10 @@ namespace HVAC_CheckEngine
             SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
             List<string> listStrLastId = new List<string>();
-            while (readerDoors.Read())
+            if (readerDoors.Read())
             {
-                Door door = new Door(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
-                listStrLastId.Add(readerDoors["ToRoomId"].ToString());
+                Door door = new Door(Convert.ToInt64(readerDoors["Id"].ToString()));
+                listStrLastId.Add(readerDoors["Id"].ToString());
                 doors.Add(door);
             }
 
@@ -1965,13 +1964,12 @@ namespace HVAC_CheckEngine
             SQLiteDataReader readerDoorsTo = commandDoorsTo.ExecuteReader();
             while (readerDoorsTo.Read())
             {
-                Door door = new Door(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
-                if (!listStrLastId.Exists(x => x == readerDoors["linkElementId"].ToString()))
+                Door door = new Door(Convert.ToInt64(readerDoors["Id"].ToString()));
+                if (!listStrLastId.Exists(x => x == readerDoors["Id"].ToString()))
                 {
                     doors.Add(door);
                 }
             }
-
 
             //关闭连接
             dbConnection.Close();

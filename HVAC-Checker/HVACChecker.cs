@@ -243,7 +243,7 @@ namespace HVAC_CheckEngine
             List<Room> between100And300sqmOvergroundCommonRooms = new List<Room>();
             List<Room> greaterThan300sqmOvergroundCommonRooms = new List<Room>();
             //如果建筑类型为公共建筑或住宅
-            if (globalData.buildingType == "公共建筑" || globalData.buildingType == "住宅")
+            if (globalData.buildingType == "公共建筑" || globalData.buildingType == "居住建筑")
             {
                 //    获得所有地上面积大于100平米的地上歌舞娱乐游艺场所的房间集合overgroundEntertainmentRooms
                 List<Room> greaterThan100sqmOvergroundEntertainmentRooms = HVACFunction.GetRooms("歌舞娱乐放映游艺场所", "", 100, RoomPosition.overground);
