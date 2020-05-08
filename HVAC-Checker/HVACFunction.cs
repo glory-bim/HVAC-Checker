@@ -908,9 +908,12 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string sql = "select * from Spaces Where CHARINDEX(";
-            sql = sql + "'" + roomType + "'";
-            sql = sql + ",userLabel)> 0";
+            //string sql = "select * from Spaces Where CHARINDEX(";
+            //sql = sql + "'" + roomType + "'";
+            //sql = sql + ",userLabel)> 0";
+
+            string sql = "select * from Spaces Where name like";
+            sql = sql + "'%"+ roomType + "%'";      
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -921,7 +924,7 @@ namespace HVAC_CheckEngine
                
                 OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
                 double dLengthOBB = obb.GetLength();
-                if (dLengthOBB > dLength)
+                if (dLengthOBB*0.001 > dLength)
                     rooms.Add(room);
             }
             //关闭连接
