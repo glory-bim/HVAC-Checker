@@ -145,28 +145,12 @@ namespace HVAC_CheckEngine
             // string sql = "select * from Spaces Where userLabel = ";
 
 
-            //string sql = "select * from Spaces Where CHARINDEX(";
-            //sql = sql + "'" + type + "'";
-
-            //sql = sql + ",userLabel)> 0";
-
-            //sql = sql + " and CHARINDEX(";
-
-            //sql = sql + "'" + name + "'";
-
-            //sql = sql + ",name)> 0";
-            //sql = sql + " and dArea > ";
-            //sql = sql + area;
-
-
-            string sql = "select * from Spaces Where name like";
-            //sql = sql + "'%" + type + "%'";
-            sql = sql + "'%" + name + "%'";
-            sql = sql + " and  name like";
-            sql = sql + "'%" + name + "%'";
-            sql = sql + " and dArea > ";
-            sql = sql + area;
-
+            string sql = "select * from Spaces Where userLabel like ";
+            sql += "'%" + type + "%'";
+            sql += " and name like ";
+            sql += "'%" + name + "%'";
+            sql += " and dArea > ";
+            sql += area;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -889,7 +873,7 @@ namespace HVAC_CheckEngine
         {
             string sql = "select * from MepConnectionRelations Where mainElementId = ";
             sql += strId;
-            sql = sql +  "and userLabel = 风机出口管道";         
+            sql = sql +  " and userLabel = '风机出口管道'";         
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -929,12 +913,9 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            //string sql = "select * from Spaces Where CHARINDEX(";
-            //sql = sql + "'" + roomType + "'";
-            //sql = sql + ",userLabel)> 0";
+            string sql = "select * from Spaces Where userLabel like ";
+            sql +="'%" + roomType + "'%";
 
-            string sql = "select * from Spaces Where name like";
-            sql = sql + "'%"+ roomType + "%'";      
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -1061,7 +1042,7 @@ namespace HVAC_CheckEngine
                 if (poly.IsPolygon2DIntersectsOBB(obbDuct))
                 {
                     Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                    duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                    SetDuctPara(readerDucts,duct);
                     List<PointInt> pointList = GetIntersectPoint(poly, duct);
                     if (!ducts.ContainsKey(duct))
                     {
@@ -1113,26 +1094,47 @@ namespace HVAC_CheckEngine
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
-
-                sql = "select * from Ducts where StoreyNo=";
-                sql += fireDistrict.m_iStoryNo.ToString();
+                double fireDistrictElevation = getRoomElevation(fireDistrict);
+                double fireDistrictTopElevation = fireDistrictElevation + Convert.ToDouble(readerSpace["dHeight"].ToString());
+                sql = "select * from Ducts where StartElevation<"+fireDistrictElevation + " And EndElevation>" + fireDistrictElevation;
+                sql += " Or EndElevation>" + fireDistrictTopElevation+ " And StartElevation<" + fireDistrictTopElevation;
+                sql+= "Or EndElevation<" + fireDistrictTopElevation + "And StartElevation > " + fireDistrictElevation;
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
                 {
+                    Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                    SetDuctPara(readerDucts, duct);
                     OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
-                     if (poly.IsPolygon2DIntersectsOBB(obbDuct))
-                     {
-                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                            duct.airVelocity = Convert.ToDouble(readerDucts["Velocity"].ToString());
+                    if (Convert.ToBoolean(readerDucts["IsVerticalDuct"].ToString()) && poly.Polygon2D_Contains_OBB(obbDuct))
+                    {
+                        
+                        if (duct.StartElevation>fireDistrictElevation&&duct.EndElevation<fireDistrictElevation)
+                            if (!ducts.ContainsKey(duct))
+                            {
+                                ducts.Add(duct, new List<PointInt>());
+                            }
+                        double elevationOfFireDistrict = getRoomElevation(fireDistrict);
+                        double H_2 = duct.EndElevation.Value - elevationOfFireDistrict;
+                        double H_1 = elevationOfFireDistrict - duct.StartElevation.Value;
+                        double Zmax = duct.ptStart.Z > duct.ptEnd.Z ? duct.ptStart.Z : duct.ptEnd.Z;
+                        double Zmin = duct.ptStart.Z < duct.ptEnd.Z ? duct.ptStart.Z : duct.ptEnd.Z;
+                        double Z = (Zmax * H_1 + Zmin * H_2) / (H_1 + H_2);
+
+                        ducts[duct].Add(new PointInt(duct.ptStart.X,duct.ptStart.Y,(int)Z));
+                    }
+                    else
+                    {
+                        if (poly.IsPolygon2DIntersectsOBB(obbDuct))
+                        {
                             List<PointInt> pointList = GetIntersectPoint(poly, duct);
-                            if(!ducts.ContainsKey(duct))
+                            if (!ducts.ContainsKey(duct))
                             {
                                 ducts.Add(duct, new List<PointInt>());
                             }
                             ducts[duct].AddRange(pointList);
-                     }
-                
+                        }
+                    }
                 }
                 dbConnectionHVAC.Close();
             }
@@ -1170,7 +1172,7 @@ namespace HVAC_CheckEngine
                     if (poly.IsPolygon2DIntersectsOBB(obbDuct))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        SetDuctPara(readerDucts, ref duct);
+                        SetDuctPara(readerDucts, duct);
                         List<PointInt> pointList = GetIntersectPoint(poly, duct);
                         if (!ducts.ContainsKey(duct))
                         {
@@ -1244,7 +1246,7 @@ namespace HVAC_CheckEngine
         }
 
 
-        private static void SetDuctPara(SQLiteDataReader ductReader, ref Duct duct)
+        private static void SetDuctPara(SQLiteDataReader ductReader,Duct duct)
         {
             string strVector = ductReader["DuctStartPoint"].ToString();
             int index = strVector.IndexOf(":");
@@ -1292,6 +1294,9 @@ namespace HVAC_CheckEngine
             duct.ptEnd.Z = Convert.ToInt32(dZ);
 
             duct.airVelocity = Convert.ToDouble(ductReader["Velocity"].ToString());
+            duct.systemType = ductReader["SystemName"].ToString();
+            duct.StartElevation= Convert.ToDouble(ductReader["StartElevation"].ToString());
+            duct.EndElevation = Convert.ToDouble(ductReader["EndElevation"].ToString());
         }
 
         static List<PointInt>  GetIntersectPoint(Polygon2D polygon,Duct duct)
@@ -1507,9 +1512,9 @@ namespace HVAC_CheckEngine
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
 
-            string sql = "select * from Spaces Where CHARINDEX(";
-            sql = sql + "'" + containedString + "'";
-            sql = sql + ",name)> 0";
+            string sql = "select * from Spaces Where name like ";
+            sql += "'%" + containedString + "%'";
+
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -1623,7 +1628,7 @@ namespace HVAC_CheckEngine
                     if (readerDucts.Read())
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                        SetDuctPara(readerDucts, ref duct);
+                        SetDuctPara(readerDucts,duct);
                         ducts.Add(duct);
                         m_listStrLastId.Add(strId);
                         FindDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -1800,11 +1805,9 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
 
-            string sql = "select * from Spaces Where CHARINDEX(";
-            sql = sql + "'" + "走廊" + "'";
-            sql = sql + ",userLabel)> 0";
-
-
+            string sql = "select * from Spaces Where userLabel like ";
+            sql += "'%走廊%'";
+           
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -1857,6 +1860,18 @@ namespace HVAC_CheckEngine
             while (readerDoors.Read())
             {
                 Room roomConnect = new Room(Convert.ToInt64(readerDoors["ToRoomId"].ToString()));
+                SetRoomPara(roomConnect);
+                rooms.Add(roomConnect);
+            }
+
+            sql = "select * from Doors Where ToRoomId = ";
+            sql = sql + room.Id;
+
+            commandDoors = new SQLiteCommand(sql, dbConnection);
+            readerDoors = commandDoors.ExecuteReader();
+            while (readerDoors.Read())
+            {
+                Room roomConnect = new Room(Convert.ToInt64(readerDoors["FromRoomId"].ToString()));
                 SetRoomPara(roomConnect);
                 rooms.Add(roomConnect);
             }
@@ -1993,29 +2008,28 @@ namespace HVAC_CheckEngine
 
             //每个走廊在门表中找关联房间
             string sql = "select * from Doors Where FromRoomId = ";
-            sql = sql + firstRoom.Id + "and ToRoomId = ";
+            sql = sql + firstRoom.Id + " and ToRoomId = ";
             sql = sql + SecondRoom.Id;
 
             SQLiteCommand commandDoors = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader readerDoors = commandDoors.ExecuteReader();
-            List<string> listStrLastId = new List<string>();
-            if (readerDoors.Read())
+
+            while (readerDoors.Read())
             {
                 Door door = new Door(Convert.ToInt64(readerDoors["Id"].ToString()));
-                listStrLastId.Add(readerDoors["Id"].ToString());
                 doors.Add(door);
             }
 
             sql = "select * from Doors Where FromRoomId = ";
-            sql = sql + SecondRoom.Id + "and ToRoomId = ";
+            sql = sql + SecondRoom.Id + " and ToRoomId = ";
             sql = sql + firstRoom.Id;
 
             SQLiteCommand commandDoorsTo = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader readerDoorsTo = commandDoorsTo.ExecuteReader();
             while (readerDoorsTo.Read())
             {
-                Door door = new Door(Convert.ToInt64(readerDoors["Id"].ToString()));
-                if (!listStrLastId.Exists(x => x == readerDoors["Id"].ToString()))
+                Door door = new Door(Convert.ToInt64(readerDoorsTo["Id"].ToString()));
+                if (!doors.Exists(x => x.Id == door.Id))
                 {
                     doors.Add(door);
                 }
@@ -2700,17 +2714,15 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_hvacXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
-            string sql = "select * from Ducts Where CHARINDEX(";
-            sql = sql + "'" + strSystemName + "'";
-
-            sql = sql + ",SystemName)> 0";
+            string sql = "select * from Ducts Where SystemName like ";
+            sql += "'%" + strSystemName + "%'";
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
             {
                 Duct duct = new Duct(Convert.ToInt64(reader["Id"].ToString()));
-                SetDuctPara(reader, ref duct);
+                SetDuctPara(reader, duct);
                 ducts.Add(duct);
             }
 
@@ -2729,11 +2741,8 @@ namespace HVAC_CheckEngine
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
             m_dbConnection.Open();
 
-            string sql = "select * from AirTerminals Where CHARINDEX(";
-            sql = sql + "'" + strSystemName + "'";
-
-            sql = sql + ",SystemName)> 0";
-
+            string sql = "select * from AirTerminals Where SystemName like ";
+            sql +="'%" + strSystemName + "%'";
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -2758,10 +2767,9 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string csSmokeCompartment = "防烟分区";
-            string sql = "select * from Spaces where CHARINDEX(";
-            sql = sql + "'" + sName + "'";
-            sql = sql + ",name)> 0 and  userLabel =  ";
-            sql = sql + "'" + csSmokeCompartment + "'";
+            string sql = "select * from Spaces where name like ";
+            sql += "'%" + sName + "%'";
+            sql += " and  userLabel =  "+ "'" + csSmokeCompartment + "'";
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -2788,9 +2796,9 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
 
-            string sql = "select * from Spaces where CHARINDEX(";
-            sql = sql + "'" + sName + "'";
-            sql = sql + ",name)> 0 and  userLabel = csSmokeCompartment ";
+            string sql = "select * from Spaces where name like ";
+            sql += "'%" + sName + "%'";
+            sql += "and  userLabel = '防火分区'";
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -2817,10 +2825,8 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string csSmokeCompartment = "防火分区";
-            string sql = "select * from Spaces where userLabel = ";
 
-            sql += csSmokeCompartment;
+            string sql = "select * from Spaces where userLabel = '防火分区'";
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -2850,11 +2856,10 @@ namespace HVAC_CheckEngine
 
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionstr);
-
+            dbConnectionArch.Open();
             string strBianxing = "变形缝";
-            string sql = "select * from Proxys Where CHARINDEX(";
-            sql = sql + "'" + strBianxing + "'";
-            sql = sql + ",userLabel)> 0";
+            string sql = "select * from Proxys Where userLabel like ";
+            sql += "'%" + strBianxing + "%'";
             SQLiteCommand commandArch = new SQLiteCommand(sql, dbConnectionArch);
             SQLiteDataReader readerProxys = commandArch.ExecuteReader();
             while (readerProxys.Read())
@@ -2910,6 +2915,31 @@ namespace HVAC_CheckEngine
             }
         }
 
+        private static double getRoomElevation(Room room)
+        {
+            if (!System.IO.File.Exists(m_archXdbPath))
+                throw new FileNotFoundException();
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+
+            string sql = "select * from Storeys where  storeyNo =  ";
+            sql += room.m_iStoryNo.ToString();
+
+            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+         
+
+            if (reader.Read())
+            {
+                return Convert.ToDouble(reader["elevation"].ToString());
+            }
+            else
+                throw new ArgumentException("房间楼层编号有误！");
+        }
+
         public static int GetHighestStoryNoOfRoom(Room room)
         {
             if (!System.IO.File.Exists(m_archXdbPath))
@@ -2929,27 +2959,23 @@ namespace HVAC_CheckEngine
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             int highestStoryNostoryNo = room.m_iStoryNo.Value;
-            if (reader.Read())
-            {
-                   
 
-                    double topElevationOfRoom = Convert.ToDouble(reader["elevation"].ToString()) + room.m_dHeight.Value;
-                    double minHeightDiff = double.MaxValue;
+            double topElevationOfRoom = getRoomElevation(room) + room.m_dHeight.Value;
+            double minHeightDiff = double.MaxValue;
                     
-                    List<Floor> floors = GetFloors();
-                    foreach(Floor floor in floors)
-                    {
-                        double HeightDiff = topElevationOfRoom - floor.elevation.Value;
-                        if (HeightDiff <= 0)
-                            continue;
-                        else if(HeightDiff<minHeightDiff)
-                        {
-                            minHeightDiff = HeightDiff;
-                            highestStoryNostoryNo = floor.m_iStoryNo.Value;
-                        }
-                    }
-
+            List<Floor> floors = GetFloors();
+            foreach(Floor floor in floors)
+            {
+               double HeightDiff = topElevationOfRoom - floor.elevation.Value;
+               if (HeightDiff <= 0)
+                   continue;
+               else if(HeightDiff<minHeightDiff)
+               {
+                  minHeightDiff = HeightDiff;
+                  highestStoryNostoryNo = floor.m_iStoryNo.Value;
+               }
             }
+
     
             //关闭连接
             dbConnection.Close();
@@ -3227,9 +3253,8 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
             dbConnectionArch.Open();          
             string strUserLabel = "防火";
-            string sql = "select * from Doors Where CHARINDEX(";
-            sql = sql + "'" + strUserLabel + "'";
-            sql = sql + ",userLabel)> 0";
+            string sql = "select * from Doors Where userLabel like ";
+            sql += "'%" + strUserLabel + "%'";
 
             SQLiteCommand commandDoor = new SQLiteCommand(sql, dbConnectionArch);
             SQLiteDataReader readerDoor = commandDoor.ExecuteReader();
@@ -3299,7 +3324,7 @@ namespace HVAC_CheckEngine
                     if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, aabbAirTerminal))
                     {
                         Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));                     
-                        SetDuctPara(readerDucts, ref duct);
+                        SetDuctPara(readerDucts, duct);
                         ducts.Add(duct);
                     }
                 }
@@ -3348,51 +3373,10 @@ namespace HVAC_CheckEngine
                     SQLiteDataReader readerDucts = commandDucts.ExecuteReader();
                     if (readerDucts.Read())
                     {
-                        // if(abs(Convert.ToDouble(readerDucts["EndElevation"].ToString())  - Convert.ToDouble(readerDucts["StartElevation"].ToString()))<0.1)
-
-                        string strVector = readerDucts["DuctStartPoint"].ToString();
-                        int index = strVector.IndexOf(":");
-                        int index_s = strVector.LastIndexOf(",\"Y");
-                        string strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                        double dsX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                        string strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double dsY = Convert.ToDouble(strY);
-
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        string strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double dsZ = Convert.ToDouble(strY);
-
-
-
-                        strVector = readerDucts["DuctEndPoint"].ToString();
-                        index = strVector.IndexOf(":");
-                        index_s = strVector.LastIndexOf(",\"Y");
-                        strX = strVector.Substring(index + 1, index_s - index - 1);
-
-                        double deX = Convert.ToDouble(strX);
-                        index = strVector.IndexOf("Y");
-                        index_s = strVector.LastIndexOf(",\"Z");
-                         strY = strVector.Substring(index + 3, index_s - index - 3);
-                        double deY = Convert.ToDouble(strY);
-
-                        index = strVector.IndexOf("Z");
-
-                        index_s = strVector.Length;
-                        strZ = strVector.Substring(index + 3, index_s - index - 4);
-                        double deZ = Convert.ToDouble(strY);
-
-                        if((System.Math.Abs(dsX - deX)<0.01)&&(System.Math.Abs(dsY - deY) < 0.01) &&  (System.Math.Abs(dsZ - deZ) >0.01) )
+                        Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
+                        SetDuctPara(readerDucts, duct);
+                        if(Convert.ToBoolean(readerDucts["IsVerticalDuct"].ToString()))
                         {
-                            Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
-                            SetDuctPara(readerDucts, ref duct);
-
-                            AABB aabbDuct = GetAABB(readerDucts, dbConnection);
-
                             ducts.Add(duct);
                             m_listStrLastId.Add(strId);
                             FindVerticalDucts(dbConnection, readerDucts["Id"].ToString(), ducts);
@@ -3406,6 +3390,8 @@ namespace HVAC_CheckEngine
                 }
             }
         }
+
+      
        
         public static List<Duct> GetBranchDamperDucts()
         {

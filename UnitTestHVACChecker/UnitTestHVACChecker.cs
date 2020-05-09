@@ -1066,7 +1066,30 @@ namespace UnitTestHVACChecker
                 Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
             }
         }
+
+        [TestMethod]
+        public void test_XDB_unpass()
+        {
+            //arrange
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50016_2014_9_3_11\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB50016_2014_9_3_11\机电模型.XDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+
+            string comment = "设计不满足规范GB50016_2014中第9.3.11条条文规定。";
+            //List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+
+
+
+            //act
+            BimReview result = new BimReview();
+            result = HVACChecker.GB50016_2014_9_3_11();
+
+            //assert
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+        }
     }
+
 
     [TestClass]
     public class GB51251_2017_3_1_2_Test
@@ -1323,7 +1346,7 @@ namespace UnitTestHVACChecker
                 //arrange
                 globalData.buildingHeight = 50;
                 globalData.buildingType = "公共建筑";
-                string comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。";
+                string comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。请专家核对剪刀楼梯间机械加压送风系统是否独立设置。";
 
                 List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
                 FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_1_5.xlsx";
@@ -1546,7 +1569,30 @@ namespace UnitTestHVACChecker
         }
 
 
+        [TestMethod]
+        public void test_notpass_XDB()
+        {
+            globalData.buildingHeight = 50;
+            globalData.buildingType = "公共建筑";
+            //arrange
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB51251_2017_3_1_5\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB51251_2017_3_1_5\机电模型.GDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
 
+            string comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。";
+            //List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+
+
+
+            //act
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_3_1_5();
+
+            //assert
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+            //Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+        }
 
     }
     [TestClass]

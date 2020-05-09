@@ -11,7 +11,8 @@ namespace HVAC_CheckEngine
     {
         public Duct(long id):base(id)
         {
-            
+            ptStart = new PointInt(0,0,0);
+            ptEnd = new PointInt(0, 0, 0);
         }
         public double? airVelocity { get; set; } = null;
 
@@ -21,5 +22,8 @@ namespace HVAC_CheckEngine
 
         public string systemType { get; set; } = null;
 
+        public double? StartElevation { get; set; } = null;
+
+        public double? EndElevation { get; set; } = null;
     }
 }
