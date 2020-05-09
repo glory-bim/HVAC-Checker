@@ -17,7 +17,7 @@ namespace HVAC_CheckEngine
 
             foreach (AirTerminal airTerminal in airTerminals)
             {
-                if (airTerminal.systemType == systemType)
+                if (airTerminal.systemType.Contains(systemType))
                     return airTerminal;
             }
             return null;
