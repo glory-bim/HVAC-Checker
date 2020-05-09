@@ -15,6 +15,10 @@ using Newtonsoft.Json.Linq;
 namespace HVAC_CheckEngine
 {
 
+  
+
+
+
     public class TreeNode
     {
         public long? Id { get; set; } = null;
@@ -74,6 +78,58 @@ namespace HVAC_CheckEngine
             return strPath;
         }
 
+
+        public static bool GetGlobalData()
+        {
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return false;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
+            m_dbConnection.Open();      
+
+            string sql = "select * from BuildingBCs Where key = ";
+            sql = sql + "'" + "建筑名称" + "'";
+              
+
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {            
+                string strBuildingType  = reader["value"].ToString();          
+                string[] chMsg = strBuildingType.Split(new char[] { '+' });
+                if(chMsg.Length == 3)
+                {
+                    if(chMsg[0] == "公共建筑")
+                    {
+                        globalData.buildingType = chMsg[0];
+                    }
+                    else if(chMsg[0] == "居住建筑")
+                    {
+                        if(chMsg[1] == "住宅建筑")
+                        {
+                            if (chMsg[2] == "公寓")
+                            {
+                                globalData.buildingType = "公共建筑";
+                            }
+                            else 
+                            {
+                                globalData.buildingType = "住宅";
+                            }
+                        }
+                        else if(chMsg[1] == "宿舍建筑")
+                        {
+                            globalData.buildingType = "公共建筑";
+                        }
+                    }                   
+                }
+                
+                return true;
+            }
+            return false;
+        }
+
         //1获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
         public static List<Room> GetRooms(string type, string name, double area, RoomPosition roomPosition)
         {
@@ -100,23 +156,7 @@ namespace HVAC_CheckEngine
             while (reader.Read())
             {
                 Room room = new Room(Convert.ToInt64(reader["Id"].ToString()));
-                room.name = reader["name"].ToString();
-                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
-                room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
-                //room.m_dMaxlength
-                //     room.m_dVolume
-                //    room.m_eRoomPosition
-                //    room.type
-                sql = "select * from Storeys where  Id =  ";
-                sql = sql + reader["storeyId"].ToString();
-                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                if (reader1.Read())
-                {
-                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                }
+                SetRoomPara(room);
                 rooms.Add(room);
             }
             //关闭连接
@@ -834,7 +874,7 @@ namespace HVAC_CheckEngine
             }
         }
 
-        //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花// 表里加type
+        //5找到大于一定长度的走道对象  double  “走道、走廊”    长度清华引擎 计算学院  张荷花// 表里加type//dLength单位为m
         public static List<Room> GetRoomsMoreThan(string roomType, double dLength)
         {
             List<Room> rooms = new List<Room>();
@@ -859,7 +899,7 @@ namespace HVAC_CheckEngine
                
                 OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
                 double dLengthOBB = obb.GetLength();
-                if (dLengthOBB > dLength)
+                if (dLengthOBB*0.001 > dLength)
                     rooms.Add(room);
             }
             //关闭连接
@@ -1918,10 +1958,10 @@ namespace HVAC_CheckEngine
             m_dbConnection.Close();
         }
 
+        //不知道 FromRoomId 和 ToRoomId 顺序所以  分别查询
         public static List<Door> GetDoorsBetweenTwoRooms(Room firstRoom, Room SecondRoom)
         {
             List<Door> doors = new List<Door>();
-
             if (!System.IO.File.Exists(m_archXdbPath))
                 return doors;
 
@@ -1958,7 +1998,6 @@ namespace HVAC_CheckEngine
                     doors.Add(door);
                 }
             }
-
 
             //关闭连接
             dbConnection.Close();
