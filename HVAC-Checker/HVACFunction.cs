@@ -543,6 +543,33 @@ namespace HVAC_CheckEngine
             window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
             window.area = Convert.ToDouble(readerWindows["Area"].ToString());
             window.effectiveArea= Convert.ToDouble(readerWindows["EffectiveArea"].ToString());
+            window.sFaceOrient = readerWindows["sFacingOrientation"].ToString();
+
+
+            if (!System.IO.File.Exists(m_archXdbPath))
+                return;
+
+            //创建一个连接
+            string connectionstr = @"data source =" + m_archXdbPath;
+            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
+            dbConnection.Open();
+
+            string sql = "select * from Storeys where  Id =  ";
+            sql = sql + readerWindows["storeyId"].ToString();
+            SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+            SQLiteDataReader reader1 = command1.ExecuteReader();
+
+            if (reader1.Read())
+            {
+                window.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
+            }
+
+            window.isExternalWindow = Convert.ToBoolean( readerWindows["IsOutsideComponent"].ToString());
+            //window.isSmokeExhaustWindow            
+           
+             
+
+
         }
 
         public static List<Window> GetWindowsInRoom(Room room)
