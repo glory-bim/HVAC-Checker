@@ -142,15 +142,24 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            // string sql = "select * from Spaces Where userLabel = ";
+      
 
 
-            string sql = "select * from Spaces Where userLabel like ";
+            string sql = "select * from Spaces Where name like ";
             sql += "'%" + type + "%'";
             sql += " and name like ";
             sql += "'%" + name + "%'";
-            sql += " and dArea > ";
-            sql += area;
+            sql += " and dArea > "+area;
+            sql += " and (";
+            List<string> roomPositionStrings = changeRoomPositonTypeToRoomPositionString(roomPosition);
+            string lastString = roomPositionStrings.Last();
+            foreach(string roomPostionString in roomPositionStrings)
+            {
+                sql += "position = '" + roomPostionString + "'";
+                if (roomPostionString != lastString)
+                    sql += " or";
+            }
+            sql += ")";
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             while (reader.Read())
@@ -886,7 +895,7 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string sql = "select * from Spaces Where userLabel like ";
+            string sql = "select * from Spaces Where name like ";
             sql +="'%" + roomType + "'%";
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
@@ -1069,7 +1078,7 @@ namespace HVAC_CheckEngine
                 double fireDistrictTopElevation = fireDistrictElevation + Convert.ToDouble(readerSpace["dHeight"].ToString());
                 sql = "select * from Ducts where StartElevation<"+fireDistrictElevation + " And EndElevation>" + fireDistrictElevation;
                 sql += " Or EndElevation>" + fireDistrictTopElevation+ " And StartElevation<" + fireDistrictTopElevation;
-                sql+= "Or EndElevation<" + fireDistrictTopElevation + "And StartElevation > " + fireDistrictElevation;
+                sql+= " Or EndElevation<" + fireDistrictTopElevation + " And StartElevation > " + fireDistrictElevation;
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
@@ -1077,7 +1086,7 @@ namespace HVAC_CheckEngine
                     Duct duct = new Duct(Convert.ToInt64(readerDucts["Id"].ToString()));
                     SetDuctPara(readerDucts, duct);
                     OBB obbDuct = GetOBB(readerDucts, dbConnectionHVAC);
-                    if (Convert.ToBoolean(readerDucts["IsVerticalDuct"].ToString()) && poly.Polygon2D_Contains_OBB(obbDuct))
+                    if (Convert.ToBoolean(readerDucts["IsVerticalDuct"].ToString()) && poly.IsLineInsidePolygon2D(duct.ptStart,duct.ptEnd))
                     {
                         
                         if (duct.StartElevation>fireDistrictElevation&&duct.EndElevation<fireDistrictElevation)
@@ -1769,7 +1778,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
 
-            string sql = "select * from Spaces Where userLabel like ";
+            string sql = "select * from Spaces Where name like ";
             sql += "'%走廊%'";
            
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
@@ -1866,12 +1875,8 @@ namespace HVAC_CheckEngine
                 room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString());
                 room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                if (reader["position"].Equals("地上房间"))
-                    room.m_eRoomPosition = RoomPosition.overground;
-                else if (reader["position"].Equals("地下室"))
-                    room.m_eRoomPosition = RoomPosition.underground;
-                else
-                    room.m_eRoomPosition = RoomPosition.semi_underground;
+                room.m_eRoomPosition=changeRoomPositonStringToRoomPositionType(reader["position"].ToString());
+               
                 room.m_dVolume = room.m_dArea * room.m_dHeight;
                 //room.m_dMaxlength
                 //     room.m_dVolume
@@ -1890,6 +1895,29 @@ namespace HVAC_CheckEngine
             }
 
             m_dbConnection.Close();
+        }
+
+        private static RoomPosition changeRoomPositonStringToRoomPositionType(string XdbRoomPosition)
+        {
+            if (XdbRoomPosition.Equals("地上房间"))
+                return RoomPosition.overground;
+            else if (XdbRoomPosition.Equals("地下室"))
+                return RoomPosition.underground;
+            else
+                return RoomPosition.semi_underground;
+        }
+
+        private static List<string> changeRoomPositonTypeToRoomPositionString(RoomPosition positon)
+        {
+            List<string> roomPositionStrings = new List<string>();
+            if ((positon&RoomPosition.overground)!=0)
+                roomPositionStrings.Add( "地上房间");
+            else if ((positon & RoomPosition.underground) != 0)
+                roomPositionStrings.Add("地下室");
+            else if ((positon & RoomPosition.semi_underground) != 0)
+                roomPositionStrings.Add("半地下室");
+
+            return roomPositionStrings;
         }
 
         public static void SetFireCompartmentPara(FireCompartment fireCompartment)
@@ -2730,10 +2758,10 @@ namespace HVAC_CheckEngine
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
-            string csSmokeCompartment = "防烟分区";
+
             string sql = "select * from Spaces where name like ";
-            sql += "'%" + sName + "%'";
-            sql += " and  userLabel =  "+ "'" + csSmokeCompartment + "'";
+            sql += "'%防烟分区%'";
+            sql += " and  userLabel = 面积 ";
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
@@ -2761,8 +2789,8 @@ namespace HVAC_CheckEngine
             dbConnection.Open();
 
             string sql = "select * from Spaces where name like ";
-            sql += "'%" + sName + "%'";
-            sql += "and  userLabel = '防火分区'";
+            sql += "'%防火分区%'";
+            sql += "and  userLabel = '面积'";
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -2790,7 +2818,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
 
-            string sql = "select * from Spaces where userLabel = '防火分区'";
+            string sql = "select * from Spaces where name like '%防火分区%' and userLabel = '面积'";
 
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -2959,7 +2987,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
             dbConnection.Open();
             string csSmokeCompartment = "防火分区";
-            string sql = "select * from Spaces where userLabel =  ";
+            string sql = "select * from Spaces where name like '%防火分区%' And userLabel = 面积 ";
             sql += csSmokeCompartment;
             SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
@@ -3087,7 +3115,7 @@ namespace HVAC_CheckEngine
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
-                sql = "select * from Spaces where userLabel = 防烟分区 ";
+                sql = "select * from Spaces where name like '%防烟分区%’And userLabel = 面积 ";
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
@@ -3217,7 +3245,7 @@ namespace HVAC_CheckEngine
             SQLiteConnection dbConnectionArch = new SQLiteConnection(connectionArchstr);
             dbConnectionArch.Open();          
             string strUserLabel = "防火";
-            string sql = "select * from Doors Where userLabel like ";
+            string sql = "select * from Doors Where name like ";
             sql += "'%" + strUserLabel + "%'";
 
             SQLiteCommand commandDoor = new SQLiteCommand(sql, dbConnectionArch);
@@ -3227,31 +3255,7 @@ namespace HVAC_CheckEngine
             {
                 Room room = new Room(Convert.ToInt64(readerDoor["FromRoomId"].ToString()));
 
-                sql = "select * from Space where  Id =  ";
-                sql = sql + readerDoor["FromRoomId"].ToString();
-                SQLiteCommand commandSpace = new SQLiteCommand(sql, dbConnectionArch);
-                SQLiteDataReader readerSpace = commandSpace.ExecuteReader();
-                if (readerSpace.Read())
-                {
-                    room.name = readerSpace["name"].ToString();
-                    room.m_dHeight = Convert.ToDouble(readerSpace["dHeight"].ToString());
-                    room.m_dArea = Convert.ToDouble(readerSpace["dArea"].ToString());
-                    room.m_iNumberOfPeople = Convert.ToInt32(readerSpace["nNumberOfPeople"].ToString());
-                    //room.m_dMaxlength
-                    //     room.m_dVolume
-                    //    room.m_eRoomPosition
-                    room.type = readerSpace["userLabel"].ToString();
-                    sql = "select * from Storeys where  Id =  ";
-                    sql = sql + readerSpace["storeyId"].ToString();
-                    SQLiteCommand command1 = new SQLiteCommand(sql, dbConnectionArch);
-                    SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                    if (reader1.Read())
-                    {
-                        room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                    }
-
-                }
+                SetRoomPara(room);
 
                 rooms.Add(room);
 
