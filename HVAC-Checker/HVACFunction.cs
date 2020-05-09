@@ -1791,7 +1791,7 @@ namespace HVAC_CheckEngine
                 // Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
                 OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
-                dLength = obb.GetLength();
+                dLength = obb.GetLength() * 0.001;
 
             }
             //关闭连接
@@ -1906,9 +1906,9 @@ namespace HVAC_CheckEngine
             if (reader.Read())
             {              
                 room.name = reader["name"].ToString();
-                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString())*0.001;
                 room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString());
+                room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString()) * 0.001;
                 room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
                 room.m_eRoomPosition=changeRoomPositonStringToRoomPositionType(reader["position"].ToString());
@@ -3115,7 +3115,7 @@ namespace HVAC_CheckEngine
         }
         public static List<SmokeCompartment> GetSmokeCompartmentsInRoom(Room room)
         {
-            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();
+            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();                            
 
             if (!System.IO.File.Exists(m_archXdbPath))
                 return smokeCompartments;
@@ -3131,19 +3131,10 @@ namespace HVAC_CheckEngine
 
             if (reader.Read())
             {
-                 room.name = reader["name"].ToString();
-                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                   Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+                SetRoomPara(room);
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
-                sql = "select * from Storeys where  Id =  ";
-                sql = sql + reader["storeyId"].ToString();
-                SQLiteCommand command1 = new SQLiteCommand(sql, dbArchConnection);
-                SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                if (reader1.Read())
-                {
-                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                }
+          
 
                 //AABB aabbRoom = GetAABB(reader, dbConnection);
 
@@ -3153,42 +3144,29 @@ namespace HVAC_CheckEngine
                 dbConnectionHVAC.Open();             
                 sql =  "select * from Spaces where name like '%防烟分区%' and userLabel = '面积'";
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbArchConnection);
-                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
-                while (readerAirTerminals.Read())
+                SQLiteDataReader readerSmokeCompartments = commandHVAC.ExecuteReader();
+                while (readerSmokeCompartments.Read())
                 {
-                    Room room1 = new Room(0);
-                     room1.name = readerAirTerminals["name"].ToString();
-                     room1.boundaryLoops = readerAirTerminals["boundaryLoops"].ToString();
-                       Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-                    sql = "select * from Storeys where  Id =  ";
-                    sql = sql + reader["storeyId"].ToString();
-                    SQLiteCommand command2 = new SQLiteCommand(sql, dbArchConnection);
-                    SQLiteDataReader reader2 = command2.ExecuteReader();
-
-                    if (reader2.Read())
-                    {
-                        room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                    }
+                    Room roomSmokeCompartment = new Room(Convert.ToInt32(readerSmokeCompartments["Id"].ToString()));                
+                    SetRoomPara(roomSmokeCompartment);
+                    Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+             
                     // AABB polySmokeCompartment = GetAABB(readerAirTerminals, dbConnection);
-                    if(room.m_iStoryNo == room1.m_iStoryNo)
+                    if(room.m_iStoryNo == roomSmokeCompartment.m_iStoryNo)
                     {                   
                         if (poly.Polygon2D_Contains_Polygon2D(polySmokeCompartment))
                         {
-                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerSmokeCompartments["Id"].ToString()));
                             SetSmokeCompartmentPara(smokeCompartment);
                             smokeCompartments.Add(smokeCompartment);
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, polySmokeCompartment))
                         {
-                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerSmokeCompartments["Id"].ToString()));
                             SetSmokeCompartmentPara(smokeCompartment);
                             smokeCompartments.Add(smokeCompartment);
                         }
-
-                    }
-
-                
-
+                    }               
                 }
             }
             //关闭连接
