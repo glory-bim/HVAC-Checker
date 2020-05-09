@@ -90,14 +90,14 @@ namespace HVAC_CheckEngine
             m_dbConnection.Open();      
 
             string sql = "select * from BuildingBCs Where key = ";
-            sql = sql + "'" + "建筑名称" + "'";
-              
+            sql = sql + "'" + "建筑名称" + "'";              
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {            
-                string strBuildingType  = reader["value"].ToString();          
+                string strBuildingType  = reader["value"].ToString();
+              
                 string[] chMsg = strBuildingType.Split(new char[] { '+' });
                 if(chMsg.Length == 3)
                 {
@@ -125,9 +125,19 @@ namespace HVAC_CheckEngine
                     }                   
                 }
                 
-                return true;
+               
             }
-            return false;
+
+            sql = "select * from BuildingBCs Where key = ";
+            sql = sql + "'" + "高度" + "'";
+
+            SQLiteCommand commandHeight = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader readerHeight = commandHeight.ExecuteReader();
+            if (readerHeight.Read())
+            {
+                globalData.buildingHeight = Convert.ToDouble(readerHeight["value"].ToString());
+            }
+            return true;             
         }
 
         //1获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
