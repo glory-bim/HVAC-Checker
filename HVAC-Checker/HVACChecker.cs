@@ -46,7 +46,7 @@ namespace HVAC_CheckEngine
             {
                 //如果房间中没有正压送风系统，则在审查结果中标注审核不通过，并将当前房间信息加到违规构建列表中
 
-                if (!assistantFunctions.isRoomHaveSomeSystem(room, "正压送风"))
+                if (!assistantFunctions.isRoomHaveSomeSystem(room, "加压送风"))
                 {
                     result.isPassCheck = false;
                     string remark = string.Empty;
@@ -504,7 +504,9 @@ namespace HVAC_CheckEngine
                 ductsCrossFireCompartment.addDuctsToDictionary( HVACFunction.GetDuctsCrossFireDistrict(fireCompartment));
             }
             List<string> systemTypes = new List<string>();
-            systemTypes.Add("通风");
+            systemTypes.Add("送风");
+            systemTypes.Add("排风");
+            systemTypes.Add("回风");
             systemTypes.Add("空调");
             //从风管集合ductsCrossFireCompartment中筛选出所有空调、通风管道
             ductsCrossFireCompartment = ductsCrossFireCompartment.filterSomeSystemTypeDuctsDictionary(systemTypes);
@@ -666,6 +668,39 @@ namespace HVAC_CheckEngine
             }
             return result;
         }
+
+
+        //建筑地下部分的防烟楼梯间前室及消防电梯前室，当无自然通风条件或自然通风不符合要求时，应采用机械加压送风系统。
+
+        //初始化审查结果
+        //获得所有的地下防烟楼梯间前室及消防电梯前室
+        //依次遍历每一个前室
+        //如果前室没有自然通风条件或可开启外窗面积小于2㎡且没有设置机械加压送风系统
+        //则在审查结果中标记审查不通过，并将前室加入到审查结果，在前室的备注中记录此前室未设置机械加压送风系统
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果批注中注明审查不通过相关内容
+        public static BimReview GB51251_2017_3_1_4()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB51251_2017", "3.1.2");
+           
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.1.2条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.1.2条条文规定。";
+            }
+            return result;
+        }
+
         //防烟楼梯间及其前室的机械加压送风系统的设置应符合下列规定：
         //1 建筑高度小于或等于50m的公共建筑、工业建筑和建筑高度小于或等于100m的住宅建筑，当采用独立前室且其仅有一个门与走道或房间相通时，
         //可仅在楼梯间设置机械加压送风系统；当独立前室有多个门时，楼梯间、独立前室应分别独立设置机械加压送风系统。
@@ -716,7 +751,7 @@ namespace HVAC_CheckEngine
                 {
                     //则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
                     result.isPassCheck = false;
-                    string remark = string.Empty;
+                    string remark = "楼梯间机械加压送风系统未独立设置";
                     result.AddViolationComponent(stairCase.Id.Value, stairCase.type, remark);
                 }
                 //     找到此楼梯间的所有前室atrias
@@ -728,7 +763,7 @@ namespace HVAC_CheckEngine
                    bool atriaPressureAirSystemIsIndependent = false;
                    if (atriaHaveMechanicalPressureSystem)
                        atriaPressureAirSystemIsIndependent = assistantFunctions.isAtriaPressureAirSystemIndependent(atria);
-                   bool atriaIsIndependent = atria.type == "独立前室";
+                   bool atriaIsIndependent = atria.type.Contains("独立前室");
                    int numberOfDoorsToCorridor = assistantFunctions.getDoorsToCorridorOfAtria(atria).Count;
                     //     如果建筑类型为公共建筑或工业建筑且建筑高度大于50m或建筑类型为住宅且建筑高度大于100m
                     //     或楼梯间没有设置机械加压送风系统或前室不为独立前室或独立前室通向走廊的
@@ -742,7 +777,7 @@ namespace HVAC_CheckEngine
                         {
                             //       则将审查结果标记为不通过，且把当前楼梯间记录进审查结果中。
                             result.isPassCheck = false;
-                            string remark = string.Empty;
+                            string remark = "前室没有设置机械加压送风系统";
                             result.AddViolationComponent(atria.Id.Value, atria.type, remark);
                             continue;
                         }
@@ -752,7 +787,7 @@ namespace HVAC_CheckEngine
                    if(atriaHaveMechanicalPressureSystem&&!atriaPressureAirSystemIsIndependent)
                    {
                         result.isPassCheck = false;
-                        string remark = string.Empty;
+                        string remark = "前室机械加压送风系统未独立设置";
                         result.AddViolationComponent(atria.Id.Value, atria.type, remark);
                    }
 
@@ -763,7 +798,7 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。";
+                result.comment = "设计满足规范GB51251_2017中第3.1.5条条文规定。请专家核对剪刀楼梯间机械加压送风系统是否独立设置。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
@@ -1110,6 +1145,38 @@ namespace HVAC_CheckEngine
             return result;         
         }
 
+
+
+        // 设置机械加压送风系统的避难层（间），尚应在外墙设置可开启外窗，其有效面积不应小于该避难层（间）地面面积的1％。有效面积的计算应符合本标准第4．3．5条的规定。
+
+        //获得所有避难层
+        //依次遍历每一个避难层
+        //如果避难层设置了机械加压送风系统
+        //获得避难层的所有可开启外窗
+        //如果可开其外窗面积小于避难层地面面积的1%，则将审查结果标记为不通过，并将当前避难层加入到审查结果中。
+        //如果审查通过
+        //则在审查结果批注中注明审查通过相关内容
+        //如果审查不通过
+        //则在审查结果中注明审查不通过的相关内容
+        public static BimReview GB51251_2017_3_3_12()
+        {
+            //初始化审查结果
+            BimReview result = new BimReview("GB51251_2017", "3.3.11");
+           
+            //如果审查通过
+            //则在审查结果批注中注明审查通过相关内容
+            if (result.isPassCheck)
+            {
+                result.comment = "设计满足规范GB51251_2017中第3.3.11条条文规定。";
+            }
+            //如果审查不通过
+            //则在审查结果中注明审查不通过的相关内容
+            else
+            {
+                result.comment = "设计不满足规范GB51251_2017中第3.3.11条条文规定。";
+            }
+            return result;
+        }
 
 
         //当建筑的机械排烟系统沿水平方向布置时，每个防火分区的机械排烟系统应独立设置。

@@ -867,7 +867,7 @@ namespace HVAC_CheckEngine
             List<Room> stairCases = new List<Room>();
             foreach (Room room in linkedRooms)
             {
-                if (room.type == "防烟楼梯间")
+                if (room.type.Contains( "防烟楼梯间"))
                     stairCases.Add(room);
             }
             linkedRooms = linkedRooms.exceptSameItems(stairCases);
