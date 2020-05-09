@@ -281,7 +281,7 @@ namespace HVAC_CheckEngine.Tests
         [TestMethod()]
         public void GB51251_2017_4_2_4Test1()
         {
-            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//3_2_3.XDB";
+            string strArchPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//424ARCH.XDB";
             string strHVACPath = "D://Users//zheny//Source//Repos//HVAC-Checker//HVAC-Checker//8_5_4-HVAC.XDB";
             HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
             BimReview result = new BimReview();

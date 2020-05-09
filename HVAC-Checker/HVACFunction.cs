@@ -3122,11 +3122,11 @@ namespace HVAC_CheckEngine
 
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
+            SQLiteConnection dbArchConnection = new SQLiteConnection(connectionstr);
+            dbArchConnection.Open();
             string sql = "select * from Spaces Where Id = ";
             sql = sql + room.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteCommand command = new SQLiteCommand(sql, dbArchConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
             if (reader.Read())
@@ -3137,7 +3137,7 @@ namespace HVAC_CheckEngine
 
                 sql = "select * from Storeys where  Id =  ";
                 sql = sql + reader["storeyId"].ToString();
-                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
+                SQLiteCommand command1 = new SQLiteCommand(sql, dbArchConnection);
                 SQLiteDataReader reader1 = command1.ExecuteReader();
 
                 if (reader1.Read())
@@ -3150,9 +3150,9 @@ namespace HVAC_CheckEngine
                 //创建一个连接
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                dbConnectionHVAC.Open();
-                sql = "select * from Spaces where name like '%防烟分区%’And userLabel = 面积 ";
-                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
+                dbConnectionHVAC.Open();             
+                sql =  "select * from Spaces where name like '%防烟分区%' and userLabel = '面积'";
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbArchConnection);
                 SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
                 while (readerAirTerminals.Read())
                 {
@@ -3162,7 +3162,7 @@ namespace HVAC_CheckEngine
                        Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
                     sql = "select * from Storeys where  Id =  ";
                     sql = sql + reader["storeyId"].ToString();
-                    SQLiteCommand command2 = new SQLiteCommand(sql, dbConnection);
+                    SQLiteCommand command2 = new SQLiteCommand(sql, dbArchConnection);
                     SQLiteDataReader reader2 = command2.ExecuteReader();
 
                     if (reader2.Read())
@@ -3192,7 +3192,7 @@ namespace HVAC_CheckEngine
                 }
             }
             //关闭连接
-            dbConnection.Close();
+            dbArchConnection.Close();
 
             return smokeCompartments;
         }
