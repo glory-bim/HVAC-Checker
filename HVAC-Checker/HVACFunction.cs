@@ -90,14 +90,14 @@ namespace HVAC_CheckEngine
             m_dbConnection.Open();      
 
             string sql = "select * from BuildingBCs Where key = ";
-            sql = sql + "'" + "建筑名称" + "'";
-              
+            sql = sql + "'" + "建筑名称" + "'";              
 
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
             if (reader.Read())
             {            
-                string strBuildingType  = reader["value"].ToString();          
+                string strBuildingType  = reader["value"].ToString();
+              
                 string[] chMsg = strBuildingType.Split(new char[] { '+' });
                 if(chMsg.Length == 3)
                 {
@@ -125,9 +125,19 @@ namespace HVAC_CheckEngine
                     }                   
                 }
                 
-                return true;
+               
             }
-            return false;
+
+            sql = "select * from BuildingBCs Where key = ";
+            sql = sql + "'" + "高度" + "'";
+
+            SQLiteCommand commandHeight = new SQLiteCommand(sql, m_dbConnection);
+            SQLiteDataReader readerHeight = commandHeight.ExecuteReader();
+            if (readerHeight.Read())
+            {
+                globalData.buildingHeight = Convert.ToDouble(readerHeight["value"].ToString());
+            }
+            return true;             
         }
 
         //1获取指定类型、指定名称、大于一定面积的地上或地下房间对象集合
@@ -1836,7 +1846,7 @@ namespace HVAC_CheckEngine
                 // Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
                 OBB obb = GetSpaceOBB(room.boundaryLoops, room.Id.ToString());
-                dLength = obb.GetLength();
+                dLength = obb.GetLength() * 0.001;
 
             }
             //关闭连接
@@ -1951,9 +1961,9 @@ namespace HVAC_CheckEngine
             if (reader.Read())
             {              
                 room.name = reader["name"].ToString();
-                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString());
+                room.m_dHeight = Convert.ToDouble(reader["dHeight"].ToString())*0.001;
                 room.m_dArea = Convert.ToDouble(reader["dArea"].ToString());
-                room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString());
+                room.m_dWidth = Convert.ToDouble(reader["dWidth"].ToString()) * 0.001;
                 room.m_iNumberOfPeople = Convert.ToInt32(reader["nNumberOfPeople"].ToString());
                 room.boundaryLoops = reader["boundaryLoops"].ToString();
                 room.m_eRoomPosition=changeRoomPositonStringToRoomPositionType(reader["position"].ToString());
@@ -3181,84 +3191,62 @@ namespace HVAC_CheckEngine
         }
         public static List<SmokeCompartment> GetSmokeCompartmentsInRoom(Room room)
         {
-            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();
+            List<SmokeCompartment> smokeCompartments = new List<SmokeCompartment>();                            
 
             if (!System.IO.File.Exists(m_archXdbPath))
                 return smokeCompartments;
 
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
-            SQLiteConnection dbConnection = new SQLiteConnection(connectionstr);
-            dbConnection.Open();
+            SQLiteConnection dbArchConnection = new SQLiteConnection(connectionstr);
+            dbArchConnection.Open();
             string sql = "select * from Spaces Where Id = ";
             sql = sql + room.Id;
-            SQLiteCommand command = new SQLiteCommand(sql, dbConnection);
+            SQLiteCommand command = new SQLiteCommand(sql, dbArchConnection);
             SQLiteDataReader reader = command.ExecuteReader();
 
             if (reader.Read())
             {
-                 room.name = reader["name"].ToString();
-                 room.boundaryLoops = reader["boundaryLoops"].ToString();
-                   Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+                SetRoomPara(room);
+                Polygon2D poly = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
 
-                sql = "select * from Storeys where  Id =  ";
-                sql = sql + reader["storeyId"].ToString();
-                SQLiteCommand command1 = new SQLiteCommand(sql, dbConnection);
-                SQLiteDataReader reader1 = command1.ExecuteReader();
-
-                if (reader1.Read())
-                {
-                    room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                }
+          
 
                 //AABB aabbRoom = GetAABB(reader, dbConnection);
 
                 //创建一个连接
                 connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
-                dbConnectionHVAC.Open();
-                sql = "select * from Spaces where name like '%防烟分区%’And userLabel = 面积 ";
-                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
-                SQLiteDataReader readerAirTerminals = commandHVAC.ExecuteReader();
-                while (readerAirTerminals.Read())
+                dbConnectionHVAC.Open();             
+                sql =  "select * from Spaces where name like '%防烟分区%' and userLabel = '面积'";
+                SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbArchConnection);
+                SQLiteDataReader readerSmokeCompartments = commandHVAC.ExecuteReader();
+                while (readerSmokeCompartments.Read())
                 {
-                    Room room1 = new Room(0);
-                     room1.name = readerAirTerminals["name"].ToString();
-                     room1.boundaryLoops = readerAirTerminals["boundaryLoops"].ToString();
-                       Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
-                    sql = "select * from Storeys where  Id =  ";
-                    sql = sql + reader["storeyId"].ToString();
-                    SQLiteCommand command2 = new SQLiteCommand(sql, dbConnection);
-                    SQLiteDataReader reader2 = command2.ExecuteReader();
-
-                    if (reader2.Read())
-                    {
-                        room.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
-                    }
+                    Room roomSmokeCompartment = new Room(Convert.ToInt32(readerSmokeCompartments["Id"].ToString()));                
+                    SetRoomPara(roomSmokeCompartment);
+                    Polygon2D polySmokeCompartment = GetSpaceBBox(room.boundaryLoops, room.Id.ToString());
+             
                     // AABB polySmokeCompartment = GetAABB(readerAirTerminals, dbConnection);
-                    if(room.m_iStoryNo == room1.m_iStoryNo)
+                    if(room.m_iStoryNo == roomSmokeCompartment.m_iStoryNo)
                     {                   
                         if (poly.Polygon2D_Contains_Polygon2D(polySmokeCompartment))
                         {
-                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerSmokeCompartments["Id"].ToString()));
                             SetSmokeCompartmentPara(smokeCompartment);
                             smokeCompartments.Add(smokeCompartment);
                         }
                         else if (Geometry_Utils_BBox.IsBBoxIntersectsBBox3D(poly, polySmokeCompartment))
                         {
-                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerAirTerminals["Id"].ToString()));
+                            SmokeCompartment smokeCompartment = new SmokeCompartment(Convert.ToInt64(readerSmokeCompartments["Id"].ToString()));
                             SetSmokeCompartmentPara(smokeCompartment);
                             smokeCompartments.Add(smokeCompartment);
                         }
-
-                    }
-
-                
-
+                    }               
                 }
             }
             //关闭连接
-            dbConnection.Close();
+            dbArchConnection.Close();
 
             return smokeCompartments;
         }
