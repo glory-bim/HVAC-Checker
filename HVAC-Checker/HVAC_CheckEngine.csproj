@@ -58,7 +58,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BCGL.Sharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="BCGL.Sharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\BCGL.Sharp.dll</HintPath>
     </Reference>
@@ -84,6 +84,8 @@
     <Reference Include="System.Data.SQLite.Linq, Version=1.0.112.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.112.2\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -113,6 +115,18 @@
     <Compile Include="FireDamper.cs" />
     <Compile Include="FlexibleShortTubes.cs" />
     <Compile Include="Floor.cs" />
+    <Compile Include="Form_Select.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_Select.Designer.cs">
+      <DependentUpon>Form_Select.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form_showResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_showResult.Designer.cs">
+      <DependentUpon>Form_showResult.cs</DependentUpon>
+    </Compile>
     <Compile Include="GasMeter.cs" />
     <Compile Include="GeometryFunction.cs" />
     <Compile Include="globalData.cs" />
@@ -143,6 +157,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="question.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Form_Select.resx">
+      <DependentUpon>Form_Select.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_showResult.resx">
+      <DependentUpon>Form_showResult.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -1836,6 +1836,31 @@ namespace UnitTestHVACChecker
                 Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
             }
         }
+
+        [TestMethod]
+        public void test_notpass_XDB()
+        {
+            globalData.buildingHeight = 50;
+            globalData.buildingType = "公共建筑";
+            //arrange
+            string strArchPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB51251_2017_3_2_1\建筑模型.XDB";
+            string strHVACPath = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\xdb\GB51251_2017_3_2_1\机电模型.XDB";
+            HVACFunction hvacFunction = new HVACFunction(strArchPath, strHVACPath);
+
+            string comment = "可开启外窗设置不满足规范GB51251_2017中第3.2.1条条文规定。请专家复核楼梯间中是否有其他开口满足规范要求。";
+            //List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+
+
+
+            //act
+            BimReview result = new BimReview();
+            result = HVACChecker.GB51251_2017_3_2_1();
+
+            //assert
+            Assert.AreEqual(comment, result.comment);
+            Assert.IsFalse(result.isPassCheck);
+            //Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+        }
     }
 
     [TestClass]

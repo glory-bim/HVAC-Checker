@@ -25,5 +25,7 @@ namespace HVAC_CheckEngine
         public double? StartElevation { get; set; } = null;
 
         public double? EndElevation { get; set; } = null;
+
+        public bool? isVertical { get; set; } = null;
     }
 }
