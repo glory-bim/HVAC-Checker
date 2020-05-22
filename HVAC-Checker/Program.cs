@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.IO;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 
 namespace HVAC_CheckEngine
@@ -31,6 +32,7 @@ namespace HVAC_CheckEngine
             Form_showResult form_showResult = new Form_showResult();
             form_showResult.showResult(result);
             form_showResult.ShowDialog();
+
         }
 
         private static void initialStandardTable()

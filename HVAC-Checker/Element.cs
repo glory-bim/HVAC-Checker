@@ -14,6 +14,8 @@ namespace HVAC_CheckEngine
         }
 
         public long? Id { get; set; } = null;
+
+        public long? revitId { get; set; } = null;
         public int? m_iStoryNo { get; set; } = null;
     }
 }

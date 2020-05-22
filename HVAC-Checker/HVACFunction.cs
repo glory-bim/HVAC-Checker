@@ -313,6 +313,7 @@ namespace HVAC_CheckEngine
 
         private static void SetAirterminalPara(ref AirTerminal airTerminal, SQLiteDataReader readerAirTerminals)
         {
+            airTerminal.revitId = Convert.ToInt64(readerAirTerminals["extendProperty"].ToString());
             airTerminal.airVelocity = Convert.ToDouble(readerAirTerminals["AirVelocity"].ToString());
             airTerminal.systemType = readerAirTerminals["SystemName"].ToString();
             airTerminal.width= Convert.ToDouble(readerAirTerminals["AirTerminalWidth"].ToString());
@@ -498,7 +499,7 @@ namespace HVAC_CheckEngine
 
         private static void SetBoilerPara(Boiler boiler, SQLiteDataReader readerBoiler)
         {
-           
+            boiler.revitId = Convert.ToInt64(readerBoiler["extendProperty"].ToString());
             boiler.type = readerBoiler["BoilerType"].ToString();
             boiler.thermalPower = Convert.ToDouble(readerBoiler["ThermalPower"].ToString());
             boiler.ThermalEfficiency = Convert.ToDouble(readerBoiler["ThermalEfficiency"].ToString());
@@ -547,7 +548,7 @@ namespace HVAC_CheckEngine
 
         private static void SetWindowPara(Window window, SQLiteDataReader readerWindows)
         {
-
+            window.revitId = window.Id;
             window.isExternalWindow = Convert.ToBoolean(readerWindows["IsOutsideComponent"].ToString());
             window.area = Convert.ToDouble(readerWindows["Area"].ToString());
             window.effectiveArea= Convert.ToDouble(readerWindows["EffectiveArea"].ToString());
@@ -1121,9 +1122,9 @@ namespace HVAC_CheckEngine
                 dbConnectionHVAC.Open();
                 double fireDistrictElevation = getRoomElevation(fireDistrict);
                 double fireDistrictTopElevation = fireDistrictElevation + Convert.ToDouble(readerSpace["dHeight"].ToString());
-                sql = "select * from Ducts where StartElevation<"+fireDistrictElevation;
-                sql+= " and EndElevation>" + fireDistrictElevation;
-                sql += " or StartElevation>" + fireDistrictElevation + " and EndElevation<" + fireDistrictTopElevation;
+                sql = "select * from Ducts where BottomElevation<" + fireDistrictElevation;
+                sql+= " and TopElevation>" + fireDistrictElevation;
+                sql += " or BottomElevation>" + fireDistrictElevation + " and TopElevation<" + fireDistrictTopElevation;
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
@@ -1134,15 +1135,15 @@ namespace HVAC_CheckEngine
                     if (Convert.ToBoolean(readerDucts["IsVerticalDuct"]) && poly.IsPointInPolygon2D(duct.ptStart))
                     {
 
-                        if (duct.StartElevation < fireDistrictElevation && duct.EndElevation > fireDistrictElevation)
+                        if (duct.BottomElevation < fireDistrictElevation && duct.TopElevation > fireDistrictElevation)
                         {
                             if (!ducts.ContainsKey(duct))
                             {
                                 ducts.Add(duct, new List<PointInt>());
                             }
                             double elevationOfFireDistrict = getRoomElevation(fireDistrict);
-                            double H_2 = duct.EndElevation.Value - elevationOfFireDistrict;
-                            double H_1 = elevationOfFireDistrict - duct.StartElevation.Value;
+                            double H_2 = duct.TopElevation.Value - elevationOfFireDistrict;
+                            double H_1 = elevationOfFireDistrict - duct.BottomElevation.Value;
                             double Zmax = duct.ptStart.Z > duct.ptEnd.Z ? duct.ptStart.Z : duct.ptEnd.Z;
                             double Zmin = duct.ptStart.Z < duct.ptEnd.Z ? duct.ptStart.Z : duct.ptEnd.Z;
                             double Z = (Zmax * H_1 + Zmin * H_2) / (H_1 + H_2);
@@ -1189,8 +1190,7 @@ namespace HVAC_CheckEngine
                 string connectionstr = @"data source =" + m_hvacXdbPath;
                 SQLiteConnection dbConnectionHVAC = new SQLiteConnection(connectionstr);
                 dbConnectionHVAC.Open();
-                string sql = "select * from Ducts where StoreyNo=";
-                sql += movementJoint.m_iStoryNo.ToString();
+                string sql = "select * from Ducts";
                 SQLiteCommand commandHVAC = new SQLiteCommand(sql, dbConnectionHVAC);
                 SQLiteDataReader readerDucts = commandHVAC.ExecuteReader();
                 while (readerDucts.Read())
@@ -1285,6 +1285,7 @@ namespace HVAC_CheckEngine
 
         private static void SetDuctPara(SQLiteDataReader ductReader,Duct duct)
         {
+            duct.revitId = Convert.ToInt64(ductReader["extendProperty"].ToString());
             string strVector = ductReader["DuctStartPoint"].ToString();
             int index = strVector.IndexOf(":");
             int index_s = strVector.LastIndexOf(",\"Y");
@@ -1332,8 +1333,8 @@ namespace HVAC_CheckEngine
 
             duct.airVelocity = Convert.ToDouble(ductReader["Velocity"].ToString());
             duct.systemType = ductReader["SystemName"].ToString();
-            duct.StartElevation= Convert.ToDouble(ductReader["StartElevation"].ToString());
-            duct.EndElevation = Convert.ToDouble(ductReader["EndElevation"].ToString());
+            duct.BottomElevation= Convert.ToDouble(ductReader["BottomElevation"].ToString());
+            duct.TopElevation = Convert.ToDouble(ductReader["TopElevation"].ToString());
             duct.isVertical= Convert.ToBoolean(ductReader["IsVerticalDuct"]);
             duct.m_iStoryNo= Convert.ToInt32(ductReader["StoreyNo"].ToString());
         }
@@ -1958,6 +1959,7 @@ namespace HVAC_CheckEngine
             sql = sql + room.Id;
             SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader = command.ExecuteReader();
+            room.revitId = room.Id;
             if (reader.Read())
             {              
                 room.name = reader["name"].ToString();
@@ -2015,7 +2017,7 @@ namespace HVAC_CheckEngine
         {
             if (!System.IO.File.Exists(m_archXdbPath))
                 return;
-
+            fireCompartment.revitId = fireCompartment.Id;
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
@@ -2049,7 +2051,7 @@ namespace HVAC_CheckEngine
         {
             if (!System.IO.File.Exists(m_archXdbPath))
                 return;
-
+            smokeCompartment.revitId = smokeCompartment.Id;
             //创建一个连接
             string connectionstr = @"data source =" + m_archXdbPath;
             SQLiteConnection m_dbConnection = new SQLiteConnection(connectionstr);
@@ -2403,6 +2405,7 @@ namespace HVAC_CheckEngine
         }
         private static void SetAbsorptionChillerPara(AbsorptionChiller absorptionChiller, SQLiteDataReader readerAbsorptionChiller)
         {
+            absorptionChiller.revitId = Convert.ToInt64(readerAbsorptionChiller["extendProperty"].ToString());
             absorptionChiller.coolingCoefficient = Convert.ToDouble(readerAbsorptionChiller["PerformanceRate"].ToString());
             absorptionChiller.heatingCoefficient = Convert.ToDouble(readerAbsorptionChiller["HeatingPerformanceRate"].ToString());
             absorptionChiller.m_iStoryNo = Convert.ToInt32(readerAbsorptionChiller["StoreyNo"].ToString());
@@ -2433,6 +2436,7 @@ namespace HVAC_CheckEngine
 
         private static void SetChillerPara(Chiller chiller, SQLiteDataReader readerChiller)
         {
+            chiller.revitId = Convert.ToInt64(readerChiller["extendProperty"].ToString());
             chiller.capacity = Convert.ToDouble(readerChiller["CoolingCapacity"].ToString());
             chiller.coolingType = readerChiller["CoolingType"].ToString();
             chiller.COP = Convert.ToDouble(readerChiller["COP"].ToString());
@@ -2466,6 +2470,7 @@ namespace HVAC_CheckEngine
 
         private static void SetRoofTopAHUPara(RoofTopAHU roofTopAHU, SQLiteDataReader readerRoofTopAHU)
         {
+            roofTopAHU.revitId = Convert.ToInt64(readerRoofTopAHU["extendProperty"].ToString());
             roofTopAHU.capacity = Convert.ToDouble(readerRoofTopAHU["CoolingCapacity"].ToString());
             roofTopAHU.coolingType = readerRoofTopAHU["CoolingType"].ToString();
             roofTopAHU.EER = Convert.ToDouble(readerRoofTopAHU["EER"].ToString());
@@ -2496,6 +2501,7 @@ namespace HVAC_CheckEngine
 
         private static void SetOutDoorUnitPara(OutDoorUnit outDoorUnit, SQLiteDataReader readerOutDoorUnit)
         {
+            outDoorUnit.revitId = Convert.ToInt64(readerOutDoorUnit["extendProperty"].ToString());
             outDoorUnit.capacity = Convert.ToDouble(readerOutDoorUnit["CoolingCapacity"].ToString());
             outDoorUnit.coolingType = readerOutDoorUnit["CoolingType"].ToString();
             outDoorUnit.EER = Convert.ToDouble(readerOutDoorUnit["EER"].ToString());
@@ -2943,7 +2949,7 @@ namespace HVAC_CheckEngine
             sql +=  reader["storeyId"].ToString();
             SQLiteCommand command1 = new SQLiteCommand(sql, m_dbConnection);
             SQLiteDataReader reader1 = command1.ExecuteReader();
-
+            movementJoint.revitId = movementJoint.Id;
             if (reader1.Read())
             {
                 movementJoint.m_iStoryNo = Convert.ToInt32(reader1["storeyNo"].ToString());
@@ -3343,7 +3349,7 @@ namespace HVAC_CheckEngine
 
             while (readerDoor.Read())
             {
-                if (readerDoor["FromRoomId"] != null)
+                if (readerDoor["FromRoomId"].ToString().Length>0)
                 {
                     Room fromRoom = new Room(Convert.ToInt64(readerDoor["FromRoomId"].ToString()));
                     SetRoomPara(fromRoom);

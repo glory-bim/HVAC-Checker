@@ -10,7 +10,8 @@ namespace HVAC_CheckEngine
 	{
 		public long Id;       //构件id
 		public string type;   //构件类型
-		public string remark;//备注
+		public int storeyId;    //楼层id
+
 	};
 
 
@@ -29,19 +30,22 @@ namespace HVAC_CheckEngine
 			isPassCheck = true;
 			violationComponents = new List<ComponentAnnotation>();
 		}
-		public void AddViolationComponent(long Id,string componentType,string remark)
+		public void AddViolationComponent(long Id,string componentType,int storeyId)
 		{
 			ComponentAnnotation componentAnnotation = new ComponentAnnotation();
 			componentAnnotation.Id = Id;
 			componentAnnotation.type = componentType;
-			componentAnnotation.remark = remark;
+			componentAnnotation.storeyId = storeyId;
+
 			if (violationComponents == null)
 			{
 				violationComponents = new List<ComponentAnnotation>();
 			}
 			violationComponents.Add(componentAnnotation);
 		}
-		
+
+	
+
 		public List<ComponentAnnotation> violationComponents;  // 违规构建【无】	
 	};
 	class CheckResult

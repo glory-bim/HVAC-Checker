@@ -122,15 +122,15 @@
             this.button_ArchXDB = new System.Windows.Forms.Button();
             this.textBox_ArchXDB = new System.Windows.Forms.TextBox();
             this.groupBox_MechXDB = new System.Windows.Forms.GroupBox();
-            this.textBox_MechXDB = new System.Windows.Forms.TextBox();
             this.button_MechXBD = new System.Windows.Forms.Button();
+            this.textBox_MechXDB = new System.Windows.Forms.TextBox();
             this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.treeView_select = new System.Windows.Forms.TreeView();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.textBox_standardCode = new System.Windows.Forms.TextBox();
-            this.label_standardCode = new System.Windows.Forms.Label();
             this.textBox_itemCode = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.label_standardCode = new System.Windows.Forms.Label();
+            this.textBox_standardCode = new System.Windows.Forms.TextBox();
             this.button_Ok = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox_MechXDB.SuspendLayout();
@@ -143,9 +143,11 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.button_ArchXDB);
             this.groupBox1.Controls.Add(this.textBox_ArchXDB);
-            this.groupBox1.Location = new System.Drawing.Point(49, 46);
+            this.groupBox1.Location = new System.Drawing.Point(74, 69);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(703, 76);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Size = new System.Drawing.Size(1054, 114);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "建筑XDB路径";
@@ -153,9 +155,10 @@
             // button_ArchXDB
             // 
             this.button_ArchXDB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_ArchXDB.Location = new System.Drawing.Point(572, 22);
+            this.button_ArchXDB.Location = new System.Drawing.Point(858, 33);
+            this.button_ArchXDB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_ArchXDB.Name = "button_ArchXDB";
-            this.button_ArchXDB.Size = new System.Drawing.Size(111, 37);
+            this.button_ArchXDB.Size = new System.Drawing.Size(166, 56);
             this.button_ArchXDB.TabIndex = 2;
             this.button_ArchXDB.Text = "选择文件";
             this.button_ArchXDB.UseVisualStyleBackColor = true;
@@ -165,10 +168,11 @@
             // 
             this.textBox_ArchXDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_ArchXDB.Location = new System.Drawing.Point(29, 31);
+            this.textBox_ArchXDB.Location = new System.Drawing.Point(44, 46);
+            this.textBox_ArchXDB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox_ArchXDB.Name = "textBox_ArchXDB";
             this.textBox_ArchXDB.ReadOnly = true;
-            this.textBox_ArchXDB.Size = new System.Drawing.Size(515, 21);
+            this.textBox_ArchXDB.Size = new System.Drawing.Size(770, 28);
             this.textBox_ArchXDB.TabIndex = 1;
             // 
             // groupBox_MechXDB
@@ -177,33 +181,37 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox_MechXDB.Controls.Add(this.button_MechXBD);
             this.groupBox_MechXDB.Controls.Add(this.textBox_MechXDB);
-            this.groupBox_MechXDB.Location = new System.Drawing.Point(49, 163);
+            this.groupBox_MechXDB.Location = new System.Drawing.Point(74, 244);
+            this.groupBox_MechXDB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox_MechXDB.Name = "groupBox_MechXDB";
-            this.groupBox_MechXDB.Size = new System.Drawing.Size(703, 71);
+            this.groupBox_MechXDB.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox_MechXDB.Size = new System.Drawing.Size(1054, 106);
             this.groupBox_MechXDB.TabIndex = 1;
             this.groupBox_MechXDB.TabStop = false;
             this.groupBox_MechXDB.Text = "机电XDB路径";
+            // 
+            // button_MechXBD
+            // 
+            this.button_MechXBD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_MechXBD.Location = new System.Drawing.Point(858, 30);
+            this.button_MechXBD.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button_MechXBD.Name = "button_MechXBD";
+            this.button_MechXBD.Size = new System.Drawing.Size(166, 60);
+            this.button_MechXBD.TabIndex = 2;
+            this.button_MechXBD.Text = "选择文件";
+            this.button_MechXBD.UseVisualStyleBackColor = true;
+            this.button_MechXBD.Click += new System.EventHandler(this.button_MechXBD_Click);
             // 
             // textBox_MechXDB
             // 
             this.textBox_MechXDB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_MechXDB.Location = new System.Drawing.Point(29, 30);
+            this.textBox_MechXDB.Location = new System.Drawing.Point(44, 45);
+            this.textBox_MechXDB.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox_MechXDB.Name = "textBox_MechXDB";
             this.textBox_MechXDB.ReadOnly = true;
-            this.textBox_MechXDB.Size = new System.Drawing.Size(515, 21);
+            this.textBox_MechXDB.Size = new System.Drawing.Size(770, 28);
             this.textBox_MechXDB.TabIndex = 2;
-            // 
-            // button_MechXBD
-            // 
-            this.button_MechXBD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_MechXBD.Location = new System.Drawing.Point(572, 20);
-            this.button_MechXBD.Name = "button_MechXBD";
-            this.button_MechXBD.Size = new System.Drawing.Size(111, 40);
-            this.button_MechXBD.TabIndex = 2;
-            this.button_MechXBD.Text = "选择文件";
-            this.button_MechXBD.UseVisualStyleBackColor = true;
-            this.button_MechXBD.Click += new System.EventHandler(this.button_MechXBD_Click);
             // 
             // openFileDialog
             // 
@@ -215,7 +223,8 @@
             this.treeView_select.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.treeView_select.Location = new System.Drawing.Point(19, 32);
+            this.treeView_select.Location = new System.Drawing.Point(28, 48);
+            this.treeView_select.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.treeView_select.Name = "treeView_select";
             treeNode1.Name = "8_5_1";
             treeNode1.Text = "8_5_1";
@@ -324,7 +333,7 @@
             treeNode44,
             treeNode47,
             treeNode49});
-            this.treeView_select.Size = new System.Drawing.Size(317, 215);
+            this.treeView_select.Size = new System.Drawing.Size(474, 320);
             this.treeView_select.TabIndex = 3;
             this.treeView_select.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
             // 
@@ -338,55 +347,62 @@
             this.groupBox2.Controls.Add(this.label_standardCode);
             this.groupBox2.Controls.Add(this.textBox_standardCode);
             this.groupBox2.Controls.Add(this.treeView_select);
-            this.groupBox2.Location = new System.Drawing.Point(49, 281);
+            this.groupBox2.Location = new System.Drawing.Point(74, 422);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(701, 270);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Size = new System.Drawing.Size(1052, 405);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "册数条文选择";
-            // 
-            // textBox_standardCode
-            // 
-            this.textBox_standardCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_standardCode.Location = new System.Drawing.Point(485, 32);
-            this.textBox_standardCode.Name = "textBox_standardCode";
-            this.textBox_standardCode.Size = new System.Drawing.Size(177, 21);
-            this.textBox_standardCode.TabIndex = 4;
-            // 
-            // label_standardCode
-            // 
-            this.label_standardCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_standardCode.AutoSize = true;
-            this.label_standardCode.Location = new System.Drawing.Point(409, 35);
-            this.label_standardCode.Name = "label_standardCode";
-            this.label_standardCode.Size = new System.Drawing.Size(65, 12);
-            this.label_standardCode.TabIndex = 5;
-            this.label_standardCode.Text = "规范编号：";
+            this.groupBox2.Text = "测试条文选择";
             // 
             // textBox_itemCode
             // 
             this.textBox_itemCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_itemCode.Location = new System.Drawing.Point(485, 113);
+            this.textBox_itemCode.Location = new System.Drawing.Point(728, 170);
+            this.textBox_itemCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox_itemCode.Name = "textBox_itemCode";
-            this.textBox_itemCode.Size = new System.Drawing.Size(177, 21);
+            this.textBox_itemCode.Size = new System.Drawing.Size(264, 28);
             this.textBox_itemCode.TabIndex = 6;
             // 
             // label1
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(409, 116);
+            this.label1.Location = new System.Drawing.Point(614, 174);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(65, 12);
+            this.label1.Size = new System.Drawing.Size(98, 18);
             this.label1.TabIndex = 5;
             this.label1.Text = "条文编号：";
+            // 
+            // label_standardCode
+            // 
+            this.label_standardCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_standardCode.AutoSize = true;
+            this.label_standardCode.Location = new System.Drawing.Point(614, 52);
+            this.label_standardCode.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_standardCode.Name = "label_standardCode";
+            this.label_standardCode.Size = new System.Drawing.Size(98, 18);
+            this.label_standardCode.TabIndex = 5;
+            this.label_standardCode.Text = "规范编号：";
+            // 
+            // textBox_standardCode
+            // 
+            this.textBox_standardCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_standardCode.Location = new System.Drawing.Point(728, 48);
+            this.textBox_standardCode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBox_standardCode.Name = "textBox_standardCode";
+            this.textBox_standardCode.Size = new System.Drawing.Size(264, 28);
+            this.textBox_standardCode.TabIndex = 4;
             // 
             // button_Ok
             // 
             this.button_Ok.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_Ok.Location = new System.Drawing.Point(661, 557);
+            this.button_Ok.Location = new System.Drawing.Point(992, 836);
+            this.button_Ok.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.button_Ok.Name = "button_Ok";
-            this.button_Ok.Size = new System.Drawing.Size(91, 29);
+            this.button_Ok.Size = new System.Drawing.Size(136, 44);
             this.button_Ok.TabIndex = 5;
             this.button_Ok.Text = "确定";
             this.button_Ok.UseVisualStyleBackColor = true;
@@ -394,13 +410,14 @@
             // 
             // Form_Select
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(821, 598);
+            this.ClientSize = new System.Drawing.Size(1232, 897);
             this.Controls.Add(this.button_Ok);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox_MechXDB);
             this.Controls.Add(this.groupBox1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form_Select";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form_Select";

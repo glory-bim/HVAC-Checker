@@ -31,9 +31,19 @@ namespace HVAC_CheckEngine
                 ++index;
                 text += "构件"+ index+":\n";
                 text += "       构件ID：" + annotation.Id + "\n";
-                text += "       批注：" + annotation.remark+ "\n\n";
+                text += "       构件类型：" + annotation.type + "\n\n";
             }
             richTextBox.Text = text;
+        }
+
+        private void richTextBox_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form_showResult_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
