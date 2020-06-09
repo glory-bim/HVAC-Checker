@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Messaging;
 using BCGL.Sharp;
+using Newtonsoft.Json;
 
 namespace HVAC_CheckEngine
 {
@@ -148,11 +150,36 @@ namespace HVAC_CheckEngine
                 return true;
         }
 
+        public static bool isAnteroomSatisfyVentilateRequirement(Room anterRoom)
+        {
+            //获得前室的所有窗户对象的集合
+            List<Window> windows = HVACFunction.GetWindowsInRoom(anterRoom);
+            //筛选出所有排烟窗
+            List<Window> outerOpenableWindows = assistantFunctions.filtrateOuterOpenableWindows(windows);
+            //如果有排烟窗，则计算排烟窗的总有效面积
+            if (outerOpenableWindows.Count > 0)
+            {
+                double totalAreaOfWindows = assistantFunctions.calculateTotalEffectiveAreaOfWindows(outerOpenableWindows);
+                //如果前室为独立前室或消防电梯前室且前室排烟窗总有效面积小于2㎡
+                if ((anterRoom.type.Contains("独立前室") || anterRoom.type.Contains("消防电梯前室")) && totalAreaOfWindows >= 2)
+                {
+                    return true;
+                }
+                //如果前室为合用前室或共用前室且前室排烟窗总有效面积小于3㎡
+                else if (anterRoom.type.Contains("共用前室") && totalAreaOfWindows >= 3)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static bool isRegionHaveSomeSystem(Region region, string systemName)
         {
             if (region == null || systemName == null)
                 throw new ArgumentException();
-            List<Room> nonPublicRooms = region.rooms;
+            List<Room> nonPublicRooms = new List<Room>();
+            nonPublicRooms.AddRange( region.rooms);
             nonPublicRooms.exceptPublicRooms();
             Room corridor = getCorridorOfConnectedRegion(region);
             if (isRoomHaveSomeSystem(corridor, "排烟"))
@@ -185,14 +212,13 @@ namespace HVAC_CheckEngine
         {
             if (items == null || exceptedItems == null)
                 throw new ArgumentException();
-            List<T> items_copy = new List<T>();
-            items_copy.AddRange(items);
+ 
             foreach (T item in exceptedItems)
             {
-                T aimItem = items_copy.findItem(item);
-                items_copy.Remove(aimItem);
+                T aimItem = items.findItem(item);
+                items.Remove(aimItem);
             }
-            return items_copy;
+            return items;
         }
 
         public static List<T> getCommonItems<T>(this List<T> firstItems, List<T> secondItems) where T : Element
@@ -265,7 +291,7 @@ namespace HVAC_CheckEngine
 
             List<string> publicRooms = new List<string>(PublicRooms);
 
-            return publicRooms.Exists(type => type == room.type);
+            return publicRooms.Exists(type => room.type.Contains(type));
 
         }
 
@@ -344,6 +370,134 @@ namespace HVAC_CheckEngine
                     smokeExhaustWindows.Add(window);
             }
             return smokeExhaustWindows;
+        }
+
+        public static List<Fan> filtrateSomkeExhaustFans(List<Fan> fans)
+        {
+            List<Fan> smokeExhaustFans = new List<Fan>();
+            List<violateMessage> violateMessages = new List<violateMessage>();
+            foreach (Fan fan in fans)
+            {
+                try
+                {
+                    if (isExhaustSomkeFan(fan))
+                        smokeExhaustFans.Add(fan);
+                }
+                catch(ArgumentException e)
+                {
+                    violateMessage message = JsonConvert.DeserializeObject<violateMessage>(e.Message);
+                    violateMessages.Add(message);
+                }
+            }
+            if (violateMessages.Count > 0)
+                throw new ArgumentException(JsonConvert.SerializeObject(violateMessages));
+            return smokeExhaustFans;
+        }
+
+       
+
+        public static List<Fan> filtratePressureFans(List<Fan> fans)
+        {
+            List<Fan> pressureFans = new List<Fan>();
+            List<violateMessage> violateMessages = new List<violateMessage>();
+            foreach (Fan fan in fans)
+            {
+                try
+                {
+                    if (isPressuerFan(fan))
+                        pressureFans.Add(fan);
+                }
+                catch (ArgumentException e)
+                {
+                    violateMessage message = JsonConvert.DeserializeObject<violateMessage>(e.Message);
+                    violateMessages.Add(message);
+                }
+            }
+            if (violateMessages.Count > 0)
+                throw new ArgumentException(JsonConvert.SerializeObject(violateMessages));
+            return pressureFans;
+        }
+
+        public static bool isDedicatedEquipmentRoomOfFan(Room room,Fan judgedFan)
+        {
+            if (room == null || judgedFan == null)
+                throw new ArgumentException();
+            if (!room.type.Contains("设备用房"))
+                return false;
+            List<Element> boilers = HVACFunction.getCertainEquipmentsInRoom(room, "Boilers");
+            if (boilers.Count > 0)
+                return false;
+            List<Element> chillers = HVACFunction.getCertainEquipmentsInRoom(room, "Chillers");
+            if (chillers.Count > 0)
+                return false;
+            List<Element> outDoorUnits = HVACFunction.getCertainEquipmentsInRoom(room, "OutDoorUnits");
+            if (outDoorUnits.Count > 0)
+                return false;
+            List<Element> assemblyAHUs = HVACFunction.getCertainEquipmentsInRoom(room, "AssemblyAHUs");
+            if (assemblyAHUs.Count > 0)
+                return false;
+            List<Element> absorptionChillers = HVACFunction.getCertainEquipmentsInRoom(room, "AbsorptionChillers");
+            if (absorptionChillers.Count > 0)
+                return false;
+
+            List<Element> fans = HVACFunction.getCertainEquipmentsInRoom(room, "HVACFans");
+            bool isJudgedFanIsPressureFan = isPressuerFan(judgedFan);
+            bool isJudgedFanIsExhaustSmokeFan = isExhaustSomkeFan(judgedFan);
+            foreach (Fan fan in fans)
+            {
+                if (isJudgedFanIsPressureFan && !isPressuerFan(fan))
+                    return false;
+                else if (isJudgedFanIsExhaustSmokeFan && !isExhaustSomkeFan(judgedFan))
+                    return false;
+            }
+
+            return true;
+
+        }
+
+        public static bool isExhaustSomkeFan(Fan fan)
+        {
+            List<AirTerminal> airTerminals = HVACFunction.GetInletsOfFan(fan);
+            if (airTerminals.Count <= 0)
+            {
+                violateMessage message = new violateMessage();
+                message.revitId = fan.revitId.Value;
+                message.elementId = fan.Id.Value;
+                message.storeyId = fan.m_iStoryNo.Value;
+                message.message = "风机未连接排风口";
+                throw new ArgumentException(JsonConvert.SerializeObject(message));
+            }
+                
+
+            return airTerminals[0].systemType.Contains("排烟");
+        }
+
+        public static bool isPressuerFan(Fan fan)
+        {
+            List<AirTerminal> airTerminals = HVACFunction.GetOutletsOfFan(fan);
+            if (airTerminals.Count <= 0)
+            {
+                violateMessage message = new violateMessage();
+                message.revitId = fan.revitId.Value;
+                message.elementId = fan.Id.Value;
+                message.storeyId = fan.m_iStoryNo.Value;
+                message.message = "风机未连接送风口";
+                throw new ArgumentException(JsonConvert.SerializeObject(message));
+            }
+                
+
+            return airTerminals[0].systemType.Contains("加压送风");
+        }
+
+        public static List<Window> filtrateOuterOpenableWindows(List<Window> windows)
+        {
+            List<Window> outerOpenableWindows = new List<Window>();
+            foreach (Window window in windows)
+            {
+                if (window.isExternalWindow.Value&&window.effectiveArea.Value>0)
+                    outerOpenableWindows.Add(window);
+            }
+            return outerOpenableWindows;
         }
 
         public static Dictionary<string,List<Window>> sortWindowsByOrient(List<Window>windows)
@@ -722,7 +876,7 @@ namespace HVAC_CheckEngine
             //获得楼梯间包含的所有风口集合airTerminalsInStairCase
             List<AirTerminal> airTerminalsInStairCase = HVACFunction.GetRoomContainAirTerminal(stairCase);
             if (airTerminalsInStairCase.Count == 0)
-                throw new ArgumentException("未设置机械加压送风系统");
+                return false;
             //遍历airTerminalsInStairCase中的每一个风口
             Dictionary<long, Fan> fans = new Dictionary<long, Fan>();
             foreach (AirTerminal airTerminal in airTerminalsInStairCase)
@@ -730,7 +884,7 @@ namespace HVAC_CheckEngine
                 //找到风口所连接的风机
                 List<Fan> temp_fans = HVACFunction.GetFanConnectingAirterminal(airTerminal);
                 if (temp_fans.Count <= 0)
-                    throw new modelException("风口未连接风机");
+                    return false;
                 Fan fan = temp_fans[0];
                 //  如果风机未加入到风机集合fans中,
                 if (!fans.ContainsKey(fan.Id.Value))
@@ -774,7 +928,7 @@ namespace HVAC_CheckEngine
             //获得前室中的风口的集合airTerminalsInAtria
             List<AirTerminal> airTerminalsInAtria = HVACFunction.GetRoomContainAirTerminal(atria);
             if (airTerminalsInAtria.Count == 0)
-                throw new ArgumentException("未设置机械加压送风系统");
+                return false;
             //获得airTerminalsInAtria集合中所有风口所连接的风机的集合Fans
             List<Fan> fans = new List<Fan>();
             foreach (AirTerminal airTerminal in airTerminalsInAtria)
@@ -782,7 +936,7 @@ namespace HVAC_CheckEngine
                 fans.AddRange(HVACFunction.GetFanConnectingAirterminal(airTerminal));
             }
             if (fans.Count <= 0)
-                throw new modelException("风口未连接风机");
+                return false;
 
             //获得Fans集合中风机所连接的所有风口的集合airTerminalsConnectToFans
             List<AirTerminal> airTerminalsConnectToFans = new List<AirTerminal>();
@@ -797,7 +951,7 @@ namespace HVAC_CheckEngine
             {
                 //  如果风口不在前室中
                 Room room = HVACFunction.GetRoomOfAirterminal(airTerminal);
-                if (room != null && !room.type.Contains("前室"))
+                if (room .Id==-1 || !room.type.Contains("前室"))
                     //      则返回false
                     return false;
             }
@@ -905,7 +1059,7 @@ namespace HVAC_CheckEngine
 
             foreach (Room room in region.rooms)
             {
-                if (room.type == "走廊" || room.type == "走道")
+                if (room.type .Contains( "走廊") || room.type.Contains("走道"))
                     return room;
             }
             //如果区域没有走廊则抛出异常
@@ -1191,7 +1345,7 @@ namespace HVAC_CheckEngine
                 return getRowIndexOfVaporBoilerThermalEfficiencyLimitTable(boiler);
             }
             else
-                throw new ArgumentException("锅炉热媒类型有误！");
+                throw new ArgumentException("锅炉热媒类型有误");
         }
 
         private static int getRowIndexOfWaterBoilerThermalEfficiencyLimitTable(Boiler boiler)
@@ -1287,7 +1441,7 @@ namespace HVAC_CheckEngine
             else if (globalData.climateZone.Equals("夏热冬暖地区"))
                 return 5;
             else
-                throw new Exception("气候分区有误！");
+                throw new ArgumentException("气候分区有误！");
         }
 
         private static int getColIndexOfChillerCOPLimitTable(Chiller chiller)
@@ -1314,7 +1468,7 @@ namespace HVAC_CheckEngine
                     else
                         return 7;
                 else
-                    throw new Exception("冷水机组类型有误！");
+                    throw new ArgumentException("冷水机组类型有误！");
             }
             else if (chiller.coolingType.Contains("风冷") || chiller.coolingType.Contains("蒸发"))
             {
@@ -1329,10 +1483,10 @@ namespace HVAC_CheckEngine
                     else
                         return 11;
                 else
-                    throw new Exception("冷水机组类型有误！");
+                    throw new ArgumentException("冷水机组类型有误！");
             }
             else
-                throw new Exception("冷却类型有误");
+                throw new ArgumentException("冷却类型有误");
           
         }
 
@@ -1373,7 +1527,7 @@ namespace HVAC_CheckEngine
             else if (globalData.climateZone.Equals("夏热冬暖地区"))
                 return 5;
             else
-                throw new Exception("气候分区有误！");
+                throw new ArgumentException("气候分区有误！");
         }
 
         private static int getColIndexOfEquipmentEERLimitTable(Element equipment)
@@ -1418,7 +1572,7 @@ namespace HVAC_CheckEngine
                     return 8;
             }
             else
-                throw new Exception("设备参数有误！");
+                throw new ArgumentException("设备参数有误！");
 
         }
 
@@ -1456,7 +1610,7 @@ namespace HVAC_CheckEngine
             else if (globalData.climateZone.Equals("夏热冬暖地区"))
                 return 5;
             else
-                throw new Exception("气候分区有误！");
+                throw new ArgumentException("气候分区有误！");
         }
 
         private static int getColIndexOfOutDoorUnitIPLVLimitTable(OutDoorUnit outDoorUnit)
@@ -1484,9 +1638,29 @@ namespace HVAC_CheckEngine
             return elementsByStoryNo;
         }
 
+        public static bool isShaftHasExhaustDuct(Room shaft)
+        {
+            List<Duct> ducts = HVACFunction.GetAllDuctsInRoom(shaft);
+            foreach(Duct duct in ducts)
+            {
+                if (duct.systemType.Contains("排烟"))
+                    return true;
+            }
+            return false;
+        }
+
 
         private static string[] CommonOfenStayRoomTypes = { "办公室", "会议室", "报告厅", "商场" };
-        private static string[] PublicRooms = { "走廊", "走道", "楼梯间", "前室", "避难间" };
+        private static string[] PublicRooms = { "走廊", "走道", "楼梯间", "前室", "避难间","设备用房" };
         private static double error = 0.00001;
     }
+
+    public class violateMessage
+    {
+        public long revitId;
+        public long elementId;
+        public  string message;
+        public  int storeyId;
+    }
+
 }

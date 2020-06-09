@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,21 @@ namespace HVAC_CheckEngine
 
         public override string ToString()
         {
-            return "锅炉";
+            return "Boilers";
+        }
+
+        public override void setParameter(SQLiteDataReader readerBoiler)
+        {
+            base.setParameter(readerBoiler);
+
+            revitId = Convert.ToInt64(readerBoiler["extendProperty"].ToString());
+            type = readerBoiler["BoilerType"].ToString();
+            thermalPower = Convert.ToDouble(readerBoiler["ThermalPower"].ToString());
+            ThermalEfficiency = Convert.ToDouble(readerBoiler["ThermalEfficiency"].ToString());
+            mediaType = readerBoiler["HeatMediumType"].ToString();
+            fuelType = readerBoiler["FuelType"].ToString();
+            evaporationCapacity = Convert.ToDouble(readerBoiler["Evaporation"].ToString());
+            m_iStoryNo = Convert.ToInt32(readerBoiler["StoreyNo"].ToString());
         }
     }
 }

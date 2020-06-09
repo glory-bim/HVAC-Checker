@@ -12,8 +12,11 @@ namespace HVAC_CheckEngine
         {
 
         }
-   
 
+        public override string ToString()
+        {
+            return "UnitAirconditions";
+        }
         public string coolingType { get; set; }
 
         public double? capacity { get; set; }

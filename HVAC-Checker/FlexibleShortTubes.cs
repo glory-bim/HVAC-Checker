@@ -15,5 +15,10 @@ namespace HVAC_CheckEngine
         }
 
         public double? m_length { get; set; } = null;
+
+        public override string ToString()
+        {
+            return "FlexibleShortTubes";
+        }
     }
 }

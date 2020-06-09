@@ -9,10 +9,10 @@ namespace HVAC_CheckEngine
     public struct globalData
     {       
         public static double buildingHeight { get; set; }
-        public static string buildingType { get; set; } 
-          
-        public static bool haveSubentryMeasures { get; set; }
+        public static string buildingType { get; set; } = string.Empty;
 
-        public static string climateZone { get; set; }
+        public static bool haveSubentryMeasures { get; set; } = false;
+
+        public static string climateZone { get; set; } = string.Empty;
     }
 }

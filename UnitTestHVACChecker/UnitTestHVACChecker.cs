@@ -54,10 +54,10 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        if (isNeedReCheck)
-                            componentAnnotation.remark = "此楼梯间需要专家复核";
-                        else
-                            componentAnnotation.remark = string.Empty;
+                       // if (isNeedReCheck)
+                          //  componentAnnotation.remark = "此楼梯间需要专家复核";
+                       // else
+                         //   componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -117,10 +117,10 @@ namespace UnitTestHVACChecker
                     componentAnnotation.Id = Convert.ToInt64(context.DataRow["房间ID"].ToString());
                     componentAnnotation.type = context.DataRow["房间类型"].ToString();
                     bool isNeedReCheck = Boolean.Parse(context.DataRow["是否需要复核"].ToString());
-                    if (isNeedReCheck)
-                        componentAnnotation.remark = "此楼梯间需要专家复核";
-                    else
-                        componentAnnotation.remark = string.Empty;
+                   // if (isNeedReCheck)
+                       // componentAnnotation.remark = "此楼梯间需要专家复核";
+                   // else
+                       // componentAnnotation.remark = string.Empty;
                     componentViolations.Add(componentAnnotation);
                 }
                 //act
@@ -258,13 +258,13 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int remarkType = Convert.ToInt32(row.GetCell(16).ToString());
-                        if (isNeedReCheck)
-                            if (remarkType == 1)
-                                componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
-                            else
-                                componentAnnotation.remark = "此房间需专家核对是否经常有人停留或可燃物较多";
-                        else
-                            componentAnnotation.remark = string.Empty;
+                        //if (isNeedReCheck)
+                           // if (remarkType == 1)
+                               // componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
+                            //else
+                               // componentAnnotation.remark = "此房间需专家核对是否经常有人停留或可燃物较多";
+                        //else
+                           // componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -371,13 +371,13 @@ namespace UnitTestHVACChecker
                     componentAnnotation.type = context.DataRow["房间类型"].ToString();
                     bool isNeedReCheck = Boolean.Parse(context.DataRow["是否需要复核"].ToString());
                     int remarkType = Convert.ToInt32(context.DataRow["复审类型"].ToString());
-                    if (isNeedReCheck)
-                        if (remarkType == 1)
-                            componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
-                        else
-                            componentAnnotation.remark = "此房间需专家核对是否经常有人停留或可燃物较多";
-                    else
-                        componentAnnotation.remark = string.Empty;
+                    //if (isNeedReCheck)
+                        //if (remarkType == 1)
+                            //componentAnnotation.remark = "此房间需专家核对是否人员或可燃物较多";
+                       // else
+                            //componentAnnotation.remark = "此房间需专家核对是否经常有人停留或可燃物较多";
+                   // else
+                        //componentAnnotation.remark = string.Empty;
                     componentViolations.Add(componentAnnotation);
                 }
                 //act
@@ -500,15 +500,15 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int remarkType = (int)row.GetCell(16).NumericCellValue;
-                        if (isNeedReCheck)
-                        {
-                            if (remarkType == 1)
-                                componentAnnotation.remark = "需专家复核此房间是否人员经常停留";
-                            else
-                                componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
-                        }
-                        else
-                            componentAnnotation.remark = string.Empty;
+                        //if (isNeedReCheck)
+                        //{
+                       //     if (remarkType == 1)
+                                //componentAnnotation.remark = "需专家复核此房间是否人员经常停留";
+                        //    else
+                               // componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
+                      // / }
+                      //  else
+                            //componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -618,15 +618,15 @@ namespace UnitTestHVACChecker
                     componentAnnotation.type = context.DataRow["房间类型"].ToString();
                     bool isNeedReCheck = Boolean.Parse(context.DataRow["是否需要复核"].ToString());
                     int remarkType = Convert.ToInt32(context.DataRow["复审类型"].ToString());
-                    if (isNeedReCheck)
-                    {
-                        if (remarkType == 1)
-                            componentAnnotation.remark = "需专家复核此房间是否人员经常停留";
-                        else
-                            componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
-                    }
-                    else
-                        componentAnnotation.remark = string.Empty;
+                   // if (isNeedReCheck)
+                    //{
+                       //if (remarkType == 1)
+                            //componentAnnotation.remark = "需专家复核此房间是否人员经常停留";
+                       // else
+                           // componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
+                    //}
+                  //  else
+                        //componentAnnotation.remark = string.Empty;
                     componentViolations.Add(componentAnnotation);
                 }
                 //act
@@ -750,7 +750,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
+                        //componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -814,7 +814,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
+                        //componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -880,7 +880,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
+                        //componentAnnotation.remark = "需专家复核此房间是否人员经常停留或可燃物较多";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -967,12 +967,12 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = ductId;
                         componentAnnotation.type = "风管";
                         int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此风管未设置防火阀";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此风管未在穿越点附近设置防火阀";
-                        else if (commentType == 3)
-                            componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
+                       // if (commentType == 1)
+                            //componentAnnotation.remark = "此风管未设置防火阀";
+                       // else if (commentType == 2)
+                            //componentAnnotation.remark = "此风管未在穿越点附近设置防火阀";
+                        //else if (commentType == 3)
+                            //componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1046,10 +1046,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = ductId;
                         componentAnnotation.type = "风管";
                         int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此风管未设置防火阀";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
+                        //if (commentType == 1)
+                            //componentAnnotation.remark = "此风管未设置防火阀";
+                       // else if (commentType == 2)
+                           // componentAnnotation.remark = "此风管未在穿越变形缝两侧设置防火阀";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1133,7 +1133,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                        //componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1187,7 +1187,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                       // componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1241,7 +1241,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                       /// componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1295,7 +1295,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1370,7 +1370,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1429,7 +1429,7 @@ namespace UnitTestHVACChecker
                 ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                 componentAnnotation.Id = roomId;
                 componentAnnotation.type = type;
-                componentAnnotation.remark = string.Empty;
+              //  componentAnnotation.remark = string.Empty;
                 componentViolations.Add(componentAnnotation);
 
                 //act
@@ -1487,7 +1487,7 @@ namespace UnitTestHVACChecker
                 ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                 componentAnnotation.Id = roomId;
                 componentAnnotation.type = type;
-                componentAnnotation.remark = string.Empty;
+               // componentAnnotation.remark = string.Empty;
                 componentViolations.Add(componentAnnotation);
 
                 //act
@@ -1549,7 +1549,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -1639,7 +1639,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -1699,7 +1699,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                       // componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -1759,7 +1759,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                      //  componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -1819,7 +1819,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
+                       // componentAnnotation.remark = row.GetCell(sheet_rooms.getColNumber("批注")).ToString(); ;
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -1911,7 +1911,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -1975,7 +1975,139 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      // componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsFalse(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+    }
+
+    [TestClass]
+    public class GB51251_2017_3_3_2_Test
+    {
+        [TestMethod]
+        public void test_pass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+                //arrange
+
+                string comment = "设计满足规范GB51251_2017中第3.3.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        //  componentAnnotation.remark = string.Empty;
+                        componentViolations.Add(componentAnnotation);
+                    }
+
+                }
+
+
+                //act
+                BimReview result = new BimReview();
+                result = HVACChecker.GB51251_2017_3_3_1();
+
+
+                //assert
+                Assert.AreEqual(comment, result.comment);
+                Assert.IsTrue(result.isPassCheck);
+                Custom_Assert.AreComponentViolationListEqual(componentViolations, result.violationComponents);
+            }
+        }
+
+        [TestMethod]
+        public void test_unpass()
+        {
+            using (ShimsContext.Create())
+            {
+                FakeHVACFunction.inital();
+
+                FakeHVACFunction.roomSheetName_new = "房间(不通过)";
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetHighestStoryNoOfRoomRoom = FakeHVACFunction.getHighestStoryNoOfRoom_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFloors = FakeHVACFunction.GetAllFLoorsOfBuilding_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomContainAirTerminalRoom = FakeHVACFunction.GetRoomContainAirTerminal_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetRoomsString = FakeHVACFunction.GetRooms_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetOutletsOfFanFan = FakeHVACFunction.GetOutputLetsOfFan_new;
+
+                HVAC_CheckEngine.Fakes.ShimHVACFunction.GetFanConnectingAirterminalAirTerminal = FakeHVACFunction.GetFanConnectingAirterminal_new;
+                //arrange
+
+                string comment = "设计不满足规范GB51251_2017中第3.3.1条条文规定。";
+
+                List<ComponentAnnotation> componentViolations = new List<ComponentAnnotation>();
+                FakeHVACFunction.ExcelPath_new = @"D:\wangT\HVAC-Checker\UnitTestHVACChecker\测试数据\测试数据_GB51251_2017_3_3_1.xlsx";
+                //打开测试数据文件
+                string importExcelPath = FakeHVACFunction.ExcelPath_new;
+                //打开数据文件
+                IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
+                //读取数据表格
+                ISheet sheet_rooms = workbook.GetSheet(FakeHVACFunction.roomSheetName_new);
+
+                List<Room> rooms = new List<Room>();
+                //依次读取数据行，并根据数据内容创建房间，并加入房间集合中
+                for (int index = 1; index <= sheet_rooms.LastRowNum; ++index)
+                {
+                    IRow row = (IRow)sheet_rooms.GetRow(index);
+                    if (!row.GetCell(sheet_rooms.getColNumber("是否通过")).BooleanCellValue)
+                    {
+                        long roomId = Convert.ToInt64(row.GetCell(sheet_rooms.getColNumber("ID")).ToString());
+                        String type = row.GetCell(sheet_rooms.getColNumber("房间类型")).ToString();
+                        ComponentAnnotation componentAnnotation = new ComponentAnnotation();
+                        componentAnnotation.Id = roomId;
+                        componentAnnotation.type = type;
+                        // componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2043,7 +2175,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2107,7 +2239,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                       // componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2174,7 +2306,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统跨越了防火分区设置";
+                      //  componentAnnotation.remark = "风机所在的排烟系统跨越了防火分区设置";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2237,7 +2369,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统跨越了防火分区设置";
+                     //   componentAnnotation.remark = "风机所在的排烟系统跨越了防火分区设置";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2303,7 +2435,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                    //    componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2366,7 +2498,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                    //    componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2429,7 +2561,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                   //     componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2493,7 +2625,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                   //     componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2557,7 +2689,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                   //     componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2619,7 +2751,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = "风机";
-                        componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
+                   //     componentAnnotation.remark = "风机所在的排烟系统设置高度超过规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2687,7 +2819,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = string.Empty;
+                      //  componentAnnotation.remark = string.Empty;
                         componentViolations.Add(componentAnnotation);
                     }
                     if(row.GetCell(sheet_rooms.getColNumber("是否自然排烟")).BooleanCellValue)
@@ -2697,7 +2829,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
+                     //   componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2759,7 +2891,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此房间未设补风系统";
+                      //  componentAnnotation.remark = "此房间未设补风系统";
                         componentViolations.Add(componentAnnotation);
                     }
                     if (row.GetCell(sheet_rooms.getColNumber("是否自然排烟")).BooleanCellValue)
@@ -2769,7 +2901,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
+                       // componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2831,7 +2963,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此房间未设补风系统";
+                       // componentAnnotation.remark = "此房间未设补风系统";
                         componentViolations.Add(componentAnnotation);
                     }
                     if (row.GetCell(sheet_rooms.getColNumber("是否自然排烟")).BooleanCellValue)
@@ -2841,7 +2973,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
+                       // componentAnnotation.remark = "此房间采用自然排烟方式，请专家核对此房间补风系统是否满足要求";
                         componentViolations.Add(componentAnnotation);
                     }
 
@@ -2912,10 +3044,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if(commentType==1)
-                            componentAnnotation.remark = "此房间补风系统未从室外引入空气";
-                        else if(commentType==2)
-                            componentAnnotation.remark = "此房间补风量小于排烟量的50%";
+                      //  if(commentType==1)
+                      //      componentAnnotation.remark = "此房间补风系统未从室外引入空气";
+                      //  else if(commentType==2)
+                      //      componentAnnotation.remark = "此房间补风量小于排烟量的50%";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -2979,10 +3111,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此房间补风系统未从室外引入空气";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此房间补风量小于排烟量的50%";
+                       // if (commentType == 1)
+                       //     componentAnnotation.remark = "此房间补风系统未从室外引入空气";
+                       // else if (commentType == 2)
+                       //     componentAnnotation.remark = "此房间补风量小于排烟量的50%";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3049,10 +3181,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库未设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库未设置防烟分区";
+                        //if (commentType == 1)
+                       //     componentAnnotation.remark = "此车库未设置排烟系统";
+                       // else if (commentType == 2)
+                       //     componentAnnotation.remark = "此车库未设置防烟分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3115,10 +3247,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库未设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库未设置防烟分区";
+                      //  if (commentType == 1)
+                     //       componentAnnotation.remark = "此车库未设置排烟系统";
+                     //   else if (commentType == 2)
+                      //      componentAnnotation.remark = "此车库未设置防烟分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3181,10 +3313,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库未设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库未设置防烟分区";
+                      //  if (commentType == 1)
+                      //      componentAnnotation.remark = "此车库未设置排烟系统";
+                      //  else if (commentType == 2)
+                      //      componentAnnotation.remark = "此车库未设置防烟分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3254,10 +3386,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库防烟分区大于2000㎡";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库防烟分区跨越防火分区";
+                       // if (commentType == 1)
+                       //     componentAnnotation.remark = "此车库防烟分区大于2000㎡";
+                       // else if (commentType == 2)
+                       //     componentAnnotation.remark = "此车库防烟分区跨越防火分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3325,10 +3457,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库防烟分区大于2000㎡";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库防烟分区跨越防火分区";
+                       // if (commentType == 1)
+                      //      componentAnnotation.remark = "此车库防烟分区大于2000㎡";
+                       /// else if (commentType == 2)
+                        //    componentAnnotation.remark = "此车库防烟分区跨越防火分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3392,10 +3524,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此车库未设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此车库未设置防烟分区";
+                       // if (commentType == 1)
+                       //     componentAnnotation.remark = "此车库未设置排烟系统";
+                       // else if (commentType == 2)
+                        //    componentAnnotation.remark = "此车库未设置防烟分区";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3464,10 +3596,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此房间没有设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                      //  if (commentType == 1)
+                       //     componentAnnotation.remark = "此房间没有设置排烟系统";
+                      //  else if (commentType == 2)
+                      //      componentAnnotation.remark = "此房间没有设置加压送风系统";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3531,10 +3663,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此房间没有设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                       // if (commentType == 1)
+                       //     componentAnnotation.remark = "此房间没有设置排烟系统";
+                      //  else if (commentType == 2)
+                       //     componentAnnotation.remark = "此房间没有设置加压送风系统";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3599,10 +3731,10 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "此房间没有设置排烟系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "此房间没有设置加压送风系统";
+                      //  if (commentType == 1)
+                      //      componentAnnotation.remark = "此房间没有设置排烟系统";
+                      //  else if (commentType == 2)
+                      //      componentAnnotation.remark = "此房间没有设置加压送风系统";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3677,7 +3809,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = smokeCompartmentId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
-                            componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                       //     componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3694,7 +3826,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                       // componentAnnotation.remark = "此风机排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3762,7 +3894,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = smokeCompartmentId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                      //  componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3778,7 +3910,7 @@ namespace UnitTestHVACChecker
                         ComponentAnnotation componentAnnotation = new ComponentAnnotation();
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = type;
-                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                      //  componentAnnotation.remark = "此风机排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3847,7 +3979,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = smokeCompartmentId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
+                      //  componentAnnotation.remark = "防烟分区排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3864,7 +3996,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = fanId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_smokeCompartments.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "此风机排烟量不满足规范要求";
+                       // componentAnnotation.remark = "此风机排烟量不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3928,18 +4060,18 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "公共卫生间未保持负压";
-                        else if(commentType==3)
-                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
-                        else if (commentType == 4)
-                            componentAnnotation.remark = "公共浴室没有设置排风系统";
-                        else if (commentType == 5)
-                            componentAnnotation.remark = "公共浴室未保持负压";
-                        else if (commentType == 6)
-                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                      //  if (commentType == 1)
+                      //      componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                      /// else if (commentType == 2)
+                      //      componentAnnotation.remark = "公共卫生间未保持负压";
+                      //  else if(commentType==3)
+                       //     componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                       // else if (commentType == 4)
+                      //      componentAnnotation.remark = "公共浴室没有设置排风系统";
+                      //  else if (commentType == 5)
+                      //      componentAnnotation.remark = "公共浴室未保持负压";
+                     //  else if (commentType == 6)
+                      //      componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -3998,18 +4130,18 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "公共卫生间未保持负压";
-                        else if (commentType == 3)
-                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
-                        else if (commentType == 4)
-                            componentAnnotation.remark = "公共浴室没有设置排风系统";
-                        else if (commentType == 5)
-                            componentAnnotation.remark = "公共浴室未保持负压";
-                        else if (commentType == 6)
-                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                        //if (commentType == 1)
+                      //      componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                      //  else if (commentType == 2)
+                      //      componentAnnotation.remark = "公共卫生间未保持负压";
+                     //   else if (commentType == 3)
+                      //      componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                     //   else if (commentType == 4)
+                      //      componentAnnotation.remark = "公共浴室没有设置排风系统";
+                      //  else if (commentType == 5)
+                      //      componentAnnotation.remark = "公共浴室未保持负压";
+                      //  else if (commentType == 6)
+                      //      componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -4069,18 +4201,18 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "公共卫生间未保持负压";
-                        else if (commentType == 3)
-                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
-                        else if (commentType == 4)
-                            componentAnnotation.remark = "公共浴室没有设置排风系统";
-                        else if (commentType == 5)
-                            componentAnnotation.remark = "公共浴室未保持负压";
-                        else if (commentType == 6)
-                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                      //  if (commentType == 1)
+                     //       componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                     //   else if (commentType == 2)
+                     //       componentAnnotation.remark = "公共卫生间未保持负压";
+                     //   else if (commentType == 3)
+                     //       componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                      //  else if (commentType == 4)
+                     //       componentAnnotation.remark = "公共浴室没有设置排风系统";
+                     //   else if (commentType == 5)
+                     //       componentAnnotation.remark = "公共浴室未保持负压";
+                     //   else if (commentType == 6)
+                     //       componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -4166,18 +4298,18 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = roomId;
                         componentAnnotation.type = type;
                         int commentType = Convert.ToInt32(row.GetCell(sheet_rooms.getColNumber("批注类型")).ToString());
-                        if (commentType == 1)
-                            componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
-                        else if (commentType == 2)
-                            componentAnnotation.remark = "公共卫生间未保持负压";
-                        else if (commentType == 3)
-                            componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
-                        else if (commentType == 4)
-                            componentAnnotation.remark = "公共浴室没有设置排风系统";
-                        else if (commentType == 5)
-                            componentAnnotation.remark = "公共浴室未保持负压";
-                        else if (commentType == 6)
-                            componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
+                       // if (commentType == 1)
+                      //      componentAnnotation.remark = "公共卫生间没有设置机械排风系统";
+                      //  else if (commentType == 2)
+                      //      componentAnnotation.remark = "公共卫生间未保持负压";
+                     //   else if (commentType == 3)
+                     //       componentAnnotation.remark = "公共卫生间换气次数不满足规范要求";
+                     //   else if (commentType == 4)
+                     //       componentAnnotation.remark = "公共浴室没有设置排风系统";
+                     //   else if (commentType == 5)
+                     //       componentAnnotation.remark = "公共浴室未保持负压";
+                     //   else if (commentType == 6)
+                      //      componentAnnotation.remark = "公共浴室换气次数不满足规范要求";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -4252,7 +4384,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = ductId;
                         componentAnnotation.type = "风管";
                         int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "此风管未设置防火阀";
+                       // componentAnnotation.remark = "此风管未设置防火阀";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -4322,7 +4454,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = ductId;
                         componentAnnotation.type = "风管";
                         int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "此风管未设置防火阀";
+                       // componentAnnotation.remark = "此风管未设置防火阀";
                         componentViolations.Add(componentAnnotation);
                     }
                 }
@@ -4418,7 +4550,7 @@ namespace UnitTestHVACChecker
                         componentAnnotation.Id = ductId;
                         componentAnnotation.type = "风管";
                         int commentType = Convert.ToInt32(row.GetCell(sheet_ducts.getColNumber("批注类型")).ToString());
-                        componentAnnotation.remark = "此风管未设置防火阀";
+                       //componentAnnotation.remark = "此风管未设置防火阀";
                         componentViolations.Add(componentAnnotation);
                     }
                 }

@@ -14,6 +14,9 @@ namespace HVAC_CheckEngine
         {
 
         }
-
+        public override string ToString()
+        {
+            return "WaterMeters";
+        }
     }
 }

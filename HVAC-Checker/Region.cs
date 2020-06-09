@@ -9,7 +9,10 @@ namespace HVAC_CheckEngine
     public  class Region
     {
  
-
+        public Region()
+        {
+            rooms = new List<Room>();
+        }
         public List<Room> rooms{ get; set; } 
     }
 }

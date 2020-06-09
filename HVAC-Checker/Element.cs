@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.SQLite;
 
 namespace HVAC_CheckEngine
 {
@@ -17,5 +18,10 @@ namespace HVAC_CheckEngine
 
         public long? revitId { get; set; } = null;
         public int? m_iStoryNo { get; set; } = null;
+
+        public virtual void setParameter(SQLiteDataReader reader) 
+        {
+            Id= Convert.ToInt64(reader["Id"].ToString());
+        }
     }
 }
