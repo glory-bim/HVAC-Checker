@@ -18,15 +18,17 @@ namespace HVAC_CheckEngine
 	//批注管理的结构体，最后转换为json返回
 	public struct BimReview
 	{
-		public string compulsory;        //规范编号 
+		public string compulsory;        //条文编号 
 		public string comment;       //审查意见  【xxx条通过】
 		public string standardCode; //规范编号  【3-2-1】
+		public string standardName;//规范名称
 		public bool isPassCheck;    //是否通过审查
 		public List<ComponentAnnotation> violationComponents;  // 违规构建【无】	
-		public BimReview(string compulsory_input,string standardCode_input)
+		public BimReview(string standardCode_input, string compulsory_input, string standardName_input)
 		{
 			compulsory = compulsory_input;
 			standardCode = standardCode_input;
+			standardName = standardName_input;
 			comment = string.Empty;
 			isPassCheck = true;
 			violationComponents = new List<ComponentAnnotation>();

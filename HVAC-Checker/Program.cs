@@ -30,8 +30,8 @@ namespace HVAC_CheckEngine
             //}
             //catch(Exception e)
             //{
-                //Console.WriteLine(e.Message);
-                //Console.ReadLine();
+            //    Console.WriteLine(e.Message);
+            //    Console.ReadLine();
             //}
         }
 
@@ -40,7 +40,7 @@ namespace HVAC_CheckEngine
             CheckResult checkResult = new CheckResult();
             try
             {
-                checkResult.addBimReview(HVACChecker.GB50016_2014_8_1_9());
+                //checkResult.addBimReview(HVACChecker.GB50016_2014_8_1_9());
                // checkResult.addBimReview(HVACChecker.GB50016_2014_8_5_1());
                // checkResult.addBimReview(HVACChecker.GB50016_2014_8_5_2());
                 checkResult.addBimReview(HVACChecker.GB50016_2014_8_5_3());
@@ -74,16 +74,17 @@ namespace HVAC_CheckEngine
              //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_4_7());
              //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_4_10());
                 checkResult.addBimReview(HVACChecker.GB51251_2017_4_4_11());
-             //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_1());
-             //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_2());
-             //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_6());
-             //   checkResult.addBimReview(HVACChecker.GB50067_2014_8_2_1());
-             //   checkResult.addBimReview(HVACChecker.GB50067_2014_8_2_2());
-             //   checkResult.addBimReview(HVACChecker.GB50157_2013_28_4_2());
-             //  checkResult.addBimReview(HVACChecker.GB50157_2013_28_4_22());
-             //   checkResult.addBimReview(HVACChecker.GB50490_2009_8_4_17());
-             //   checkResult.addBimReview(HVACChecker.GB50490_2009_8_4_19());
-             //   checkResult.addBimReview(HVACChecker.GB50041_2008_15_3_7());
+                checkResult.addBimReview(HVACChecker.GB50738_2011_8_4_2());
+                //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_1());
+                //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_2());
+                //   checkResult.addBimReview(HVACChecker.GB51251_2017_4_5_6());
+                //   checkResult.addBimReview(HVACChecker.GB50067_2014_8_2_1());
+                //   checkResult.addBimReview(HVACChecker.GB50067_2014_8_2_2());
+                //   checkResult.addBimReview(HVACChecker.GB50157_2013_28_4_2());
+                //  checkResult.addBimReview(HVACChecker.GB50157_2013_28_4_22());
+                //   checkResult.addBimReview(HVACChecker.GB50490_2009_8_4_17());
+                //   checkResult.addBimReview(HVACChecker.GB50490_2009_8_4_19());
+                //   checkResult.addBimReview(HVACChecker.GB50041_2008_15_3_7());
                 checkResult.state = 1;
                 checkResult.message = "succeed";
             }

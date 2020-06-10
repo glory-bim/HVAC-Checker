@@ -29,7 +29,7 @@ namespace HVAC_CheckEngine
 
         public static BimReview GB50016_2014_8_5_1()
         {
-            BimReview result = new BimReview("GB50016_2014", "8.5.1");
+            BimReview result = new BimReview("GB50016-2014", "8.5.1", "《建筑设计防火规范》");
 
             //获得建筑中所有防烟楼梯间、前室及避难间的集合
             List<Room> rooms = new List<Room>();
@@ -70,7 +70,7 @@ namespace HVAC_CheckEngine
             //经过以上操作后，如果审查通过，则在审查结果中注明审查通过
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《建筑设计防火规范》(GB50016_2014)中第8.5.1条条文规定。";
+                result.comment = "设计满足《建筑设计防火规范》(GB50016-2014)中第8.5.1条条文规定。";
             }
             //                如果审查不通过，则在审查结果中注明审查未通过，并写明原因
             else
@@ -81,7 +81,7 @@ namespace HVAC_CheckEngine
         }
         private static string build_GB50016_2014_8_5_1_ViolationComment(BimReview result, bool isNeedRecheck)
         {
-            string comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第8.5.1条条文规定。";
+            string comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第8.5.1条条文规定。";
 
             foreach (ComponentAnnotation component in result.violationComponents)
             {
@@ -107,7 +107,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50016_2014_8_5_2()
         {
             //对审查结果进行初始化
-            BimReview result = new BimReview("GB50016_2014", "8.5.2");
+            BimReview result = new BimReview("GB50016-2014", "8.5.2", "《建筑设计防火规范》");
             //如果建筑类型为厂房或仓库
             List<Room> rooms = new List<Room>();
             List<Room> rooms_Class_C_productPlant = new List<Room>();
@@ -203,7 +203,7 @@ namespace HVAC_CheckEngine
             //   则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《建筑设计防火规范》(GB50016_2014)中第8.5.2条条文规定。";
+                result.comment = "设计满足《建筑设计防火规范》(GB50016-2014)中第8.5.2条条文规定。";
             }
             //如果审查不通过
             //   则在审查结果中注明审查不通过的相关内容
@@ -217,7 +217,7 @@ namespace HVAC_CheckEngine
 
         private static string build_GB50016_2014_8_5_2_ViolationComment(BimReview result,bool isNeedRecheck)
         {
-            string comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第8.5.2条条文规定。";
+            string comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第8.5.2条条文规定。";
 
             foreach (ComponentAnnotation component in result.violationComponents)
             {
@@ -241,7 +241,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50016_2014_8_5_3()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50016_2014", "8.5.3");
+            BimReview result = new BimReview("GB50016-2014", "8.5.3", "《建筑设计防火规范》");
 
             List<Room> Rooms = new List<Room>();
             List<Room> between100And300sqmOvergroundCommonRooms = new List<Room>();
@@ -347,7 +347,7 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《建筑设计防火规范》(GB50016_2014)中第8.5.3条条文规定。";
+                result.comment = "设计满足《建筑设计防火规范》(GB50016-2014)中第8.5.3条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
@@ -361,7 +361,7 @@ namespace HVAC_CheckEngine
 
         private static string build_GB50016_2014_8_5_3_ViolationComment(BimReview result, bool isNeedRecheck_people,bool isNeedRecheck_material)
         {
-            string comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第8.5.3条条文规定。不满足原因：未设置排烟系统；";
+            string comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第8.5.3条条文规定。不满足原因：未设置排烟系统；";
 
             foreach (ComponentAnnotation component in result.violationComponents)
             {
@@ -405,7 +405,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50016_2014_8_5_4()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50016_2014", "8.5.4");
+            BimReview result = new BimReview("GB50016-2014", "8.5.4", "《建筑设计防火规范》");
             try
             {
                 //获得所有地下及半地下大于50㎡房间的集合undergroundLargerThan50sqmRooms
@@ -468,19 +468,19 @@ namespace HVAC_CheckEngine
                 //则在审查结果批注中注明审查通过相关内容
                 if (result.isPassCheck)
                 {
-                    result.comment = "设计满足《建筑设计防火规范》(GB50016_2014)中第8.5.4条条文规定。";
+                    result.comment = "设计满足《建筑设计防火规范》(GB50016-2014)中第8.5.4条条文规定。";
                 }
                 //如果审查不通过
                 //则在审查结果中注明审查不通过的相关内容
                 else
                 {
-                    result.comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第8.5.4条条文规定。不满足原因:未设置排烟系统；请专家复核：相关违规房间是否人员长期停留或可燃物较多";
+                    result.comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第8.5.4条条文规定。不满足原因:未设置排烟系统；请专家复核：相关违规房间是否人员长期停留或可燃物较多";
                 }
             }
             catch (ArgumentException e)
             {
                 result.isPassCheck = false;
-                result.comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第8.5.4条条文规定。不满足原因:"+e.Message;
+                result.comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第8.5.4条条文规定。不满足原因:"+e.Message;
             }
             return result;
         }
@@ -520,7 +520,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50016_2014_9_3_11()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50016_2014", "9.3.11");
+            BimReview result = new BimReview("GB50016-2014", "9.3.11", "《建筑设计防火规范》");
             string remark = string.Empty;
             Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //获得所有防火分区对象
@@ -625,13 +625,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《建筑设计防火规范》(GB50016_2014)中第9.3.11条条文规定。";
+                result.comment = "设计满足《建筑设计防火规范》(GB50016-2014)中第9.3.11条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《建筑设计防火规范》(GB50016_2014)中第9.3.11条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《建筑设计防火规范》(GB50016-2014)中第9.3.11条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -654,7 +654,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_1_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "3.1.2");
+            BimReview result = new BimReview("GB51251-2017", "3.1.2", "《建筑防排烟系统技术标准》");
             bool isPublicBuildingHeigherThan50m = globalData.buildingType.Contains("公共建筑") &&
                 globalData.buildingHeight > 50;
             bool isIndustrialBuildingHeigherThan50m = globalData.buildingType.Contains("工业") &&
@@ -713,7 +713,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_1_4()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "3.1.4");
+            BimReview result = new BimReview("GB51251-2017", "3.1.4", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             List<Room> atrias = new List<Room>();
             //获得所有的地下防烟楼梯间前室、消防电梯前室及共用前室
@@ -776,7 +776,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_1_5()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.1.5");
+            BimReview result = new BimReview("GB51251-2017", "3.1.5", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             //获取所有防烟楼梯间集合staircases
             //依次遍历每个防烟楼梯间
@@ -884,7 +884,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_2_1()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "3.2.1");
+            BimReview result = new BimReview("GB51251-2017", "3.2.1", "《建筑防排烟系统技术标准》");
             //获取所有的封闭楼梯间及防烟楼梯间的集合stairCases
             List<Room> stairCases = new List<Room>();
             string remark = string.Empty;
@@ -1022,7 +1022,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_3_1()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.3.1");
+            BimReview result = new BimReview("GB51251-2017", "3.3.1", "《建筑防排烟系统技术标准》");
             //获得所有防烟楼梯间及封闭楼梯间
             List<Room> stairCases = new List<Room>();
             stairCases.AddRange(HVACFunction.GetRooms("防烟楼梯间"));
@@ -1119,7 +1119,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_3_11()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "3.3.11");
+            BimReview result = new BimReview("GB51251-2017", "3.3.11", "《建筑防排烟系统技术标准》");
             //获得所有封闭楼梯间、防烟楼梯间的集合
             List<Room> stairCases = new List<Room>();
             stairCases.AddRange(HVACFunction.GetRooms("封闭楼梯间"));
@@ -1215,7 +1215,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_3_12()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "3.3.11");
+            BimReview result = new BimReview("GB51251-2017", "3.3.11", "《建筑防排烟系统技术标准》");
            
             //如果审查通过
             //则在审查结果批注中注明审查通过相关内容
@@ -1249,7 +1249,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_4_1()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.4.1");
+            BimReview result = new BimReview("GB51251-2017", "4.4.1", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             //通过排烟口找到所有排烟风机
             List<Fan> fans = assistantFunctions.getFansOfSomeSyetemType("排烟");
@@ -1320,7 +1320,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_4_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.4.2");
+            BimReview result = new BimReview("GB51251-2017", "4.4.2", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             //如果建筑类型为公共建筑且建筑高度大于50m或者建筑类型为住宅且建筑高度大于100m
             if (globalData.buildingType.Contains("公共建筑") && globalData.buildingHeight > 50 || globalData.buildingType.Contains("住宅") && globalData.buildingHeight > 100)
@@ -1377,7 +1377,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_5_1()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.5.1");
+            BimReview result = new BimReview("GB51251-2017", "4.5.1", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             bool isNeedRecheck = false;
             //获取所有房间的集合rooms
@@ -1475,9 +1475,9 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_5_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.5.2");
+            BimReview result = new BimReview("GB51251-2017", "4.5.2", "《建筑防排烟系统技术标准》");
             //获得所有房间
-            List<Room> rooms = HVACFunction.GetRooms("");
+            List <Room> rooms = HVACFunction.GetRooms("");
 
             string remark = string.Empty;
             //依次遍历所有房间
@@ -1567,7 +1567,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_5_6()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.5.6");
+            BimReview result = new BimReview("GB51251-2017", "4.5.6", "《建筑防排烟系统技术标准》");
             //获得所有房间
             List<Room> rooms = HVACFunction.GetRooms("");
 
@@ -1668,7 +1668,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_4_10()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "4.4.10");
+            BimReview result = new BimReview("GB51251-2017", "4.4.10", "《建筑防排烟系统技术标准》");
 
             Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
 
@@ -1779,7 +1779,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_4_11()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB51251_2017", "4.4.11");
+            BimReview result = new BimReview("GB51251-2017", "4.4.11", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             //获得所有的竖井
             List<Room> shafts = HVACFunction.GetRooms("竖井");
@@ -1862,7 +1862,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50067_2014_8_2_1()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50067_2014", "8.2.1");
+            BimReview result = new BimReview("GB50067-2014", "8.2.1", "《汽车库.修车库.停车场设计防火规范》");
             //获得所有的汽车库修车库
             List<Room> garages = HVACFunction.GetRooms("汽车库");
             string remark =string.Empty;
@@ -1906,13 +1906,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50067_2014中第8.2.1条条文规定。";
+                result.comment = "设计满足规范GB50067-2014中第8.2.1条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50067_2014中第8.2.1条条文规定。";
+                result.comment = "设计不满足规范GB50067-2014中第8.2.1条条文规定。";
             }
 
             return result;
@@ -1937,9 +1937,9 @@ namespace HVAC_CheckEngine
         public static BimReview GB50067_2014_8_2_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50067_2014", "8.2.2");
+            BimReview result = new BimReview("GB50067-2014", "8.2.2", "《汽车库.修车库.停车场设计防火规范》");
             //获得所有的汽车库、修车库
-            List<Room> garages = HVACFunction.GetRooms("汽车库");
+            List <Room> garages = HVACFunction.GetRooms("汽车库");
             garages.AddRange(HVACFunction.GetRooms("修车库"));
 
             string remark =string.Empty;
@@ -1975,13 +1975,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《汽车库、修车库、停车场设计防火规范》(GB50067_2014)中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
+                result.comment = "设计满足《汽车库、修车库、停车场设计防火规范》(GB50067-2014)中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《汽车库、修车库、停车场设计防火规范》(GB50067_2014)中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分。不满足原因："+remark;
+                result.comment = "设计不满足《汽车库、修车库、停车场设计防火规范》(GB50067-2014)中第8.2.2条条文规定。请专家复核防烟分区是否采用挡烟垂壁、隔墙或从顶棚下突出不小于0．5m的梁划分。不满足原因："+remark;
             }
 
             return result;
@@ -2008,7 +2008,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50157_2013_28_4_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50157_2013", "28.4.2");
+            BimReview result = new BimReview("GB50157-2013", "28.4.2", "《地铁设计规范》");
             string remark = string.Empty;
             //若果建筑类型为地铁建筑
             if (globalData.buildingType.Contains("地铁建筑"))
@@ -2097,7 +2097,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50490_2009_8_4_19()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50490_2009", "8.4.19");
+            BimReview result = new BimReview("GB50490-2009", "8.4.19", "《城市轨道交通技术规范》");
             string remark = string.Empty ;
             //如果建筑类型为城市轨道交通建筑
             if (globalData.buildingType.Contains("城市轨道交通建筑"))
@@ -2240,7 +2240,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50736_2012_6_3_6()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50736_2012", "6.3.6");
+            BimReview result = new BimReview("GB50736-2012", "6.3.6","《民用建筑供暖通风与空气调节设计规范》");
             string remark = string.Empty;
             //获得所有的公共卫生间、公共浴室
             List<Room> rooms = HVACFunction.GetRooms("公共卫生间");
@@ -2352,13 +2352,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.3.6条条文规定。";
+                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.3.6条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.3.6条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.3.6条条文规定。不满足原因："+remark;
             }
 
             return result;
@@ -2381,7 +2381,7 @@ namespace HVAC_CheckEngine
 
         public static BimReview GB50736_2012_6_6_13()
         {  //初始化审查结果
-            BimReview result = new BimReview("GB50736_2012", "6.6.13");
+            BimReview result = new BimReview("GB50736-2012", "6.6.13", "《民用建筑供暖通风与空气调节设计规范》");
             List<Element> equipments = new List<Element>();
 
             string remark = string.Empty;
@@ -2447,7 +2447,7 @@ namespace HVAC_CheckEngine
 
         public static BimReview GB50736_2012_7_4_13()
         {  //初始化审查结果
-            BimReview result = new BimReview("GB50736_2012", "7.4.13");
+            BimReview result = new BimReview("GB50736-2012", "7.4.13", "《民用建筑供暖通风与空气调节设计规范》");
             //获得所有回风口对象的集合
             List<AirTerminal> airTerminals =new List<AirTerminal>();
             airTerminals = HVACFunction.GetAirterminals("回风");
@@ -2492,13 +2492,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第7.4.13条条文规定。";
+                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第7.4.13条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第7.4.13条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第7.4.13条条文规定。不满足原因："+remark;
             }
 
             return result;
@@ -2532,7 +2532,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50157_2013_28_4_22()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50157_2013", "28.4.22");
+            BimReview result = new BimReview("GB50157-2013", "28.4.22", "《地铁设计规范》");
             string remark = string.Empty;
             Dictionary<Duct, List<PointInt>> ducts = new Dictionary<Duct, List<PointInt>>(new ElementEqualityComparer());
             //获得所有防火分区对象
@@ -2607,13 +2607,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《地铁设计规范》(GB50157_2013)中第28.4.22条条文规定。";
+                result.comment = "设计满足《地铁设计规范》(GB50157-2013)中第28.4.22条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《地铁设计规范》(GB50157_2013)中第28.4.22条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《地铁设计规范》(GB50157-2013)中第28.4.22条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -2658,7 +2658,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50736_2012_6_6_5()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50736_2012", "6.6.5");
+            BimReview result = new BimReview("GB50736-2012", "6.6.5", "《民用建筑供暖通风与空气调节设计规范》");
             string remark = string.Empty;
             //获得所有风机对象的集合
             List<Fan> fans = HVACFunction.GetAllFans();
@@ -2758,13 +2758,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.6.5条条文规定。";
+                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.6.5条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.6.5条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.6.5条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -2799,7 +2799,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50736_2012_6_6_7()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50736_2012", "6.6.7");
+            BimReview result = new BimReview("GB50736-2012", "6.6.7", "《民用建筑供暖通风与空气调节设计规范》");
             string remark = string.Empty;
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach(Fan fan in fans)
@@ -2853,11 +2853,11 @@ namespace HVAC_CheckEngine
 
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.6.7条条文规定。";
+                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.6.7条条文规定。";
             }  
             else
             {
-                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第6.6.7条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第6.6.7条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -2887,7 +2887,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50736_2012_9_1_5()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50736_2012", "9.1.5");
+            BimReview result = new BimReview("GB50736-2012", "9.1.5", "《民用建筑供暖通风与空气调节设计规范》");
             result.isPassCheck = true;
             string remark = string.Empty;
            List <Room> rooms = HVACFunction.GetRooms("锅炉房");
@@ -2937,11 +2937,11 @@ namespace HVAC_CheckEngine
             }
             if (result.isPassCheck)
             {
-                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第9.1.5条条文规定。";
+                result.comment = "设计满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第9.1.5条条文规定。";
             }
             else
             {
-                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736_2012)中第9.1.5条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足《民用建筑供暖通风与空气调节设计规范》(GB50736-2012)中第9.1.5条条文规定。不满足原因："+remark;
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
@@ -2972,7 +2972,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_5_2()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.5.2");
+            BimReview result = new BimReview("GB50189-2015", "4.5.2", "《公共建筑节能设计标准》");
             string remark = string.Empty; ;
             result.isPassCheck = true;
             List<Room> rooms = HVACFunction.GetRooms("锅炉房");
@@ -3019,11 +3019,11 @@ namespace HVAC_CheckEngine
             }
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50189_2015中第4.5.2条条文规定。";
+                result.comment = "设计满足规范GB50189-2015中第4.5.2条条文规定。";
             }
             else
             {
-                result.comment = "设计不满足规范GB50189_2015中第4.5.2条条文规定。不满足的原因："+remark; ;
+                result.comment = "设计不满足规范GB50189-2015中第4.5.2条条文规定。不满足的原因："+remark; ;
             }
             return result;
         }
@@ -3044,7 +3044,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_2_5()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.2.5");
+            BimReview result = new BimReview("GB50189-2015", "4.2.5", "《公共建筑节能设计标准》");
             string remark = string.Empty; ;
             List<Boiler> boilers = new List<Boiler>();
             //获得所有锅炉对象的集合
@@ -3078,13 +3078,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50189_2015中第4.2.5条条文规定。";
+                result.comment = "设计满足规范GB50189-2015中第4.2.5条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50189_2015中第4.2.5条条文规定。不满足原因:"+remark;
+                result.comment = "设计不满足规范GB50189-2015中第4.2.5条条文规定。不满足原因:"+remark;
             }
 
             return result;
@@ -3115,7 +3115,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_2_10()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.2.10");
+            BimReview result = new BimReview("GB50189-2015", "4.2.10", "《公共建筑节能设计标准》");
             string remark = string.Empty; ;
             List<Chiller> chillers = new List<Chiller>();
             //获得所有冷水机组的集合
@@ -3181,13 +3181,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50189_2015中第4.2.10条条文规定。";
+                result.comment = "设计满足规范GB50189-2015中第4.2.10条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50189_2015中第4.2.10条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB50189-2015中第4.2.10条条文规定。不满足原因："+remark;
             }
 
             return result;
@@ -3212,7 +3212,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_2_14()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.2.14");
+            BimReview result = new BimReview("GB50189-2015", "4.2.14", "《公共建筑节能设计标准》");
             List<UnitAircondition> equipments = new List<UnitAircondition>();
             string remark = string.Empty;
             //获得所有室外机的集合
@@ -3252,13 +3252,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50189_2015中第4.2.14条条文规定。";
+                result.comment = "设计满足规范GB50189-2015中第4.2.14条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50189_2015中第4.2.14条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB50189-2015中第4.2.14条条文规定。不满足原因："+remark;
             }
 
             return result;
@@ -3280,7 +3280,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_2_17()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.2.17");
+            BimReview result = new BimReview("GB50189-2015", "4.2.17", "《公共建筑节能设计标准》");
             List<OutDoorUnit> outDoorUnits = new List<OutDoorUnit>();
             string remark = string.Empty;
             //获得所有VRV室外机的集合
@@ -3345,7 +3345,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50189_2015_4_2_19()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50189_2015", "4.2.19");
+            BimReview result = new BimReview("GB50189-2015", "4.2.19", "《公共建筑节能设计标准》");
             List<AbsorptionChiller> absorptionChillers = new List<AbsorptionChiller>();
             string remark = string.Empty;
             //获得所有直燃机的集合
@@ -3411,7 +3411,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50016_2014_9_3_16()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50016_2014", "9.3.16");
+            BimReview result = new BimReview("GB50016-2014", "9.3.16", "《建筑设计防火规范》");
             
             List<Room> rooms = HVACFunction.GetRooms("锅炉房");
             string remark = string.Empty;
@@ -3465,13 +3465,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50016_2014中第9.3.16条条文规定。";
+                result.comment = "设计满足规范GB50016-2014中第9.3.16条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50016_2014中第9.3.16条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB50016-2014中第9.3.16条条文规定。不满足原因："+remark;
             }
 
             return result;
@@ -3499,7 +3499,7 @@ namespace HVAC_CheckEngine
         {
             string remark = string.Empty;
             //初始化审查结果
-            BimReview result = new BimReview("GB50016_2014", "8.1.9");
+            BimReview result = new BimReview("GB50016-2014", "8.1.9", "《建筑设计防火规范》");
             try
             {
                 //获得所有风机对象
@@ -3561,13 +3561,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50016_2014中第8.1.9条条文规定。";
+                result.comment = "设计满足规范GB50016-2014中第8.1.9条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50016_2014中第8.1.9条条文规定。不满足原因：" + remark;
+                result.comment = "设计不满足规范GB50016-2014中第8.1.9条条文规定。不满足原因：" + remark;
             }
 
             return result;
@@ -3593,7 +3593,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_2_2()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.2.2");
+            BimReview result = new BimReview("GB51251-2017", "3.2.2", "《建筑防排烟系统技术标准》");
             //获得所有前室的集合
             List<Room> anteRooms = HVACFunction.GetRooms("前室");
             string remark = string.Empty;
@@ -3614,13 +3614,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB51251_2017中第3.2.2条条文规定。";
+                result.comment = "设计满足规范《建筑防排烟系统技术标准》（GB51251-2017）中第3.2.2条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB51251_2017中第3.2.2条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范《建筑防排烟系统技术标准》（GB51251-2017）中第3.2.2条条文规定。不满足原因：" + remark;
             }
             return result;
         }
@@ -3647,7 +3647,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_2_3()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.2.3");
+            BimReview result = new BimReview("GB51251_2017", "3.2.3", "《建筑防排烟系统技术标准》");
             //获取所有避难层房间
             List<Room> rooms = HVACFunction.GetRooms("避难");
             string remark = string.Empty;
@@ -3702,13 +3702,13 @@ namespace HVAC_CheckEngine
                 //则在审查结果批注中注明审查通过相关内容
                 if (result.isPassCheck)
                 {
-                    result.comment = "设计满足规范GB51251_2017中第3.2.3条条文规定。";
+                    result.comment = "设计满足规范GB51251-2017中第3.2.3条条文规定。";
                 }
                 //如果审查不通过
                 //则在审查结果中注明审查不通过的相关内容
                 else
                 {
-                    result.comment = "设计不满足规范GB51251_2017中第3.2.3条条文规定。不满足原因："+remark;
+                    result.comment = "设计不满足规范GB51251-2017中第3.2.3条条文规定。不满足原因："+remark;
                 }
 
 
@@ -3735,7 +3735,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_3_3_7()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            BimReview result = new BimReview("GB51251-2017", "3.3.7", "《建筑防排烟系统技术标准》");
             //获得所有风机对象
             List<Fan> fans = HVACFunction.GetAllFans();
 
@@ -3791,13 +3791,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB51251_2017中第3.2.7条条文规定。";
+                result.comment = "设计满足规范GB51251-2017中第3.2.7条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB51251_2017中第3.2.7条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB51251-2017中第3.2.7条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -3836,7 +3836,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_2_4()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "4.2.4");
+            BimReview result = new BimReview("GB51251-2017", "4.2.4", "《建筑防排烟系统技术标准》");
             string remark = string.Empty;
             if (globalData.buildingType.Contains("公共建筑") || globalData.buildingType.Contains("工业建筑"))
             {
@@ -3929,13 +3929,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB51251_2017中第4.2.4条条文规定。";
+                result.comment = "设计满足规范GB51251-2017中第4.2.4条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB51251_2017中第4.2.4条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB51251-2017中第4.2.4条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -3949,7 +3949,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB51251_2017_4_4_7()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "4.4.7");
+            BimReview result = new BimReview("GB51251-2017", "4.4.7", "《建筑防排烟系统技术标准》");
             //获得所有风机对象
             List<Fan> fans = HVACFunction.GetAllFans();
             string remark = string.Empty;
@@ -4004,13 +4004,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB51251_2017中第4.4.7条条文规定。";
+                result.comment = "设计满足规范GB51251-2017中第4.4.7条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB51251_2017中第4.4.7条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB51251-2017中第4.4.7条条文规定。不满足原因："+remark;
             }
             return result;
         }
@@ -4043,10 +4043,10 @@ namespace HVAC_CheckEngine
         //则在审查结果中注明审查不通过的相关内容
 
 
-        public static BimReview GB51251_2017_8_4_2()
+        public static BimReview GB50738_2011_8_4_2()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50736_2017", "8.4.2");
+            BimReview result = new BimReview("GB50738-2017", "8.4.2","《通风与空调工程施工规范》");
             List<Fan> fans = HVACFunction.GetAllFans();
             string remark = string.Empty;
             foreach (Fan fan in fans)
@@ -4100,13 +4100,13 @@ namespace HVAC_CheckEngine
 
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50736_2017中第8.4.2条条文规定。";
+                result.comment = "设计满足规范《通风与空调工程施工规范》(GB50738-2011)中第8.4.2条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50736_2017中第8.4.2条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范《通风与空调工程施工规范》(GB50738-2011)中第8.4.2条条文规定。不满足原因：" + remark;
             }
             return result;
         }
@@ -4116,10 +4116,10 @@ namespace HVAC_CheckEngine
         //    穿越建筑物变形缝墙体的风管两端外侧应设置长度为150mm～300mm的柔性短管，柔性短管距变形缝墙体的距离宜为150mm～200mm(图8．4．3-2)，
         //柔性短管的保温性能应符合风管系统功能要求。保温不用管，专家审
 
-        public static BimReview GB51251_2017_8_4_3()
+        public static BimReview GB50738_2011_8_4_3()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB51251_2017", "3.3.7");
+            BimReview result = new BimReview("GB50738-2011", "8.4.3", "《通风与空调工程施工规范》");
             List<Room> rooms = HVACFunction.GetRooms("避难");
            
             foreach (Room room in rooms)
@@ -4157,7 +4157,7 @@ namespace HVAC_CheckEngine
         //金属柔性短管长度宜为150mm～300mm，并应满足结构变形的要求，其保温性能应符合管道系统功能要求。
         public static BimReview GB51251_2017_11_1_4()
         {
-            BimReview result = new BimReview("GB50736_2017", "11.1.4");
+            BimReview result = new BimReview("GB50738-2011", "11.1.4", "《通风与空调工程施工规范》");
 
             List<Fan> fans = HVACFunction.GetAllFans();
             foreach (Fan fan in fans)
@@ -4203,13 +4203,13 @@ namespace HVAC_CheckEngine
 
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50736_2012中第6.6.5条条文规定。";
+                result.comment = "设计满足规范GB50736-2012中第6.6.5条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50736_2012中第6.6.5条条文规定。";
+                result.comment = "设计不满足规范GB50736-2012中第6.6.5条条文规定。";
             }
             return result;
         }
@@ -4252,7 +4252,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50490_2009_8_4_17()
         {
             //将审查结果初始化
-            BimReview result = new BimReview("GB50490_2009", "8.4.17");
+            BimReview result = new BimReview("GB50490-2009", "8.4.17", "《城市轨道交通技术规范》");
             string remark = string.Empty;
             if (globalData.buildingType.Contains("城市轨道交通"))
             {
@@ -4350,13 +4350,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50490_2009中第8.4.17条条文规定。";
+                result.comment = "设计满足规范GB50490-2009中第8.4.17条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50490_2009中第8.4.17条条文规定。不满足原因:"+remark;
+                result.comment = "设计不满足规范GB50490-2009中第8.4.17条条文规定。不满足原因:"+remark;
             }
             return result;
         }
@@ -4403,7 +4403,7 @@ namespace HVAC_CheckEngine
         public static BimReview GB50041_2008_15_3_7()
         {
             //初始化审查结果
-            BimReview result = new BimReview("GB50041_2008", "15.3.7");
+            BimReview result = new BimReview("GB50041-2008", "15.3.7", "《城市轨道交通技术规范》");
             //获取锅炉房集合
             List<Room> rooms = HVACFunction.GetRooms("锅炉房");
             string remark = string.Empty;
@@ -4493,13 +4493,13 @@ namespace HVAC_CheckEngine
             //则在审查结果批注中注明审查通过相关内容
             if (result.isPassCheck)
             {
-                result.comment = "设计满足规范GB50041_2008中第15.3.7条条文规定。";
+                result.comment = "设计满足规范GB50041-2008中第15.3.7条条文规定。";
             }
             //如果审查不通过
             //则在审查结果中注明审查不通过的相关内容
             else
             {
-                result.comment = "设计不满足规范GB50041_2008中第15.3.7条条文规定。不满足原因："+remark;
+                result.comment = "设计不满足规范GB50041-2008中第15.3.7条条文规定。不满足原因："+remark;
             }
 
             return result;
